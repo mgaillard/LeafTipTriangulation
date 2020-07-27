@@ -7,7 +7,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/closest_point.hpp>
 #include <glm/gtx/string_cast.hpp>
-#include <glm/gtc/constants.hpp>
+
+#include <dlib/optimization/max_cost_assignment.h>
 
 #include "OBJWriter.h"
 
@@ -298,9 +299,53 @@ float similarity(
 	return glm::distance(point0, glm::vec2(q0)) + glm::distance(point1, glm::vec2(q1));
 }
 
+std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
+	const std::vector<Camera>& cameras,
+	const std::vector<std::vector<glm::vec2>>& points2D,
+	const std::vector<std::vector<Ray>>& rays)
+{
+	// TODO: Support more than 2 views
+	
+	dlib::matrix<long> cost(rays[0].size(), rays[1].size());
+	for (int i = 0; i < rays[0].size(); i++)
+	{
+		std::vector<float> row(rays[1].size(), 0.f);
+		for (int j = 0; j < rays[1].size(); j++)
+		{
+			const auto dist = similarity(cameras[0],
+				                         rays[0][i],
+				                         points2D[0][i],
+				                         cameras[1],
+				                         rays[1][j],
+				                         points2D[1][j]);
+
+			const auto integerDist = static_cast<long>(std::round(dist * 1000.f));
+			cost(i, j) = -integerDist;
+		}
+	}
+
+	// Compute best assignment between pairs of points
+	const auto assignment = dlib::max_cost_assignment(cost);
+
+	// A list of 3D points defined by a list of index of rays
+	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
+	
+	for (unsigned int i = 0; i < assignment.size(); i++)
+	{
+		// Add a 3D point defined by the intersection of 2 rays
+		// Ray i from camera 0
+		// Ray assignment[i] from camera 1
+		setsOfRays.push_back(
+			{{0, i}, {1, assignment[i]}}
+		);
+	}
+
+	return setsOfRays;
+}
+
 int main(int argc, char *argv[])
 {
-	const int numberPoints3D = 1;
+	const int numberPoints3D = 4;
 	const float spherePointsRadius = 1.f;
 	const int numberCameras = 2;
 	const float sphereCamerasRadius = 5.f;
@@ -314,21 +359,17 @@ int main(int argc, char *argv[])
 
 	// Draw the scene in OBJ for Debugging
 	exportSceneAsOBJ(points3D, rays, "scene.obj");
-	// TODO: Export the projections in PNG images	
-	
-	// Compute a similarity score between two points
-	const auto d = similarity(cameras[0],
-		                      rays[0][0],
-		                      points2D[0][0],
-		                      cameras[1],
-		                      rays[1][0],
-		                      points2D[1][0]);
 
-	std::cout << d << std::endl;
-
-	// TODO: Compute similarity between all points between the two cameras
+	// Compute similarity between all points between the two cameras
+	// Matching of points using the Hungarian algorithm
+	const auto setsOfRays = findSetsOfRays(cameras, points2D, rays);
 	
-	// TODO: Matching of points using the Hungarian algorithm
+	// TODO: Triangulation and bundle adjustment of sets of rays
+	// TODO: Convert mat4 to mat3x4
+	// TODO: Convert to OpenCV format
+	// See: OpenCV cv::sfm::triangulatePoints()
+
+	// TODO: Compare distance from triangulated points to original points
 	
     return 0;
 }
