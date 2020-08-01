@@ -10,70 +10,10 @@
 
 #include <dlib/optimization/max_cost_assignment.h>
 
+#include "Camera.h"
+#include "Ray.h"
 #include "OBJWriter.h"
-
-struct Ray
-{
-	glm::vec3 origin;
-	glm::vec3 direction;
-
-	glm::vec3 at(float t) const
-	{
-		return origin + t * direction;
-	}
-};
-
-struct Camera
-{
-	Camera(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up) :
-		m_eye(eye),
-		m_at(at),
-		m_up(up),
-		m_matV(glm::lookAt(eye, at, up)), // Generate the view matrix
-		m_matP(glm::perspective(45.f, 1.f, 0.1f, 10.f)), // Generate the projection matrix
-		m_mat(m_matP * m_matV),
-		m_viewport(0, 0, 1000, 1000) // Center of the image is (0, 0) 1000 px by 1000 px.
-	{
-		
-	}
-
-	const glm::vec3& eye() const { return m_eye; }
-	const glm::vec3& at() const { return m_at; }
-	const glm::vec3& up() const { return m_up; }
-
-	const glm::mat4& matV() const { return m_matV; }
-	const glm::mat4& matP() const { return m_matP; }
-	const glm::mat4& mat() const { return m_mat; }
-
-	const glm::vec4& viewport() const { return m_viewport; }
-	
-	glm::vec3 project(const glm::vec3& point) const
-	{
-		return glm::projectNO(point,
-			                  glm::identity<glm::mat4>(),
-			                  m_mat,
-			                  m_viewport);
-	}
-
-	glm::vec3 unProject(const glm::vec3& point) const
-	{
-		return glm::unProjectNO(point,
-							    glm::identity<glm::mat4>(),
-			                    m_mat,
-			                    m_viewport);
-	}
-
-private:
-	glm::vec3 m_eye;
-	glm::vec3 m_at;
-	glm::vec3 m_up;
-
-	glm::mat4 m_matV;
-	glm::mat4 m_matP;
-	glm::mat4 m_mat;
-
-	glm::vec4 m_viewport;
-};
+#include "Triangulation.h"
 
 /**
  * \brief Generate 3D points in a sphere centered around the origin
@@ -345,7 +285,7 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 
 int main(int argc, char *argv[])
 {
-	const int numberPoints3D = 4;
+	const int numberPoints3D = 1;
 	const float spherePointsRadius = 1.f;
 	const int numberCameras = 2;
 	const float sphereCamerasRadius = 5.f;
@@ -353,7 +293,7 @@ int main(int argc, char *argv[])
 	const auto points3D = generatePointsInSphere(numberPoints3D, spherePointsRadius);
 	const auto cameras = generateCamerasOnSphere(numberCameras, sphereCamerasRadius);
 	const auto points2D = projectPoints(points3D, cameras);
-	// TODO: Add noise and occlusion
+	// TODO: Add noise and occlusion and shuffle points 
 	const auto rays = computeRays(cameras, points2D);
 	checkUnProject(points3D, rays);
 
@@ -364,10 +304,8 @@ int main(int argc, char *argv[])
 	// Matching of points using the Hungarian algorithm
 	const auto setsOfRays = findSetsOfRays(cameras, points2D, rays);
 	
-	// TODO: Triangulation and bundle adjustment of sets of rays
-	// TODO: Convert mat4 to mat3x4
-	// TODO: Convert to OpenCV format
-	// See: OpenCV cv::sfm::triangulatePoints()
+	// Triangulation and bundle adjustment of sets of rays
+	const auto triangulatedPoints3D = triangulatePoints(cameras, points2D, setsOfRays);
 
 	// TODO: Compare distance from triangulated points to original points
 	
