@@ -246,41 +246,74 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 {
 	// Multiplier used to convert a floating point value to an integer value
 	const float realToLongMultiplier = 1000.f;
-	
-	// TODO: Support more than 2 views
-	
-	dlib::matrix<long> cost(rays[0].size(), rays[1].size());
-	for (int i = 0; i < rays[0].size(); i++)
-	{
-		std::vector<float> row(rays[1].size(), 0.f);
-		for (int j = 0; j < rays[1].size(); j++)
-		{
-			const auto dist = similarity(cameras[0],
-				                         rays[0][i],
-				                         points2D[0][i],
-				                         cameras[1],
-				                         rays[1][j],
-				                         points2D[1][j]);
-
-			const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
-			cost(i, j) = -integerDist;
-		}
-	}
-
-	// Compute best assignment between pairs of points
-	const auto assignment = dlib::max_cost_assignment(cost);
 
 	// A list of 3D points defined by a list of index of rays
 	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
 	
-	for (unsigned int i = 0; i < assignment.size(); i++)
+	// TODO: Find the view with the maximum number of points in 2D
+	const unsigned int referenceCamera = 0;
+
+	// Setup rays for the reference Camera
+	for (unsigned int i = 0; i < rays[referenceCamera].size(); i++)
 	{
-		// Add a 3D point defined by the intersection of 2 rays
-		// Ray i from camera 0
-		// Ray assignment[i] from camera 1
+		// Add a 3D point defined by the intersection of 1 ray from the reference camera
+		// After matching these rays with other cameras, other rays will be added
 		setsOfRays.push_back(
-			{{0, i}, {1, assignment[i]}}
+			{ {referenceCamera, i} }
 		);
+	}
+
+	for (unsigned int c = 0; c < cameras.size(); c++)
+	{
+		if (c == referenceCamera) {
+			continue;
+		}
+
+		assert(rays[referenceCamera].size() == rays[c].size());
+
+		// Compare the referenceCamera to this camera
+		dlib::matrix<long> cost(rays[referenceCamera].size(), rays[c].size());
+		for (int i = 0; i < rays[referenceCamera].size(); i++)
+		{
+			std::vector<float> row(rays[c].size(), 0.f);
+			for (int j = 0; j < rays[c].size(); j++)
+			{
+				const auto dist = similarity(cameras[referenceCamera],
+					                         rays[referenceCamera][i],
+					                         points2D[referenceCamera][i],
+					                         cameras[c],
+					                         rays[c][j],
+					                         points2D[c][j]);
+
+				const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
+				cost(i, j) = -integerDist;
+			}
+		}
+
+		// Compute best assignment between pairs of points
+		// TODO: Handle the case with non square cost matrix
+		const auto assignment = dlib::max_cost_assignment(cost);
+
+		for (unsigned int i = 0; i < assignment.size(); i++)
+		{
+			// Ray i from the reference camera is in setsOfRays[i]
+			// We add the corresponding ray assignment[i] from camera c
+			setsOfRays[i].emplace_back(c, assignment[i]);
+		}
+	}
+
+	// Clear points with only one ray associated to it
+	for (auto it = setsOfRays.begin(); it != setsOfRays.end();)
+	{
+		// If less than 2 rays are associated to this 3D point, we can't triangulate it
+		if (it->size() < 2)
+		{
+			it = setsOfRays.erase(it);
+		}
+		else
+		{
+			++it;
+		}
 	}
 
 	return setsOfRays;
