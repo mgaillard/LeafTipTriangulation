@@ -244,6 +244,9 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 	const std::vector<std::vector<glm::vec2>>& points2D,
 	const std::vector<std::vector<Ray>>& rays)
 {
+	// Multiplier used to convert a floating point value to an integer value
+	const float realToLongMultiplier = 1000.f;
+	
 	// TODO: Support more than 2 views
 	
 	dlib::matrix<long> cost(rays[0].size(), rays[1].size());
@@ -259,7 +262,7 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 				                         rays[1][j],
 				                         points2D[1][j]);
 
-			const auto integerDist = static_cast<long>(std::round(dist * 1000.f));
+			const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
 			cost(i, j) = -integerDist;
 		}
 	}
@@ -281,6 +284,50 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 	}
 
 	return setsOfRays;
+}
+
+void matchingTriangulatedPointsWithGroundTruth(
+	const std::vector<glm::vec3>& points3D,
+	const std::vector<glm::vec3>& triangulatedPoints3D
+)
+{
+	assert(points3D.size() == triangulatedPoints3D.size());
+
+	// Multiplier used to convert a floating point value to an integer value
+	const float realToLongMultiplier = 1000.f;
+
+	dlib::matrix<long> cost(points3D.size(), points3D.size());
+	dlib::matrix<float> realCost(points3D.size(), points3D.size());
+	
+	for (int i = 0; i < points3D.size(); i++)
+	{
+		for (int j = 0; j < triangulatedPoints3D.size(); j++)
+		{
+			const auto dist = glm::distance(points3D[i], triangulatedPoints3D[j]);
+			realCost(i, j) = dist;
+			
+			const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
+			cost(i, j) = -integerDist;
+		}
+	}
+
+	// Compute best assignment between pairs of points
+	const auto assignment = dlib::max_cost_assignment(cost);
+
+	// Compute statistics on the assignment
+	float maximumDistance = 0.0f;
+	for (unsigned int i = 0; i < assignment.size(); i++)
+	{
+		const auto groundTruthIndex = i;
+		const auto triangulatedIndex = assignment[i];
+
+		const auto dist = glm::distance(points3D[groundTruthIndex], triangulatedPoints3D[triangulatedIndex]);
+		maximumDistance = std::max(maximumDistance, dist);
+	}
+
+	std::cout << "Maximum distance from triangulated to ground truth: " << maximumDistance << "\n"
+		      << "Assignment cost between the ground truth and triangulation: "
+	          << dlib::assignment_cost(realCost, assignment) << std::endl;
 }
 
 int main(int argc, char *argv[])
@@ -307,15 +354,8 @@ int main(int argc, char *argv[])
 	// Triangulation and bundle adjustment of sets of rays
 	const auto triangulatedPoints3D = triangulatePoints(cameras, points2D, setsOfRays);
 
-	// Compare distance from triangulated points to original points
-	// TODO: Compute the minimum matching between the two set of points
-	float maximumDistance = 0.0f;
-	for (unsigned int i = 0; i < numberPoints3D; i++)
-	{
-		maximumDistance = std::max(maximumDistance, glm::distance(points3D[i], triangulatedPoints3D[i]));
-	}
-	std::cout << "Maximum distance from triangulated to ground truth: " << maximumDistance << std::endl;
-	
+	// Match the two sets of points and check the distance
+	matchingTriangulatedPointsWithGroundTruth(points3D, triangulatedPoints3D);
 	
     return 0;
 }
