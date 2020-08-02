@@ -10,11 +10,13 @@ glm::mat4x3 removeZRow(const glm::mat4& m)
 {
 	glm::mat4x3 output(0.0f);
 
-	// Remove the Z row in m
-	glm::row(output, 0) = glm::row(m, 0);
-	glm::row(output, 1) = glm::row(m, 1);
-	glm::row(output, 2) = glm::row(m, 3);
-
+	for (int c = 0; c < 4; c++)
+	{
+		output[c][0] = m[c][0];
+		output[c][1] = m[c][1];
+		output[c][2] = m[c][3];
+	}
+	
 	return output;
 }
 
@@ -208,9 +210,12 @@ std::vector<glm::vec3> triangulatePoints(
 		{
 			const auto& cameraIndex = pointProjection.first;
 			const auto& pointIndex = pointProjection.second;
-			const auto& cameraMat = cameras[cameraIndex].mat();
-			const auto& point2D = points2D[cameraIndex][pointIndex];
-
+			const auto& camera = cameras[cameraIndex];
+			// Camera matrix from 3D to viewport coordinates
+			const auto& cameraMat = camera.mat();
+			// 2D point in viewport coordinates
+			const auto& point2D = camera.windowToViewport(points2D[cameraIndex][pointIndex]);
+			
 			homographies.push_back(convertToOpenCV(removeZRow(cameraMat)));
 			points.push_back(convertToOpenCV(point2D));
 		}

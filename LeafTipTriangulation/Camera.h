@@ -21,6 +21,8 @@ public:
 
 	glm::vec3 unProject(const glm::vec3& point) const;
 
+	glm::vec2 windowToViewport(const glm::vec2& point) const;
+
 private:
 	glm::vec3 m_eye;
 	glm::vec3 m_at;

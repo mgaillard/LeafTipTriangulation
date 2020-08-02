@@ -307,7 +307,15 @@ int main(int argc, char *argv[])
 	// Triangulation and bundle adjustment of sets of rays
 	const auto triangulatedPoints3D = triangulatePoints(cameras, points2D, setsOfRays);
 
-	// TODO: Compare distance from triangulated points to original points
+	// Compare distance from triangulated points to original points
+	// TODO: Compute the minimum matching between the two set of points
+	float maximumDistance = 0.0f;
+	for (unsigned int i = 0; i < numberPoints3D; i++)
+	{
+		maximumDistance = std::max(maximumDistance, glm::distance(points3D[i], triangulatedPoints3D[i]));
+	}
+	std::cout << "Maximum distance from triangulated to ground truth: " << maximumDistance << std::endl;
+	
 	
     return 0;
 }

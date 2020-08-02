@@ -29,3 +29,12 @@ glm::vec3 Camera::unProject(const glm::vec3& point) const
 	                        m_mat,
 	                        m_viewport);
 }
+
+glm::vec2 Camera::windowToViewport(const glm::vec2& point) const
+{
+	// Remap the viewport coordinates in pixels to [-1, 1]
+	return {
+		-1.f + 2.0f * ((point.x - m_viewport[0]) / (m_viewport[2] - m_viewport[0])),
+		-1.f + 2.0f * ((point.y - m_viewport[1]) / (m_viewport[3] - m_viewport[1])),
+	};
+}
