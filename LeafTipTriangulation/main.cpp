@@ -38,7 +38,7 @@ std::vector<glm::vec3> generatePointsInSphere(int n, float radius)
  * \brief Generate cameras pointing to the origin on a sphere
  * \param n Number of cameras
  * \param radius Radius of the sphere
- * \return A vector of camera as glm::mat4
+ * \return A vector of camera
  */
 std::vector<Camera> generateCamerasOnSphere(int n, float radius)
 {
@@ -61,6 +61,52 @@ std::vector<Camera> generateCamerasOnSphere(int n, float radius)
 		cameras.push_back(Camera(eye, glm::vec3(0.f, 0.f, 0.f), up));
 	}
 	
+	return cameras;
+}
+
+/**
+ * \brief Load camera from a list of files
+ * \param files A list of files containing the camera information
+ * \param viewportSize Size of the viewport of images in pixels
+ * \return A vector of camera
+ */
+std::vector<Camera> loadCamerasFromFiles(
+	const std::vector<std::string>& files,
+	const glm::vec2& viewportSize)
+{
+	std::vector<Camera> cameras;
+
+	cameras.reserve(files.size());
+
+	for (const auto& filename : files)
+	{
+		std::ifstream file(filename);
+
+		if (file.is_open())
+		{
+			glm::vec3 eye, at, up;
+			glm::mat4 matV, matP;
+
+			file >> eye.x >> eye.y >> eye.z;
+			file >> at.x >> at.y >> at.z;
+			file >> up.x >> up.y >> up.z;
+
+			file >> matV[0][0] >> matV[1][0] >> matV[2][0] >> matV[3][0];
+			file >> matV[0][1] >> matV[1][1] >> matV[2][1] >> matV[3][1];
+			file >> matV[0][2] >> matV[1][2] >> matV[2][2] >> matV[3][2];
+			file >> matV[0][3] >> matV[1][3] >> matV[2][3] >> matV[3][3];
+
+			file >> matP[0][0] >> matP[1][0] >> matP[2][0] >> matP[3][0];
+			file >> matP[0][1] >> matP[1][1] >> matP[2][1] >> matP[3][1];
+			file >> matP[0][2] >> matP[1][2] >> matP[2][2] >> matP[3][2];
+			file >> matP[0][3] >> matP[1][3] >> matP[2][3] >> matP[3][3];
+			
+			file.close();
+
+			cameras.emplace_back(eye, at, up, matV, matP, viewportSize);
+		}
+	}
+
 	return cameras;
 }
 
@@ -363,7 +409,7 @@ void matchingTriangulatedPointsWithGroundTruth(
 	          << dlib::assignment_cost(realCost, assignment) << std::endl;
 }
 
-int main(int argc, char *argv[])
+void testWithSyntheticData()
 {
 	const int numberPoints3D = 1;
 	const float spherePointsRadius = 1.f;
@@ -383,12 +429,60 @@ int main(int argc, char *argv[])
 	// Compute similarity between all points between the two cameras
 	// Matching of points using the Hungarian algorithm
 	const auto setsOfRays = findSetsOfRays(cameras, points2D, rays);
-	
+
 	// Triangulation and bundle adjustment of sets of rays
 	const auto triangulatedPoints3D = triangulatePoints(cameras, points2D, setsOfRays);
 
 	// Match the two sets of points and check the distance
 	matchingTriangulatedPointsWithGroundTruth(points3D, triangulatedPoints3D);
+}
+
+int main(int argc, char *argv[])
+{
+	const float imageWidth = 2454.0;
+	const float imageHeight = 2056.0;
+	
+	const auto cameras = loadCamerasFromFiles({
+		"camera_0.txt",
+		"camera_72.txt",
+		// "camera_144.txt",
+		"camera_216.txt",
+		// "camera_288.txt",
+		// "camera_top.txt"
+	}, glm::vec2(imageWidth, imageHeight));
+
+	// X axis is from left to right
+	// Y axis is from bottom to top
+	const std::vector<std::vector<glm::vec2>> points2D = {
+		// Camera 0
+		{
+			{1095.0, (imageHeight - 1.0) - 1499.0},
+			{1452.0, (imageHeight - 1.0) - 1352.0}
+		},
+		// Camera 72
+		{
+			{855.0, (imageHeight - 1.0) - 1479.0},
+			{1639.0, (imageHeight - 1.0) - 1373.0},
+		},
+		// Camera 216
+		{
+			{1579.0, (imageHeight - 1.0) - 1471.0},
+			{819.0, (imageHeight - 1.0) - 1362.0},
+		}
+	};
+
+	// Compute rays in 3D from camera matrices and 2D points
+	const auto rays = computeRays(cameras, points2D);
+
+	// Compute similarity between all points between the two cameras
+	// Matching of points using the Hungarian algorithm
+	const auto setsOfRays = findSetsOfRays(cameras, points2D, rays);
+
+	// Triangulation and bundle adjustment of sets of rays
+	const auto triangulatedPoints3D = triangulatePoints(cameras, points2D, setsOfRays);
+
+	// Draw the scene in OBJ for Debugging
+	exportSceneAsOBJ(triangulatedPoints3D, rays, "scene.obj");
 	
     return 0;
 }
