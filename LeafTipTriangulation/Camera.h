@@ -7,6 +7,13 @@ class Camera
 public:
 	Camera(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up);
 
+	Camera(const glm::vec3& eye,
+		   const glm::vec3& at,
+		   const glm::vec3& up,
+		   const glm::mat4& matV,
+		   const glm::mat4& matP,
+		   const glm::vec2& viewportSize);
+
 	const glm::vec3& eye() const { return m_eye; }
 	const glm::vec3& at() const { return m_at; }
 	const glm::vec3& up() const { return m_up; }

@@ -14,6 +14,22 @@ Camera::Camera(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up):
 	
 }
 
+Camera::Camera(const glm::vec3& eye,
+	           const glm::vec3& at,
+	           const glm::vec3& up,
+	           const glm::mat4& matV,
+	           const glm::mat4& matP,
+	           const glm::vec2& viewportSize) :
+	m_eye(eye),
+	m_at(at),
+	m_up(up),
+	m_matV(matV),
+	m_matP(matP),
+	m_mat(m_matP * m_matV),
+	m_viewport(0, 0, viewportSize.x, viewportSize.y)
+{
+}
+
 glm::vec3 Camera::project(const glm::vec3& point) const
 {
 	return glm::projectNO(point,
