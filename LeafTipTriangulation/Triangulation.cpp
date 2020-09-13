@@ -214,7 +214,7 @@ std::vector<glm::vec3> triangulatePoints(
 			// Camera matrix from 3D to viewport coordinates
 			const auto& cameraMat = camera.mat();
 			// 2D point in viewport coordinates
-			const auto& point2D = camera.windowToViewport(points2D[cameraIndex][pointIndex]);
+			auto point2D = camera.windowToViewport(points2D[cameraIndex][pointIndex]);
 			
 			homographies.push_back(convertToOpenCV(removeZRow(cameraMat)));
 			points.push_back(convertToOpenCV(point2D));
