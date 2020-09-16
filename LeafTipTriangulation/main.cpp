@@ -290,6 +290,36 @@ bool exportSceneAsOBJ(
 	return objWriter.save(filename);
 }
 
+void exportSplitSceneAsOBJ(
+	const std::vector<std::vector<Ray>>& rays,
+	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
+	const std::vector<glm::vec3>& triangulatedPoints3D)
+{
+	// Draw the scene in OBJ for Debugging
+	exportSceneAsOBJ(triangulatedPoints3D, {}, "points.obj");
+	// Draw rays from each camera separately
+	for (unsigned int i = 0; i < rays.size(); i++)
+	{
+		exportSceneAsOBJ({}, { rays[i] }, "camera_" + std::to_string(i) + ".obj");
+	}
+	// Draw rays from each point separately
+	for (unsigned int i = 0; i < setsOfRays.size(); i++)
+	{
+		std::vector<Ray> raysToDisplay;
+		for (const auto& pointRays : setsOfRays[i])
+		{
+			// Camera
+			const auto& c = pointRays.first;
+			// Ray
+			const auto& r = pointRays.second;
+
+			raysToDisplay.push_back(rays[c][r]);
+		}
+
+		exportSceneAsOBJ({}, { raysToDisplay }, "rays_" + std::to_string(i) + ".obj");
+	}
+}
+
 float similarity(
 	const Camera& camera0,
 	const Ray& ray0,
@@ -357,6 +387,22 @@ float similarity(
 	return glm::distance(point0, glm::vec2(q0)) + glm::distance(point1, glm::vec2(q1));
 }
 
+float computeMaximumCameraResolution(const std::vector<Camera>& cameras)
+{
+	float maximumResolution = 0;
+	
+	for (const auto& camera : cameras)
+	{
+		maximumResolution = std::max({
+			maximumResolution,
+			camera.viewport().z,
+			camera.viewport().w
+		});
+	}
+
+	return maximumResolution;
+}
+
 std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 	const std::vector<Camera>& cameras,
 	const std::vector<std::vector<glm::vec2>>& points2D,
@@ -365,11 +411,22 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 	// Multiplier used to convert a floating point value to an integer value
 	const float realToLongMultiplier = 1000.f;
 
+	// Compute the maximum distance between two pixel in any camera
+	const float maximumDistancePixels = computeMaximumCameraResolution(cameras) * std::sqrt(2.f);
+	const long maximumSimilarity = static_cast<long>(std::round(maximumDistancePixels * realToLongMultiplier));
+	
+	// Find the view with the maximum number of points in 2D
+	unsigned int referenceCamera = 0;
+	for (unsigned int i = 0; i < points2D.size(); i++)
+	{
+		if (points2D[i].size() > points2D[referenceCamera].size())
+		{
+			referenceCamera = i;
+		}
+	}
+
 	// A list of 3D points defined by a list of index of rays
 	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
-	
-	// TODO: Find the view with the maximum number of points in 2D
-	const unsigned int referenceCamera = 0;
 
 	// Setup rays for the reference Camera
 	for (unsigned int i = 0; i < rays[referenceCamera].size(); i++)
@@ -387,14 +444,21 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 			continue;
 		}
 
-		assert(rays[referenceCamera].size() == rays[c].size());
+		const int costSize = rays[referenceCamera].size();
+		const int costCols = rays[c].size();
+
+		assert(costSize >= costCols);
 
 		// Compare the referenceCamera to this camera
-		dlib::matrix<long> cost(rays[referenceCamera].size(), rays[c].size());
-		for (int i = 0; i < rays[referenceCamera].size(); i++)
+		// Since the cost matrix is not necessarily square
+		// costSize is the size of the square
+		// costCols is the true number of columns, which is less than costSize
+		// We add dummy columns to account for the fact that
+		// we are looking for a matching between two sets of different size
+		dlib::matrix<long> cost(costSize, costSize);
+		for (int i = 0; i < costSize; i++)
 		{
-			std::vector<float> row(rays[c].size(), 0.f);
-			for (int j = 0; j < rays[c].size(); j++)
+			for (int j = 0; j < costCols; j++)
 			{
 				const auto dist = similarity(cameras[referenceCamera],
 					                         rays[referenceCamera][i],
@@ -406,17 +470,26 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 				const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
 				cost(i, j) = -integerDist;
 			}
+
+			// Add dummy columns, filled with min - 1
+			for (int j = costCols; j < costSize; j++)
+			{
+				cost(i, j) = -maximumSimilarity;
+			}
 		}
 
 		// Compute best assignment between pairs of points
-		// TODO: Handle the case with non square cost matrix
 		const auto assignment = dlib::max_cost_assignment(cost);
 
 		for (unsigned int i = 0; i < assignment.size(); i++)
 		{
-			// Ray i from the reference camera is in setsOfRays[i]
-			// We add the corresponding ray assignment[i] from camera c
-			setsOfRays[i].emplace_back(c, assignment[i]);
+			// If the assigned ray is not one of the dummy ray we added
+			if (assignment[i] < costCols)
+			{
+				// Ray i from the reference camera is in setsOfRays[i]
+				// We add the corresponding ray assignment[i] from camera c
+				setsOfRays[i].emplace_back(c, assignment[i]);
+			}
 		}
 	}
 
