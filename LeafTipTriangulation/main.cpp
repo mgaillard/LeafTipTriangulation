@@ -140,6 +140,78 @@ std::vector<std::vector<glm::vec2>> projectPoints(
 }
 
 /**
+ * \brief Add gaussian noise to 2D points
+ * \param points A list of 2D points
+ * \param cameras The list of cameras projecting the two points
+ * \param noiseStd Standard deviation of the gaussian noise added to 2D points
+ * \return The list of 2D points, with added noise
+ */
+std::vector<std::vector<glm::vec2>> addNoise(
+	const std::vector<std::vector<glm::vec2>>& points,
+	const std::vector<Camera>& cameras,
+	float noiseStd)
+{
+	std::vector<std::vector<glm::vec2>> newPoints;
+
+	newPoints.reserve(points.size());
+	for (unsigned int i = 0; i < points.size(); i++)
+	{
+		std::vector<glm::vec2> newCameraPoints;
+
+		newCameraPoints.reserve(points[i].size());
+		for (const auto& point : points[i])
+		{
+			// Viewport for the current camera
+			const auto& view = cameras[i].viewport();
+			
+			// 2D point + noise
+			const auto x = glm::clamp(point.x + glm::gaussRand(0.f, noiseStd), view.x, view.z);
+			const auto y = glm::clamp(point.y + glm::gaussRand(0.f, noiseStd), view.y, view.w);
+			
+			newCameraPoints.emplace_back(x, y);
+		}
+
+		newPoints.push_back(newCameraPoints);
+	}
+
+	return newPoints;
+}
+
+/**
+ * \brief Randomly remove points from the list to simulation occlusion
+ * \param points A list of 2D points
+ * \param probabilityKeep A probability to keep a 2D point
+ * \return The list of 2D points minus some points that are removed
+ */
+std::vector<std::vector<glm::vec2>> removePoints(
+	const std::vector<std::vector<glm::vec2>>& points,
+	float probabilityKeep)
+{
+	assert(probabilityKeep >= 0.f && probabilityKeep <= 1.f);
+	
+	std::vector<std::vector<glm::vec2>> newPoints;
+
+	newPoints.reserve(points.size());
+	for (const auto& cameraPoints : points)
+	{
+		std::vector<glm::vec2> newCameraPoints;
+
+		newCameraPoints.reserve(cameraPoints.size());
+		for (const auto& point : cameraPoints)
+		{
+			if (glm::linearRand(0.f, 1.f) <= probabilityKeep)
+			{
+				newCameraPoints.push_back(point);
+			}
+		}
+
+		newPoints.push_back(newCameraPoints);
+	}
+
+	return newPoints;
+}
+
+/**
  * \brief Compute rays going from camera to the 3D space
  * \param cameras A list of cameras
  * \param points A list of 2D points per camera
@@ -418,8 +490,10 @@ void testWithSyntheticData()
 
 	const auto points3D = generatePointsInSphere(numberPoints3D, spherePointsRadius);
 	const auto cameras = generateCamerasOnSphere(numberCameras, sphereCamerasRadius);
-	const auto points2D = projectPoints(points3D, cameras);
-	// TODO: Add noise and occlusion and shuffle points 
+	const auto projectedPoints2D = projectPoints(points3D, cameras);
+	// Add noise and occlusion and shuffle points
+	const auto points2D = removePoints(addNoise(projectedPoints2D, cameras, 2.f), 1.0f);
+	
 	const auto rays = computeRays(cameras, points2D);
 	checkUnProject(points3D, rays);
 
