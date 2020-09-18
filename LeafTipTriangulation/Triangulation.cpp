@@ -122,10 +122,10 @@ float residual(const std::pair<cv::Mat1f, cv::Vec2f>& data, const parameterVecto
 	return error;
 }
 
-cv::Vec3f reprojectionAdjustment(
+float reprojectionAdjustment(
 	const std::vector<cv::Mat1f>& homographies,
 	const std::vector<cv::Vec2f>& points,
-	const cv::Vec3f& initialGuess)
+	cv::Vec3f& pointToAdjust)
 {
 	assert(homographies.size() == points.size());
 
@@ -136,19 +136,22 @@ cv::Vec3f reprojectionAdjustment(
 		data.emplace_back(homographies[i], points[i]);
 	}
 
-	auto x = vectorToParameters(initialGuess);
+	auto x = vectorToParameters(pointToAdjust);
 
 	// Optimization
-	dlib::solve_least_squares(dlib::objective_delta_stop_strategy(1e-8),
-		                      residual,
-		                      derivative(residual, 1e-6),
-		                      data,
-		                      x);
+	const float finalCost = dlib::solve_least_squares(dlib::objective_delta_stop_strategy(1e-8),
+		                                              residual,
+		                                              derivative(residual, 1e-6),
+		                                              data,
+		                                              x);
 
-	return parametersToVector(x);
+	// Override the initial guess with the adjusted point
+	pointToAdjust = parametersToVector(x);
+
+	return finalCost;
 }
 
-cv::Vec3f reconstructPointFromViews(
+std::tuple<float, cv::Vec3f> reconstructPointFromViews(
 	const std::vector<cv::Mat1f>& homographies,
 	const std::vector<cv::Vec2f>& points)
 {
@@ -179,22 +182,26 @@ cv::Vec3f reconstructPointFromViews(
 	cv::Mat1f x;
 	cv::solve(A, b, x, cv::DECOMP_SVD);
 
+	cv::Vec3f triangulatedPoint(
+		x.at<float>(0),
+		x.at<float>(1),
+		x.at<float>(2)
+	);
+	
 	// Non-linear optimization to refine the result
-	return reprojectionAdjustment(
-		homographies,
-		points,
-		{
-			x.at<float>(0),
-			x.at<float>(1),
-			x.at<float>(2)
-		});
+	const auto finalError = reprojectionAdjustment(homographies, points, triangulatedPoint);
+
+	// Return the triangulated point and its reprojection error
+	return { finalError, triangulatedPoint };
 }
 
-std::vector<glm::vec3> triangulatePoints(
+std::tuple<float, std::vector<glm::vec3>> triangulatePoints(
 	const std::vector<Camera>& cameras,
 	const std::vector<std::vector<glm::vec2>>& points2D,
 	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
 {
+	float totalError = 0.f;
+	
 	std::vector<glm::vec3> points3D;
 
 	points3D.reserve(setsOfRays.size());
@@ -220,10 +227,17 @@ std::vector<glm::vec3> triangulatePoints(
 			points.push_back(convertToOpenCV(point2D));
 		}
 
-		const auto point3D = reconstructPointFromViews(homographies, points);
-		
+		// Triangulate the point
+		float error;
+		cv::Vec3f point3D;
+		std::tie(error, point3D) = reconstructPointFromViews(homographies, points);
+
+		// Sum up the re-projection errors
+		totalError += error;
+
+		// Add the point to 
 		points3D.push_back(convertToGlm(point3D));
 	}
 
-	return points3D;
+	return { totalError, points3D };
 }

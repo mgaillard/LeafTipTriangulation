@@ -387,17 +387,24 @@ float similarity(
 	return glm::distance(point0, glm::vec2(q0)) + glm::distance(point1, glm::vec2(q1));
 }
 
+float computeMaximumCameraResolution(const Camera& camera)
+{
+	return std::max(
+		camera.viewport().z,
+		camera.viewport().w
+	);
+}
+
 float computeMaximumCameraResolution(const std::vector<Camera>& cameras)
 {
 	float maximumResolution = 0;
 	
 	for (const auto& camera : cameras)
 	{
-		maximumResolution = std::max({
+		maximumResolution = std::max(
 			maximumResolution,
-			camera.viewport().z,
-			camera.viewport().w
-		});
+			computeMaximumCameraResolution(camera)
+		);
 	}
 
 	return maximumResolution;
@@ -510,6 +517,144 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 	return setsOfRays;
 }
 
+
+/**
+ * \brief Match each ray to a 3D point based on the re-projected error
+ * \param points3D A set of points in 3D
+ * \param camera A camera
+ * \param points2D A set of 2D points projected on the camera
+ * \param rays A set of rays associated to each 2D point projected on the camera
+ * \return The assignment between the 3D points and the rays
+ */
+std::vector<long> pointsRaysMatching(
+	const std::vector<glm::vec3>& points3D,
+	const Camera& camera,
+	const std::vector<glm::vec2>& points2D,
+	const std::vector<Ray>& rays
+	)
+{
+	assert(points3D.size() == points2D.size());
+	assert(points2D.size() == rays.size());
+
+	// Compute an upper bound on the maximum distance between two pixel with the camera
+	const auto maximumDistancePixels = computeMaximumCameraResolution(camera) * std::sqrt(2.f);
+
+	// Multiplier used to convert a floating point value to an integer value
+	// Make sure that this distance is about 1G for the maximum distance in the image
+	const double realToLongMultiplier = 1e9 / maximumDistancePixels;
+
+	const int costSize = points3D.size();
+	
+	dlib::matrix<long> cost(costSize, costSize);
+	for (int i = 0; i < costSize; i++)
+	{
+		for (int j = 0; j < costSize; j++)
+		{
+			// Project the 3D point i on the current camera
+			const auto projectedPoint = glm::vec2(camera.project(points3D[i]));
+
+			// Compare to the 2D point j
+			const auto pointsDistance = static_cast<double>(glm::distance(projectedPoint, points2D[j]));
+			// The distance is the ratio between the point distance and the longest distance in the image
+			const auto dist = pointsDistance / maximumDistancePixels;
+
+			// Make the distance integer
+			const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
+			cost(i, j) = -integerDist;
+		}
+	}
+
+	// Compute best assignment between pairs of points
+	return dlib::max_cost_assignment(cost);
+}
+
+std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>> solveDP(
+	const std::vector<Camera>& cameras,
+	const std::vector<std::vector<glm::vec2>>& points2D,
+	const std::vector<std::vector<Ray>>& rays,
+	const std::vector<bool>& activeCameraSet
+	)
+{
+	// TODO: lookup in the cache if the solution is already computed
+	
+	const auto numberActiveCameras = std::count(activeCameraSet.begin(), activeCameraSet.end(), true);
+
+	// Create vectors of camera only with the activeCameras
+	std::vector<Camera> activateCameras;
+	std::vector<std::vector<glm::vec2>> activatePoints2D;
+	std::vector<std::vector<Ray>> activeRays;
+
+	// Isolate the two active cameras, points and rays
+	for (unsigned int i = 0; i < activeCameraSet.size(); i++)
+	{
+		if (activeCameraSet[i])
+		{
+			activateCameras.push_back(cameras[i]);
+			activatePoints2D.push_back(points2D[i]);
+			activeRays.push_back(rays[i]);
+		}
+	}
+	
+	// If we end up in the case with 2 cameras only
+	if (numberActiveCameras == 2)
+	{
+		// Then run the already existing algorithm with only two cameras
+		const auto setsOfRays = findSetsOfRays(activateCameras, activatePoints2D, activeRays);
+		float triangulationError;
+		std::vector<glm::vec3> triangulatedPoints3D;
+		std::tie(triangulationError, triangulatedPoints3D) = triangulatePoints(activateCameras, activatePoints2D, setsOfRays);
+
+		return { triangulatedPoints3D, setsOfRays };
+	}
+	// If there are more than 2 cameras, we split to smaller cases
+	else if (numberActiveCameras > 2)
+	{
+		float minimumReprojError = std::numeric_limits<float>::max();
+		
+		// We deactivate one camera, and get the answer with one camera less
+		for (unsigned int c = 0; c < activeCameraSet.size(); c++)
+		{
+			if (activeCameraSet[c])
+			{
+				// Copy the active camera vector and deactivate camera i
+				auto subActiveCameraSet = activeCameraSet;
+				subActiveCameraSet[c] = false;
+
+				// Get the setOfRays and triangulated points from the sub problems with one camera less
+				std::vector<glm::vec3> subPoints;
+				std::vector<std::vector<std::pair<int, int>>> setsOfRays;
+				std::tie(subPoints, setsOfRays) = solveDP(cameras, points2D, rays, subActiveCameraSet);
+
+				// Match rays to subPoints and add the rays to the setsOfRays
+				const auto raysAssignment = pointsRaysMatching(subPoints, cameras[c], points2D[c], rays[c]);
+
+				// TODO: change the index of cameras in the setOfRays array to match the true index of cameras
+				// Add the assigned rays to the setOfRays
+				for (unsigned int p = 0; p < raysAssignment.size(); p++)
+				{
+					setsOfRays[p].emplace_back(c, raysAssignment[c]);
+				}
+				
+				// Re-triangulate the points with the new rays
+				// TODO: maybe just bundle adjusting is necessary
+				float triangulationError;
+				std::vector<glm::vec3> triangulatedPoints;
+				std::tie(triangulationError, triangulatedPoints) = triangulatePoints(activateCameras, activatePoints2D, setsOfRays);
+
+				std::cout << "triangulationError = " << triangulationError << std::endl;
+
+				// Compute the total re-projection error and update the best solution
+				minimumReprojError = std::min(minimumReprojError, triangulationError);
+			}
+		}
+
+		// Return the best solution
+	}
+	
+	// If there are less than 2 cameras, we can't triangulate anything
+	return {};
+}
+
 void matchingTriangulatedPointsWithGroundTruth(
 	const std::vector<glm::vec3>& points3D,
 	const std::vector<glm::vec3>& triangulatedPoints3D
@@ -578,44 +723,97 @@ void testWithSyntheticData()
 	const auto setsOfRays = findSetsOfRays(cameras, points2D, rays);
 
 	// Triangulation and bundle adjustment of sets of rays
-	const auto triangulatedPoints3D = triangulatePoints(cameras, points2D, setsOfRays);
+	float triangulationError;
+	std::vector<glm::vec3> triangulatedPoints3D;
+	std::tie(triangulationError, triangulatedPoints3D) = triangulatePoints(cameras, points2D, setsOfRays);
+	std::cout << "Triangulation re-projection error: " << triangulationError << std::endl;
 
 	// Match the two sets of points and check the distance
 	matchingTriangulatedPointsWithGroundTruth(points3D, triangulatedPoints3D);
 }
 
-int main(int argc, char *argv[])
+void runOnRealData()
 {
 	const float imageWidth = 2454.0;
 	const float imageHeight = 2056.0;
-	
+
 	const auto cameras = loadCamerasFromFiles({
 		"camera_0.txt",
 		"camera_72.txt",
 		// "camera_144.txt",
-		"camera_216.txt",
-		// "camera_288.txt",
+		// "camera_216.txt",
+		"camera_288.txt",
 		// "camera_top.txt"
-	}, glm::vec2(imageWidth, imageHeight));
+		}, glm::vec2(imageWidth, imageHeight));
 
 	// X axis is from left to right
 	// Y axis is from bottom to top
 	const std::vector<std::vector<glm::vec2>> points2D = {
 		// Camera 0
 		{
-			{1095.0, (imageHeight - 1.0) - 1499.0},
-			{1452.0, (imageHeight - 1.0) - 1352.0}
+			// {1009, 560},
+			// {813, 866},
+			{883, 1268},
+			{909, 1258},
+			// {1319, 1308},
+			// {1445, 1056},
+			// {1473, 716}
 		},
 		// Camera 72
 		{
-			{855.0, (imageHeight - 1.0) - 1479.0},
-			{1639.0, (imageHeight - 1.0) - 1373.0},
+			// {803, 884},
+			// {877, 576},
+			{931, 1260},
+			{1195, 1258},
+			// {1285, 1094},
+			// {1481, 1356},
+			// {1609, 1116},
+			// {1627, 686}
+		},
+		// Camera 144
+		/*
+		{
+			// {1348, 888},
+			// {1228, 1112},
+			// {1294, 1366},
+			{1364, 1252},
+			{1514, 1258}
 		},
 		// Camera 216
 		{
-			{1579.0, (imageHeight - 1.0) - 1471.0},
-			{819.0, (imageHeight - 1.0) - 1362.0},
+			// {815, 696},
+			// {841, 1112},
+			// {1189, 1096},
+			// {1007, 1364},
+			{1449, 1280},
+			{1627, 1266},
+			// {1731, 880},
+			// {1575, 584}
+		},
+		*/
+		// Camera 288
+		{
+			// {999, 711},
+			// {993, 1099},
+			// {1027, 1349},
+			{1051, 1281},
+			{1327, 1277},
+			// {1435, 865},
+			// {1463, 549}
+		},
+		// Camera top
+		/*
+		{
+			{776, 1357},
+			{750, 1327},
+			{764, 1137},
+			{1142, 981},
+			{1630, 693},
+			{1690, 461},
+			{1536, 455},
+			{1118, 459}
 		}
+		*/
 	};
 
 	// Compute rays in 3D from camera matrices and 2D points
@@ -626,10 +824,58 @@ int main(int argc, char *argv[])
 	const auto setsOfRays = findSetsOfRays(cameras, points2D, rays);
 
 	// Triangulation and bundle adjustment of sets of rays
-	const auto triangulatedPoints3D = triangulatePoints(cameras, points2D, setsOfRays);
+	float triangulationError;
+	std::vector<glm::vec3> triangulatedPoints3D;
+	std::tie(triangulationError, triangulatedPoints3D) = triangulatePoints(cameras, points2D, setsOfRays);
+	std::cout << "Triangulation re-projection error: " << triangulationError << std::endl;
 
-	// Draw the scene in OBJ for Debugging
+	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
+}
+
+void experiment()
+{
+	const float imageWidth = 2454.0;
+	const float imageHeight = 2056.0;
+
+	const auto cameras = loadCamerasFromFiles({
+		"camera_0.txt",
+		"camera_72.txt",
+		"camera_288.txt",
+		}, glm::vec2(imageWidth, imageHeight));
+
+	// X axis is from left to right
+	// Y axis is from bottom to top
+	const std::vector<std::vector<glm::vec2>> points2D = {
+		// Camera 0
+		{
+			{883, 1268},
+			{909, 1258}
+		},
+		// Camera 72
+		{
+			{931, 1260},
+			{1195, 1258}
+		},
+		// Camera 288
+		{
+			{1051, 1281},
+			{1327, 1277},
+		},
+	};
+
+	// Compute rays in 3D from camera matrices and 2D points
+	const auto rays = computeRays(cameras, points2D);
+	
+	std::vector<glm::vec3> triangulatedPoints3D;
+	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
+	std::tie(triangulatedPoints3D, setsOfRays) = solveDP(cameras, points2D, rays, { true, true, true });
+
 	exportSceneAsOBJ(triangulatedPoints3D, rays, "scene.obj");
+}
+
+int main(int argc, char *argv[])
+{
+	experiment();
 	
     return 0;
 }

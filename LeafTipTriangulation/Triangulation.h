@@ -43,17 +43,24 @@ glm::vec3 convertToGlm(const cv::Vec3f& v);
  */
 cv::Vec2f projectPoint(const cv::Mat1f& H, const cv::Vec4f& m);
 
-cv::Vec3f reconstructPointFromViews(
+/**
+ * \brief Triangulate a point in 3D 
+ * \param homographies The homography matrices, projecting 3D points to 2D points
+ * \param points The 2D points
+ * \return The triangulated 3D point and its reprojection error 
+ */
+std::tuple<float, cv::Vec3f> reconstructPointFromViews(
 	const std::vector<cv::Mat1f>& homographies,
 	const std::vector<cv::Vec2f>& points
 );
 
-cv::Vec3f reprojectionAdjustment(
+float reprojectionAdjustment(
 	const std::vector<cv::Mat1f>& homographies,
 	const std::vector<cv::Vec2f>& points,
-	const cv::Vec3f& initialGuess
+	cv::Vec3f& pointToAdjust
 );
 
-std::vector<glm::vec3> triangulatePoints(const std::vector<Camera>& cameras,
-	                                     const std::vector<std::vector<glm::vec2>>& points2D,
-	                                     const std::vector<std::vector<std::pair<int, int>>>& setsOfRays);
+std::tuple<float, std::vector<glm::vec3>> triangulatePoints(
+	const std::vector<Camera>& cameras,
+	const std::vector<std::vector<glm::vec2>>& points2D,
+	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays);
