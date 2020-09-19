@@ -1,5 +1,6 @@
 #include <iostream>
 #include <array>
+#include <numeric>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -568,7 +569,36 @@ std::vector<long> pointsRaysMatching(
 	return dlib::max_cost_assignment(cost);
 }
 
-std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>> solveDP(
+std::size_t convertVectorBoolToInt(const std::vector<bool>& v)
+{
+	return std::accumulate(v.rbegin(), v.rend(), 0, [](int x, int y) { return (x << 1) + y; });
+}
+
+struct MatchRaysAndTriangulateDP
+{
+	bool valid;
+	std::vector<glm::vec3> triangulatedPoints;
+	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
+
+	MatchRaysAndTriangulateDP() : valid(false) {}
+
+	void set(
+		const std::vector<glm::vec3>& newTriangulatedPoints,
+		const std::vector<std::vector<std::pair<int, int>>>& newSetsOfRays)
+	{
+		triangulatedPoints = newTriangulatedPoints;
+		setsOfRays = newSetsOfRays;
+		valid = true;
+	}
+
+	std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>> asTuple() const
+	{
+		return { triangulatedPoints, setsOfRays };
+	}
+};
+
+std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>> matchRaysAndTriangulateDP(
+	std::vector<MatchRaysAndTriangulateDP>& cacheDP,
 	const std::vector<Camera>& cameras,
 	const std::vector<std::vector<glm::vec2>>& points2D,
 	const std::vector<std::vector<Ray>>& rays,
@@ -579,16 +609,15 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 	assert(rays.size() == cameras.size());
 	assert(activeCameraSet.size() == cameras.size());
 
-	// ---------------------------------------------------------
-	std::cout << "Solve: ";
-	for (unsigned int i = 0; i < activeCameraSet.size(); i++) {
-		std::cout << activeCameraSet[i];
+	// Lookup in the cache if the solution has already been computed
+	// The cache is a map with the input active set converted as an integer and the output of the function
+	const auto cacheIndex = convertVectorBoolToInt(activeCameraSet);
+	assert(cacheIndex < cacheDP.size());
+	if (cacheDP[cacheIndex].valid)
+	{
+		// If this sub problem as already been solved, return its cached value
+		return cacheDP[cacheIndex].asTuple();
 	}
-	std::cout << std::endl;
-	// ---------------------------------------------------------
-	
-	// TODO: lookup in the cache if the solution is already computed
-	// TODO: the cache is a map with the input active set converted as an integer and the output of the function
 	
 	const auto numberActiveCameras = std::count(activeCameraSet.begin(), activeCameraSet.end(), true);
 	
@@ -630,6 +659,9 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 		std::vector<glm::vec3> triangulatedPoints3D;
 		std::tie(triangulationError, triangulatedPoints3D) = triangulatePoints(cameras, points2D, setsOfRays);
 
+		// Store in cache
+		cacheDP[cacheIndex].set(triangulatedPoints3D, setsOfRays);
+
 		return { triangulatedPoints3D, setsOfRays };
 	}
 	// If there are more than 2 cameras, we split to smaller cases
@@ -651,7 +683,7 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 				// Get the setOfRays and triangulated points from the sub problems with one camera less
 				std::vector<glm::vec3> subPoints;
 				std::vector<std::vector<std::pair<int, int>>> setsOfRays;
-				std::tie(subPoints, setsOfRays) = solveDP(cameras, points2D, rays, subActiveCameraSet);
+				std::tie(subPoints, setsOfRays) = matchRaysAndTriangulateDP(cacheDP, cameras, points2D, rays, subActiveCameraSet);
 
 				// Match rays to subPoints and add the rays to the setsOfRays
 				const auto raysAssignment = pointsRaysMatching(subPoints, cameras[c], points2D[c], rays[c]);
@@ -678,12 +710,32 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 			}
 		}
 
+		// Store in cache
+		cacheDP[cacheIndex].set(bestTriangulatedPoints, bestSetsOfRays);
+
 		// Return the best solution
 		return { bestTriangulatedPoints, bestSetsOfRays };
 	}
 	
 	// If there are less than 2 cameras, we can't triangulate anything
 	return {};
+}
+
+std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>> matchRaysAndTriangulate(
+	const std::vector<Camera>& cameras,
+	const std::vector<std::vector<glm::vec2>>& points2D,
+	const std::vector<std::vector<Ray>>& rays
+)
+{
+	// Build the active set vector
+	const std::vector<bool> activeCameraSet(cameras.size(), true);
+
+	// Declare the cache for memoization of dynamic programming
+	const auto cacheSize = static_cast<int>(pow(2.0, cameras.size()));
+	std::vector<MatchRaysAndTriangulateDP> cacheDP(cacheSize);
+
+	// Call the dynamic programming function to solve the problem
+	return matchRaysAndTriangulateDP(cacheDP, cameras, points2D, rays, activeCameraSet);
 }
 
 void matchingTriangulatedPointsWithGroundTruth(
@@ -927,7 +979,7 @@ void experiment()
 	
 	std::vector<glm::vec3> triangulatedPoints3D;
 	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
-	std::tie(triangulatedPoints3D, setsOfRays) = solveDP(cameras, points2D, rays, { true, true, true, true, true, true });
+	std::tie(triangulatedPoints3D, setsOfRays) = matchRaysAndTriangulate(cameras, points2D, rays);
 
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
