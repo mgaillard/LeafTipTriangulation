@@ -575,41 +575,69 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 	const std::vector<bool>& activeCameraSet
 	)
 {
+	assert(points2D.size() == cameras.size());
+	assert(rays.size() == cameras.size());
+	assert(activeCameraSet.size() == cameras.size());
+
+	// ---------------------------------------------------------
+	std::cout << "Solve: ";
+	for (unsigned int i = 0; i < activeCameraSet.size(); i++) {
+		std::cout << activeCameraSet[i];
+	}
+	std::cout << std::endl;
+	// ---------------------------------------------------------
+	
 	// TODO: lookup in the cache if the solution is already computed
+	// TODO: the cache is a map with the input active set converted as an integer and the output of the function
 	
 	const auto numberActiveCameras = std::count(activeCameraSet.begin(), activeCameraSet.end(), true);
-
-	// Create vectors of camera only with the activeCameras
-	std::vector<Camera> activateCameras;
-	std::vector<std::vector<glm::vec2>> activatePoints2D;
-	std::vector<std::vector<Ray>> activeRays;
-
-	// Isolate the two active cameras, points and rays
-	for (unsigned int i = 0; i < activeCameraSet.size(); i++)
-	{
-		if (activeCameraSet[i])
-		{
-			activateCameras.push_back(cameras[i]);
-			activatePoints2D.push_back(points2D[i]);
-			activeRays.push_back(rays[i]);
-		}
-	}
 	
 	// If we end up in the case with 2 cameras only
 	if (numberActiveCameras == 2)
 	{
+		// Create vectors of camera only with the activeCameras
+		std::vector<Camera> activateCameras;
+		std::vector<std::vector<glm::vec2>> activatePoints2D;
+		std::vector<std::vector<Ray>> activeRays;
+		std::vector<int> indexActiveCamera;
+
+		// Isolate the two active cameras, points and rays
+		for (unsigned int i = 0; i < activeCameraSet.size(); i++)
+		{
+			if (activeCameraSet[i])
+			{
+				activateCameras.push_back(cameras[i]);
+				activatePoints2D.push_back(points2D[i]);
+				activeRays.push_back(rays[i]);
+				indexActiveCamera.push_back(i);
+			}
+		}
+		
 		// Then run the already existing algorithm with only two cameras
-		const auto setsOfRays = findSetsOfRays(activateCameras, activatePoints2D, activeRays);
+		auto setsOfRays = findSetsOfRays(activateCameras, activatePoints2D, activeRays);
+
+		// Change the index of cameras in the setOfRays array to match the true index of cameras
+		for (auto& setOfRays : setsOfRays)
+		{
+			for (auto& ray : setOfRays)
+			{
+				// Change the camera index
+				ray.first = indexActiveCamera[ray.first];
+			}
+		}
+		
 		float triangulationError;
 		std::vector<glm::vec3> triangulatedPoints3D;
-		std::tie(triangulationError, triangulatedPoints3D) = triangulatePoints(activateCameras, activatePoints2D, setsOfRays);
+		std::tie(triangulationError, triangulatedPoints3D) = triangulatePoints(cameras, points2D, setsOfRays);
 
 		return { triangulatedPoints3D, setsOfRays };
 	}
 	// If there are more than 2 cameras, we split to smaller cases
 	else if (numberActiveCameras > 2)
 	{
-		float minimumReprojError = std::numeric_limits<float>::max();
+		float bestReprojError = std::numeric_limits<float>::max();
+		std::vector<std::vector<std::pair<int, int>>> bestSetsOfRays;
+		std::vector<glm::vec3> bestTriangulatedPoints;
 		
 		// We deactivate one camera, and get the answer with one camera less
 		for (unsigned int c = 0; c < activeCameraSet.size(); c++)
@@ -628,27 +656,30 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 				// Match rays to subPoints and add the rays to the setsOfRays
 				const auto raysAssignment = pointsRaysMatching(subPoints, cameras[c], points2D[c], rays[c]);
 
-				// TODO: change the index of cameras in the setOfRays array to match the true index of cameras
 				// Add the assigned rays to the setOfRays
 				for (unsigned int p = 0; p < raysAssignment.size(); p++)
 				{
-					setsOfRays[p].emplace_back(c, raysAssignment[c]);
+					setsOfRays[p].emplace_back(c, raysAssignment[p]);
 				}
 				
 				// Re-triangulate the points with the new rays
 				// TODO: maybe just bundle adjusting is necessary
 				float triangulationError;
 				std::vector<glm::vec3> triangulatedPoints;
-				std::tie(triangulationError, triangulatedPoints) = triangulatePoints(activateCameras, activatePoints2D, setsOfRays);
-
-				std::cout << "triangulationError = " << triangulationError << std::endl;
+				std::tie(triangulationError, triangulatedPoints) = triangulatePoints(cameras, points2D, setsOfRays);
 
 				// Compute the total re-projection error and update the best solution
-				minimumReprojError = std::min(minimumReprojError, triangulationError);
+				if (triangulationError < bestReprojError)
+				{
+					bestReprojError = triangulationError;
+					bestSetsOfRays = setsOfRays;
+					bestTriangulatedPoints = triangulatedPoints;
+				}
 			}
 		}
 
 		// Return the best solution
+		return { bestTriangulatedPoints, bestSetsOfRays };
 	}
 	
 	// If there are less than 2 cameras, we can't triangulate anything
@@ -840,7 +871,10 @@ void experiment()
 	const auto cameras = loadCamerasFromFiles({
 		"camera_0.txt",
 		"camera_72.txt",
+		"camera_144.txt",
+		"camera_216.txt",
 		"camera_288.txt",
+		"camera_top.txt"
 		}, glm::vec2(imageWidth, imageHeight));
 
 	// X axis is from left to right
@@ -856,11 +890,26 @@ void experiment()
 			{931, 1260},
 			{1195, 1258}
 		},
+		// Camera 144
+		{
+			{1364, 1252},
+			{1514, 1258}
+		},
+		// Camera 216
+		{
+			{1449, 1280},
+			{1627, 1266}
+		},
 		// Camera 288
 		{
 			{1051, 1281},
-			{1327, 1277},
+			{1327, 1277}
 		},
+		// Camera top
+		{
+			{697, 1171},
+			{671, 683}
+		}
 	};
 
 	// Compute rays in 3D from camera matrices and 2D points
@@ -868,7 +917,7 @@ void experiment()
 	
 	std::vector<glm::vec3> triangulatedPoints3D;
 	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
-	std::tie(triangulatedPoints3D, setsOfRays) = solveDP(cameras, points2D, rays, { true, true, true });
+	std::tie(triangulatedPoints3D, setsOfRays) = solveDP(cameras, points2D, rays, { true, true, true, true, true, true });
 
 	exportSceneAsOBJ(triangulatedPoints3D, rays, "scene.obj");
 }
