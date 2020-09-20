@@ -108,15 +108,21 @@
   <ItemGroup>
     <ClCompile Include="..\external\dlib\all\source.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ExportScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OBJWriter.cpp" />
     <ClCompile Include="Ray.cpp" />
+    <ClCompile Include="RayMatching.cpp" />
+    <ClCompile Include="SyntheticData.cpp" />
     <ClCompile Include="Triangulation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ExportScene.h" />
     <ClInclude Include="OBJWriter.h" />
     <ClInclude Include="Ray.h" />
+    <ClInclude Include="RayMatching.h" />
+    <ClInclude Include="SyntheticData.h" />
     <ClInclude Include="Triangulation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

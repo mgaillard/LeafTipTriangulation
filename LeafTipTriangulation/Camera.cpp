@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+#include <fstream>
+
 #include <glm/gtc/matrix_transform.hpp>
 
 Camera::Camera(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up):
@@ -53,4 +55,92 @@ glm::vec2 Camera::windowToViewport(const glm::vec2& point) const
 		-1.f + 2.0f * ((point.x - m_viewport[0]) / (m_viewport[2] - m_viewport[0])),
 		-1.f + 2.0f * ((point.y - m_viewport[1]) / (m_viewport[3] - m_viewport[1])),
 	};
+}
+
+float computeMaximumCameraResolution(const Camera& camera)
+{
+	return std::max(
+		camera.viewport().z - camera.viewport().x,
+		camera.viewport().w - camera.viewport().y
+	);
+}
+
+float computeMaximumCameraResolution(const std::vector<Camera>& cameras)
+{
+	float maximumResolution = 0;
+
+	for (const auto& camera : cameras)
+	{
+		maximumResolution = std::max(
+			maximumResolution,
+			computeMaximumCameraResolution(camera)
+		);
+	}
+
+	return maximumResolution;
+}
+
+std::vector<Camera> loadCamerasFromFiles(
+	const std::vector<std::string>& files,
+	const glm::vec2& viewportSize)
+{
+	std::vector<Camera> cameras;
+
+	cameras.reserve(files.size());
+
+	for (const auto& filename : files)
+	{
+		std::ifstream file(filename);
+
+		if (file.is_open())
+		{
+			glm::vec3 eye, at, up;
+			glm::mat4 matV, matP;
+
+			file >> eye.x >> eye.y >> eye.z;
+			file >> at.x >> at.y >> at.z;
+			file >> up.x >> up.y >> up.z;
+
+			file >> matV[0][0] >> matV[1][0] >> matV[2][0] >> matV[3][0];
+			file >> matV[0][1] >> matV[1][1] >> matV[2][1] >> matV[3][1];
+			file >> matV[0][2] >> matV[1][2] >> matV[2][2] >> matV[3][2];
+			file >> matV[0][3] >> matV[1][3] >> matV[2][3] >> matV[3][3];
+
+			file >> matP[0][0] >> matP[1][0] >> matP[2][0] >> matP[3][0];
+			file >> matP[0][1] >> matP[1][1] >> matP[2][1] >> matP[3][1];
+			file >> matP[0][2] >> matP[1][2] >> matP[2][2] >> matP[3][2];
+			file >> matP[0][3] >> matP[1][3] >> matP[2][3] >> matP[3][3];
+
+			file.close();
+
+			cameras.emplace_back(eye, at, up, matV, matP, viewportSize);
+		}
+	}
+
+	return cameras;
+}
+
+std::vector<std::vector<Ray>> computeRays(
+	const std::vector<Camera>& cameras,
+	const std::vector<std::vector<glm::vec2>>& points
+)
+{
+	std::vector<std::vector<Ray>> rays(cameras.size());
+
+	for (unsigned int c = 0; c < cameras.size(); c++)
+	{
+		for (auto point : points[c])
+		{
+			const glm::vec3 points3D(point.x, point.y, 1.f);
+
+			const auto unProjected = cameras[c].unProject(points3D);
+
+			const auto origin = cameras[c].eye();
+			const auto direction = glm::normalize(unProjected - origin);
+
+			rays[c].push_back(Ray{ origin, direction });
+		}
+	}
+
+	return rays;
 }
