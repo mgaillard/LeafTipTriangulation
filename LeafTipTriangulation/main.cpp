@@ -141,7 +141,7 @@ void runOnRealData()
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 
-void experiment()
+void experimentNoOcclusion()
 {
 	const float imageWidth = 2454.0;
 	const float imageHeight = 2056.0;
@@ -204,17 +204,86 @@ void experiment()
 
 	// Compute rays in 3D from camera matrices and 2D points
 	const auto rays = computeRays(cameras, points2D);
-	
+
+	// Matching and triangulation of points
 	std::vector<glm::vec3> triangulatedPoints3D;
 	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
 	std::tie(triangulatedPoints3D, setsOfRays) = matchRaysAndTriangulate(cameras, points2D, rays);
 
+	// Export the scene
+	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
+}
+
+void experimentWithOcclusion()
+{
+	const float imageWidth = 2454.0;
+	const float imageHeight = 2056.0;
+
+	const auto cameras = loadCamerasFromFiles({
+		// "camera_0.txt",
+		"camera_72.txt",
+		// "camera_144.txt",
+		"camera_216.txt",
+		"camera_288.txt",
+		// "camera_top.txt"
+		}, glm::vec2(imageWidth, imageHeight));
+
+	// X axis is from left to right
+	// Y axis is from bottom to top
+	const std::vector<std::vector<glm::vec2>> points2D = {
+		// Camera 0
+		/*
+		{
+			{883, 1268},
+			{909, 1258},
+		},
+		*/
+		// Camera 72
+		{
+			{931, 1260},
+			{1195, 1258},
+		},
+		// Camera 144
+		/*
+		{
+			{1364, 1252},
+			{1514, 1258},
+		},
+		*/
+		// Camera 216
+		{
+			// {1627, 1266},
+			{1449, 1280},
+		},
+		// Camera 288
+		{
+			{1327, 1277},
+			// {1051, 1281},
+		},
+		/*
+		// Camera top
+		{
+			{671, 683},
+			{697, 1171},
+		}
+		*/
+	};
+
+	// Compute rays in 3D from camera matrices and 2D points
+	const auto rays = computeRays(cameras, points2D);
+
+	// Matching and triangulation of points
+	std::vector<glm::vec3> triangulatedPoints3D;
+	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
+	std::tie(triangulatedPoints3D, setsOfRays) = matchRaysAndTriangulate(cameras, points2D, rays);
+
+	// Export the scene
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 
 int main(int argc, char *argv[])
 {
-	experiment();
+	experimentWithOcclusion();
 	
     return 0;
 }

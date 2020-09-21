@@ -207,6 +207,22 @@ std::tuple<float, std::vector<glm::vec3>> triangulatePoints(
 	points3D.reserve(setsOfRays.size());
 	for (const auto& pointProjections : setsOfRays)
 	{
+		if (pointProjections.size() <= 1)
+		{
+			// It's impossible to triangulate a point with only one projection
+			// Add an infinity point
+			points3D.emplace_back(
+				std::numeric_limits<float>::max(),
+				std::numeric_limits<float>::max(),
+				std::numeric_limits<float>::max()
+			);
+			// Go on with the next point to triangulate
+			continue;
+		}
+
+		// A point should at least have two projections to be triangulated
+		assert(pointProjections.size() >= 2);
+		
 		std::vector<cv::Mat1f> homographies;
 		std::vector<cv::Vec2f> points;
 
