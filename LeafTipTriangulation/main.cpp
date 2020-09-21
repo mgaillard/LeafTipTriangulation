@@ -31,7 +31,8 @@ void testWithSyntheticData()
 
 	// Compute similarity between all points between the two cameras
 	// Matching of points using the Hungarian algorithm
-	const auto setsOfRays = findSetsOfRays(cameras, points2D, rays);
+	auto setsOfRays = findSetsOfRays(cameras, points2D, rays);
+	removeSingleRays(setsOfRays);
 
 	// Triangulation and bundle adjustment of sets of rays
 	float triangulationError;
@@ -130,7 +131,8 @@ void runOnRealData()
 
 	// Compute similarity between all points between the two cameras
 	// Matching of points using the Hungarian algorithm
-	const auto setsOfRays = findSetsOfRays(cameras, points2D, rays);
+	auto setsOfRays = findSetsOfRays(cameras, points2D, rays);
+	removeSingleRays(setsOfRays);
 
 	// Triangulation and bundle adjustment of sets of rays
 	float triangulationError;

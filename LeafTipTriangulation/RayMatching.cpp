@@ -524,9 +524,13 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 		}
 	}
 
+	
+	return setsOfRays;
+}
+
+void removeSingleRays(std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
+{
 	// Clear points with only one ray associated to it
-	// TODO: Separate this code to a function for compatibility
-	/*
 	for (auto it = setsOfRays.begin(); it != setsOfRays.end();)
 	{
 		// If less than 2 rays are associated to this 3D point, we can't triangulate it
@@ -539,8 +543,6 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 			++it;
 		}
 	}
-	*/
-	return setsOfRays;
 }
 
 std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>> matchRaysAndTriangulate(

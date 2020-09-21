@@ -20,6 +20,12 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 	const std::vector<std::vector<Ray>>& rays);
 
 /**
+ * \brief Remove points defined by a single ray, since they can't be triangulated
+ * \param setsOfRays A matching of rays
+ */
+void removeSingleRays(std::vector<std::vector<std::pair<int, int>>>& setsOfRays);
+
+/**
  * \brief Find a matching of rays between multiple cameras and triangulate 3D points based on the matching
  * \param cameras A list of cameras
  * \param points2D A list of 2D points per camera
