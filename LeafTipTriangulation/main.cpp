@@ -26,22 +26,19 @@ void testWithSyntheticData()
 	const auto rays = computeRays(cameras, points2D);
 	checkUnProject(points3D, rays);
 
-	// Draw the scene in OBJ for Debugging
-	exportSceneAsOBJ(points3D, rays, "scene.obj");
-
-	// Compute similarity between all points between the two cameras
-	// Matching of points using the Hungarian algorithm
-	auto setsOfRays = findSetsOfRays(cameras, points2D, rays);
-	removeSingleRays(setsOfRays);
-
-	// Triangulation and bundle adjustment of sets of rays
-	float triangulationError;
+	// Matching and triangulation of points
 	std::vector<glm::vec3> triangulatedPoints3D;
-	std::tie(triangulationError, triangulatedPoints3D) = triangulatePoints(cameras, points2D, setsOfRays);
-	std::cout << "Triangulation re-projection error: " << triangulationError << std::endl;
+	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
+	std::tie(triangulatedPoints3D, setsOfRays) = matchRaysAndTriangulate(cameras, points2D, rays);
 
 	// Match the two sets of points and check the distance
 	matchingTriangulatedPointsWithGroundTruth(points3D, triangulatedPoints3D);
+
+	// TODO: Check sets of rays to make sure the matching is exact
+	
+	// Draw the scene in OBJ for Debugging
+	exportSceneAsOBJ(points3D, rays, "scene.obj");
+	// exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 
 void runOnRealData()
@@ -50,12 +47,12 @@ void runOnRealData()
 	const float imageHeight = 2056.0;
 
 	const auto cameras = loadCamerasFromFiles({
-		"camera_0.txt",
-		"camera_72.txt",
-		"camera_144.txt",
-		"camera_216.txt",
-		"camera_288.txt",
-		// "camera_top.txt"
+		"cameras/camera_0.txt",
+		"cameras/camera_72.txt",
+		"cameras/camera_144.txt",
+		"cameras/camera_216.txt",
+		"cameras/camera_288.txt",
+		"cameras/camera_top.txt"
 		}, glm::vec2(imageWidth, imageHeight));
 
 	// X axis is from left to right
@@ -112,158 +109,16 @@ void runOnRealData()
 			{1463, 549}
 		},
 		// Camera top
-		/*
 		{
-			{776, 1357},
-			{750, 1327},
-			{764, 1137},
-			{1142, 981},
-			{1630, 693},
-			{1690, 461},
-			{1536, 455},
-			{1118, 459}
-		}
-		*/
-	};
-
-	// Compute rays in 3D from camera matrices and 2D points
-	const auto rays = computeRays(cameras, points2D);
-
-	// Matching and triangulation of points
-	std::vector<glm::vec3> triangulatedPoints3D;
-	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
-	std::tie(triangulatedPoints3D, setsOfRays) = matchRaysAndTriangulate(cameras, points2D, rays);
-
-	// Export the scene
-	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
-}
-
-void experimentNoOcclusion()
-{
-	const float imageWidth = 2454.0;
-	const float imageHeight = 2056.0;
-
-	const auto cameras = loadCamerasFromFiles({
-		"camera_0.txt",
-		"camera_72.txt",
-		"camera_144.txt",
-		"camera_216.txt",
-		"camera_288.txt",
-		"camera_top.txt"
-		}, glm::vec2(imageWidth, imageHeight));
-
-	// X axis is from left to right
-	// Y axis is from bottom to top
-	const std::vector<std::vector<glm::vec2>> points2D = {
-		// Camera 0
-		{
-			{813, 866},
-			{883, 1268},
-			{909, 1258},
-			{1319, 1308},
-		},
-		// Camera 72
-		{
-			{803, 884},
-			{931, 1260},
-			{1195, 1258},
-			{1481, 1356},
-		},
-		// Camera 144
-		{
-			{1348, 888},
-			{1364, 1252},
-			{1514, 1258},
-			{1294, 1366},
-		},
-		// Camera 216
-		{
-			{1449, 1280},
-			{1627, 1266},
-			{1731, 880},
-			{1007, 1364},
-		},
-		// Camera 288
-		{
-			{1435, 865},
-			{1051, 1281},
-			{1327, 1277},
-			{1027, 1349},
-		},
-		// Camera top
-		{
-			{697, 1171},
-			{671, 683},
-			{1370, 1488},
+			{1600, 1492},
+			{1572, 1525},
+			{1373, 1491},
+			{1220, 1113},
+			{698, 1171},
+			{670, 683},
 			{633, 596},
+			{944, 628}
 		}
-	};
-
-	// Compute rays in 3D from camera matrices and 2D points
-	const auto rays = computeRays(cameras, points2D);
-
-	// Matching and triangulation of points
-	std::vector<glm::vec3> triangulatedPoints3D;
-	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
-	std::tie(triangulatedPoints3D, setsOfRays) = matchRaysAndTriangulate(cameras, points2D, rays);
-
-	// Export the scene
-	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
-}
-
-void experimentWithOcclusion()
-{
-	const float imageWidth = 2454.0;
-	const float imageHeight = 2056.0;
-
-	const auto cameras = loadCamerasFromFiles({
-		// "camera_0.txt",
-		"camera_72.txt",
-		// "camera_144.txt",
-		"camera_216.txt",
-		"camera_288.txt",
-		// "camera_top.txt"
-		}, glm::vec2(imageWidth, imageHeight));
-
-	// X axis is from left to right
-	// Y axis is from bottom to top
-	const std::vector<std::vector<glm::vec2>> points2D = {
-		// Camera 0
-		/*
-		{
-			{883, 1268},
-			{909, 1258},
-		},
-		*/
-		// Camera 72
-		{
-			{931, 1260},
-			{1195, 1258},
-		},
-		// Camera 144
-		/*
-		{
-			{1364, 1252},
-			{1514, 1258},
-		},
-		*/
-		// Camera 216
-		{
-			// {1627, 1266},
-			{1449, 1280},
-		},
-		// Camera 288
-		{
-			{1327, 1277},
-			// {1051, 1281},
-		},
-		/*
-		// Camera top
-		{
-			{671, 683},
-			{697, 1171},
-		}
-		*/
 	};
 
 	// Compute rays in 3D from camera matrices and 2D points
