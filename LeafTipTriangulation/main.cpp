@@ -129,17 +129,12 @@ void runOnRealData()
 	// Compute rays in 3D from camera matrices and 2D points
 	const auto rays = computeRays(cameras, points2D);
 
-	// Compute similarity between all points between the two cameras
-	// Matching of points using the Hungarian algorithm
-	auto setsOfRays = findSetsOfRays(cameras, points2D, rays);
-	removeSingleRays(setsOfRays);
-
-	// Triangulation and bundle adjustment of sets of rays
-	float triangulationError;
+	// Matching and triangulation of points
 	std::vector<glm::vec3> triangulatedPoints3D;
-	std::tie(triangulationError, triangulatedPoints3D) = triangulatePoints(cameras, points2D, setsOfRays);
-	std::cout << "Triangulation re-projection error: " << triangulationError << std::endl;
+	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
+	std::tie(triangulatedPoints3D, setsOfRays) = matchRaysAndTriangulate(cameras, points2D, rays);
 
+	// Export the scene
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 
@@ -285,7 +280,7 @@ void experimentWithOcclusion()
 
 int main(int argc, char *argv[])
 {
-	experimentWithOcclusion();
+	runOnRealData();
 	
     return 0;
 }

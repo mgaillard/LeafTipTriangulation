@@ -20,6 +20,27 @@
 std::size_t convertVectorBoolToInt(const std::vector<bool>& v);
 
 /**
+ * \brief Strategy for measuring errors in the similarity function 
+ */
+enum class SimilarityStrategy
+{	
+	/**
+	 * \brief Output only the re-projection error of point 0
+	 */
+	OnlyPoint0,
+
+	/**
+	 * \brief Output only the re-projection error of point 1
+	 */
+	OnlyPoint1,
+
+	/**
+	 * \brief Output the re-projection error of both points (default strategy)
+	 */
+	BothPoints
+};
+
+/**
  * \brief Compute a similarity coefficient between two points projected on two cameras
  * \param camera0 Camera A
  * \param ray0 Ray A
@@ -27,6 +48,7 @@ std::size_t convertVectorBoolToInt(const std::vector<bool>& v);
  * \param camera1 Camera B
  * \param ray1 Ray B
  * \param point1 2D Point B
+ * \param strategy Strategy to measure the error, see SimilarityStrategy
  * \return The similarity coefficient between two rays
  */
 float similarity(const Camera& camera0,
@@ -34,7 +56,8 @@ float similarity(const Camera& camera0,
                  const glm::vec2& point0,
                  const Camera& camera1,
                  const Ray& ray1,
-                 const glm::vec2& point1);
+                 const glm::vec2& point1,
+				 SimilarityStrategy strategy = SimilarityStrategy::BothPoints);
 
 /**
  * \brief Structure to hold a cache entry for the function matchRaysAndTriangulate.
@@ -123,7 +146,8 @@ float similarity(
 	const glm::vec2& point0,
 	const Camera& camera1,
 	const Ray& ray1,
-	const glm::vec2& point1)
+	const glm::vec2& point1,
+	SimilarityStrategy strategy)
 {
 	// See: Triangulation without correspondences from Cheng et al.
 	const std::array<glm::vec3, 2> u = {{ray0.direction, ray1.direction}};
@@ -181,7 +205,28 @@ float similarity(
 	assert(q1.z > 0.f);
 
 	// Compute re-projection distance
-	return glm::distance(point0, glm::vec2(q0)) + glm::distance(point1, glm::vec2(q1));
+	auto result = std::numeric_limits<float>::max();
+
+	switch (strategy)
+	{
+		// Use only point 0 to compute the re-projection error
+	case SimilarityStrategy::OnlyPoint0:
+		result = glm::distance(point0, glm::vec2(q0));
+		break;
+		
+		// Use only point 1 to compute the re-projection error
+	case SimilarityStrategy::OnlyPoint1:
+		result = glm::distance(point1, glm::vec2(q1));
+		break;
+
+		// Use both point 0 and point 1 to compute the re-projection error
+	case SimilarityStrategy::BothPoints:
+	default:
+		result = glm::distance(point0, glm::vec2(q0)) + glm::distance(point1, glm::vec2(q1));
+		break;
+	};
+
+	return result;
 }
 
 /**
@@ -245,6 +290,7 @@ std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 				const auto projectedPoint = glm::vec2(currentCamera.project(points3D[i]));
 
 				// Compare to the 2D point j
+				// Compute the re-projection error of the 3D point on the camera
 				dist = static_cast<double>(glm::distance(projectedPoint, currentPoints2D[j]));
 			}
 			else
@@ -254,16 +300,15 @@ std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 				const auto singleRayCameraIndex = singleRay.first;
 				const auto singleRayIndex = singleRay.second;
 
-				// TODO: Warning similarity computes the sum of the reprojection error on the two views
+				// Compute the sum of the re-projection error but only on the view we add
+				// We do this to be consistent with the other case, when matching the single ray with a point
 				dist = similarity(cameras[singleRayCameraIndex],
 				                  rays[singleRayCameraIndex][singleRayIndex],
 				                  points2D[singleRayCameraIndex][singleRayIndex],
 				                  currentCamera,
 				                  currentRays[j],
-				                  currentPoints2D[j]);
-
-				// TODO: Improve this, see how similarity behaves
-				dist /= 2.0;
+				                  currentPoints2D[j],
+								  SimilarityStrategy::OnlyPoint1);
 			}
 
 			// The distance is the ratio between the point distance and the longest distance in the image
@@ -280,8 +325,6 @@ std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 			cost(i, j) = -maximumSimilarity;
 		}
 	}
-
-	std::cout << cost << std::endl;
 
 	// Compute best assignment between pairs of points
 	const auto assignment = dlib::max_cost_assignment(cost);
@@ -438,6 +481,7 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 	const std::vector<std::vector<glm::vec2>>& points2D,
 	const std::vector<std::vector<Ray>>& rays)
 {
+	// TODO: Improve this multiplier to maximize the resolution of floats when converted to long integers
 	// Multiplier used to convert a floating point value to an integer value
 	const float realToLongMultiplier = 1000.f;
 
