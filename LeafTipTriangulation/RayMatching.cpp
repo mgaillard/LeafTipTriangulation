@@ -480,14 +480,14 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 	const std::vector<Camera>& cameras,
 	const std::vector<std::vector<glm::vec2>>& points2D,
 	const std::vector<std::vector<Ray>>& rays)
-{
-	// TODO: Improve this multiplier to maximize the resolution of floats when converted to long integers
-	// Multiplier used to convert a floating point value to an integer value
-	const float realToLongMultiplier = 1000.f;
+{	
+	// Compute an upper bound on the maximum distance between two pixel with the camera
+	const auto maximumDistancePixels = computeMaximumCameraResolution(cameras) * std::sqrt(2.f);
+	// Make sure that this distance is about 1G for the maximum distance in the image
+	const long maximumSimilarity = 1e9;
 
-	// Compute the maximum distance between two pixel in any camera
-	const float maximumDistancePixels = computeMaximumCameraResolution(cameras) * std::sqrt(2.f);
-	const long maximumSimilarity = static_cast<long>(std::round(maximumDistancePixels * realToLongMultiplier));
+	// Multiplier used to convert a floating point value to an integer value
+	const double realToLongMultiplier = static_cast<double>(maximumSimilarity) / maximumDistancePixels;
 
 	// Find the view with the maximum number of points in 2D
 	unsigned int referenceCamera = 0;
@@ -567,7 +567,6 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 			}
 		}
 	}
-
 	
 	return setsOfRays;
 }
