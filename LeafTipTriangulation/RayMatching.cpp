@@ -186,23 +186,24 @@ float similarity(
 	// Closest point between the two lines
 	const auto q = glm::inverse(A[0] + A[1]) * ((A[0] * ray0.origin) + (A[1] * ray1.origin));
 
+	// Compute the re-projection of q on the two views
+	const auto q0 = camera0.project(q);
+	const auto q1 = camera1.project(q);
+
 	// Failure case 2: the pseudo-intersection is on the negative side of one of the rays
 	const std::array<glm::vec3, 2> dirQ = {
 		glm::normalize(q - ray0.origin),
 		glm::normalize(q - ray1.origin)
 	};
-	if ((glm::dot(u[0], dirQ[0]) <= 0.f) || (glm::dot(u[1], dirQ[1]) <= 0.f))
+	const auto dotProduct0 = glm::dot(u[0], dirQ[0]);
+	const auto dotProduct1 = glm::dot(u[1], dirQ[1]);
+	
+	// Check depth: the point must be visible from the camera and not behind it
+	if ((dotProduct0 <= 0.f) || (dotProduct1 <= 0.f)
+	 || (q0.z <= 0.f) || (q1.z <= 0.f))
 	{
 		return std::numeric_limits<float>::max();
 	}
-
-	// Compute the re-projection of q on the two views
-	const auto q0 = camera0.project(q);
-	const auto q1 = camera1.project(q);
-
-	// Check depth: the point must be visible from the camera and not behind it
-	assert(q0.z > 0.f);
-	assert(q1.z > 0.f);
 
 	// Compute re-projection distance
 	auto result = std::numeric_limits<float>::max();
@@ -309,6 +310,8 @@ std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 				                  currentRays[j],
 				                  currentPoints2D[j],
 								  SimilarityStrategy::OnlyPoint1);
+
+				// TODO: check dist < std::numeric_limits<float>::max()
 			}
 
 			// The distance is the ratio between the point distance and the longest distance in the image
@@ -542,6 +545,8 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 				                             rays[c][j],
 				                             points2D[c][j]);
 
+				// TODO: check dist < std::numeric_limits<float>::max()
+				
 				const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
 				cost(i, j) = -integerDist;
 			}

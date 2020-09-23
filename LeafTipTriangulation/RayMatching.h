@@ -9,6 +9,7 @@
 /**
  * \brief Find a matching of rays between multiple cameras.
  *		  Warning: This function is an approximation and does not work in the general case.
+ *		  TODO: make this function private
  * \param cameras A list of cameras
  * \param points2D A list of 2D points per camera
  * \param rays A list of 3D rays associated to 2D points per camera
