@@ -446,7 +446,7 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 				}
 
 				// Match rays to subPoints and update setsOfRays with the rays in camera c
-				setsOfRays = pointsRaysMatching(cameras, points2D, rays, subPoints, setsOfRays, c);				
+				setsOfRays = pointsRaysMatching(cameras, points2D, rays, subPoints, setsOfRays, c);
 
 				// Re-triangulate the points with the new rays
 				// TODO: maybe just bundle adjusting is necessary
@@ -545,10 +545,17 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 				                             rays[c][j],
 				                             points2D[c][j]);
 
-				// TODO: check dist < std::numeric_limits<float>::max()
-				
-				const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
-				cost(i, j) = -integerDist;
+				if (dist < 10.f)
+				{
+					const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
+					cost(i, j) = -integerDist;
+				}
+				else
+				{
+					// if dist == std::numeric_limits<float>::max()
+					// or if above a threshold, we push the algorithm not to match the two points
+					cost(i, j) = -maximumSimilarity;
+				}
 			}
 
 			// Add dummy columns, filled with min - 1
@@ -563,12 +570,26 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 
 		for (unsigned int i = 0; i < assignment.size(); i++)
 		{
+			// The cost of the assignment: row `i` with column `assignment[i]`
+			const auto associatedCost = cost(i, assignment[i]);
+
 			// If the assigned ray is not one of the dummy ray we added
 			if (assignment[i] < costCols)
 			{
-				// Ray i from the reference camera is in setsOfRays[i]
-				// We add the corresponding ray assignment[i] from camera c
-				setsOfRays[i].emplace_back(c, assignment[i]);
+				// If it's not a match we prevented from happening because the two rays are two different
+				if (associatedCost > -maximumSimilarity)
+				{
+					// Ray i from the reference camera is in setsOfRays[i]
+					// We add the corresponding ray assignment[i] from camera c
+					setsOfRays[i].emplace_back(c, assignment[i]);
+				}
+				else
+				{
+					// We found a ray in camera c that matches to no ray in the reference camera
+					setsOfRays.push_back(
+						{ {c, assignment[i]} }
+					);
+				}
 			}
 		}
 	}
@@ -598,6 +619,9 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 	const std::vector<std::vector<glm::vec2>>& points2D,
 	const std::vector<std::vector<Ray>>& rays)
 {
+	// TODO: run the DP bottom up in parallel for 2 cameras, then 3 cameras,
+	// TODO: then delete all entries with 2 cameras and run in parallel for 4 cameras, etc...
+	
 	// Build the active set vector
 	const std::vector<bool> activeCameraSet(cameras.size(), true);
 

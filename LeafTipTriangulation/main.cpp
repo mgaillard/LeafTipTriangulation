@@ -12,29 +12,40 @@
 
 void testWithSyntheticData()
 {
-	const int numberPoints3D = 8;
+	// TODO: set the random seed
+	
+	const int numberPoints3D = 20;
 	const float spherePointsRadius = 1.f;
-	const int numberCameras = 6;
+	const int numberCameras = 8;
 	const float sphereCamerasRadius = 5.f;
 
 	const auto points3D = generatePointsInSphere(numberPoints3D, spherePointsRadius);
 	const auto cameras = generateCamerasOnSphere(numberCameras, sphereCamerasRadius);
 	const auto projectedPoints2D = projectPoints(points3D, cameras);
 	// Add noise and occlusion and shuffle points
-	const auto points2D = removePoints(addNoise(projectedPoints2D, cameras, 2.f), 0.8f);
-	
-	const auto rays = computeRays(cameras, points2D);
-	checkUnProject(points3D, rays);
+	// Check that the problem can be solved
+	// One point must be visible from at least two cameras
+	const auto points2D = removePoints(addNoise(projectedPoints2D, cameras, 1.f), 0.6f);
 
+	const auto rays = computeRays(cameras, points2D);
+	// Check projection of points on rays, only works with no occlusion
+	// checkUnProject(points3D, rays);
+	
 	// Matching and triangulation of points
 	std::vector<glm::vec3> triangulatedPoints3D;
 	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
+	const auto startTime = std::chrono::steady_clock::now();
 	std::tie(triangulatedPoints3D, setsOfRays) = matchRaysAndTriangulate(cameras, points2D, rays);
+	const auto endTime = std::chrono::steady_clock::now();
+	std::cout << "Runtime: "
+	          << std::chrono::duration<double, std::milli>(endTime - startTime).count()
+	          << " ms" << std::endl;
 
+	// Check sets of rays to make sure the matching is exact
+	checkCorrespondenceSetsOfRays(setsOfRays);
+	
 	// Match the two sets of points and check the distance
 	matchingTriangulatedPointsWithGroundTruth(points3D, triangulatedPoints3D);
-
-	// TODO: Check sets of rays to make sure the matching is exact
 	
 	// Draw the scene in OBJ for Debugging
 	exportSceneAsOBJ(points3D, rays, "scene.obj");
@@ -135,7 +146,10 @@ void runOnRealData()
 
 int main(int argc, char *argv[])
 {
-	runOnRealData();
+	testWithSyntheticData();
+
+	// TODO: example with a real object and a ChaRuCo calibration pattern
+	// TODO: compute mis-detection rate and false alarm rate on the synthetic
 	
     return 0;
 }

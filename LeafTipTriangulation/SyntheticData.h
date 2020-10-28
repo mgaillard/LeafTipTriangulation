@@ -72,3 +72,9 @@ bool checkUnProject(const std::vector<glm::vec3>& points,
  */
 void matchingTriangulatedPointsWithGroundTruth(const std::vector<glm::vec3>& points3D,
 	                                           const std::vector<glm::vec3>& triangulatedPoints3D);
+
+/**
+ * \brief Check the correspondence of rays to make sure the matching is perfect
+ * \param setsOfRays The matching of rays that best triangulates 2D points projected by cameras
+ */
+void checkCorrespondenceSetsOfRays(const std::vector<std::vector<std::pair<int, int>>>& setsOfRays);

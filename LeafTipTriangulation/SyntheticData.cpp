@@ -102,8 +102,13 @@ std::vector<std::vector<glm::vec2>> removePoints(
 	const std::vector<std::vector<glm::vec2>>& points,
 	float probabilityKeep)
 {
+	assert(!points.empty());
 	assert(probabilityKeep >= 0.f && probabilityKeep <= 1.f);
 
+	// Number of cameras on which each point is visible
+	std::vector<int> visibility(points.front().size(), 0);
+
+	// New array of camera points
 	std::vector<std::vector<glm::vec2>> newPoints;
 
 	newPoints.reserve(points.size());
@@ -112,15 +117,35 @@ std::vector<std::vector<glm::vec2>> removePoints(
 		std::vector<glm::vec2> newCameraPoints;
 
 		newCameraPoints.reserve(cameraPoints.size());
-		for (const auto& point : cameraPoints)
+		for (unsigned int i = 0; i < cameraPoints.size(); i++)
 		{
+			const auto& point = cameraPoints[i];
+			
 			if (glm::linearRand(0.f, 1.f) <= probabilityKeep)
 			{
 				newCameraPoints.push_back(point);
+				visibility[i]++;
 			}
 		}
 
 		newPoints.push_back(newCameraPoints);
+	}
+
+	// Check that each point is visible from at least two cameras
+	for (unsigned int i = 0; i < visibility.size(); i++)
+	{
+		if (visibility[i] < 2)
+		{
+			std::cout << "Warning: point " << i
+			          << " can't be reconstructed because it is visible from only one camera." << std::endl;
+		}
+	}
+
+	// Maximum number of points seen by a camera
+	const auto maximumVisibility = *std::max_element(visibility.begin(), visibility.end());
+	if (maximumVisibility < visibility.size())
+	{
+		std::cout << "None of the cameras can see all points" << std::endl;
 	}
 
 	return newPoints;
@@ -177,6 +202,7 @@ void matchingTriangulatedPointsWithGroundTruth(
 	const auto assignment = dlib::max_cost_assignment(cost);
 
 	// Compute statistics on the assignment
+	// TODO: Compute mean, standard-deviation and minimum
 	float maximumDistance = 0.0f;
 	for (unsigned int i = 0; i < assignment.size(); i++)
 	{
@@ -190,4 +216,62 @@ void matchingTriangulatedPointsWithGroundTruth(
 	std::cout << "Maximum distance from triangulated to ground truth: " << maximumDistance << "\n"
 		      << "Assignment cost between the ground truth and triangulation: "
 		      << dlib::assignment_cost(realCost, assignment) << std::endl;
+}
+
+void checkCorrespondenceSetsOfRays(const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
+{
+	int nbRightCorrespondences = 0;
+	int nbWrongCorrespondences = 0;
+
+	int nbRightPoints = 0;
+	int nbWrongPoints = 0;
+	
+	// If rays have been generated, all rays of a point are associated to the same point on all cameras
+	for (int i = 0; i < setsOfRays.size(); i++)
+	{
+		const auto& setOfRays = setsOfRays[i];
+
+		bool pointIsCorrect = true;
+
+		for (const auto& ray : setOfRays)
+		{
+			const auto& cameraIndex = ray.first;
+			const auto& pointIndex = ray.second;
+
+			if (pointIndex == i)
+			{
+				nbRightCorrespondences++;
+			}
+			else
+			{
+				nbWrongCorrespondences++;
+				// If at least one wrong ray is associated to this point,
+				// the point is wrongly triangulated
+				pointIsCorrect = false;
+			}
+		}
+
+		// Whether the point has successfully been triangulated or not
+		if (pointIsCorrect)
+		{
+			nbRightPoints++;
+		}
+		else
+		{
+			nbWrongPoints++;
+		}
+	}
+
+	// Compute rates of errors
+	const auto totalCorrespondences = nbWrongCorrespondences + nbRightCorrespondences;
+	const auto totalPoints = setsOfRays.size();
+	
+	const auto rateWrongCorrespondences = float(nbWrongCorrespondences) / float(totalCorrespondences);
+	const auto rateWrongPoints = float(nbWrongPoints) / float(totalPoints);
+
+	std::cout << "Number of incorrectly/correctly matched points : " << nbWrongPoints << " / " << nbRightPoints << "\n"
+			  << "Rate of incorrectly matched points : " << 100.f * rateWrongPoints << " %\n"
+			  << "Number of incorrect/correct correspondences : "
+	          << nbWrongCorrespondences << " / " << nbRightCorrespondences << "\n"
+			  << "Rate of incorrect correspondences : " << 100.f * rateWrongCorrespondences << " %" << std::endl;
 }
