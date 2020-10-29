@@ -12,23 +12,32 @@
 
 void testWithSyntheticData()
 {
-	// TODO: set the random seed
+	// Set the random seed
+	// srand(1);
 	
-	const int numberPoints3D = 20;
+	const int numberPoints3D = 10;
 	const float spherePointsRadius = 1.f;
 	const int numberCameras = 8;
 	const float sphereCamerasRadius = 5.f;
+	const float noiseStd = 0.5f;
+	const float probabilityKeep = 0.5f;
+	// TODO: give the threshold for not pairing a ray and a point as a parameter (and make it a function of the noise)
 
 	const auto points3D = generatePointsInSphere(numberPoints3D, spherePointsRadius);
 	const auto cameras = generateCamerasOnSphere(numberCameras, sphereCamerasRadius);
 	const auto projectedPoints2D = projectPoints(points3D, cameras);
 	// Add noise and occlusion and shuffle points
+	const auto noisyPoints2D = addNoise(projectedPoints2D, cameras, noiseStd);
 	// Check that the problem can be solved
 	// One point must be visible from at least two cameras
-	const auto points2D = removePoints(addNoise(projectedPoints2D, cameras, 1.f), 0.6f);
+	std::vector<std::vector<glm::vec2>> points2D;
+	std::vector<std::vector<std::pair<int, int>>> trueCorrespondences;
+	std::tie(points2D, trueCorrespondences) = removePoints(noisyPoints2D, probabilityKeep);
+
+	// TODO: if at least one point is visible from only one camera cancel the current reconstruction
 
 	const auto rays = computeRays(cameras, points2D);
-	// Check projection of points on rays, only works with no occlusion
+	// Check projection of points on rays (only works with no occlusion)
 	// checkUnProject(points3D, rays);
 	
 	// Matching and triangulation of points
@@ -41,14 +50,13 @@ void testWithSyntheticData()
 	          << std::chrono::duration<double, std::milli>(endTime - startTime).count()
 	          << " ms" << std::endl;
 
-	// Check sets of rays to make sure the matching is exact
-	checkCorrespondenceSetsOfRays(setsOfRays);
-	
+	// Sort the set of rays to make it uniquely identifiable even if it has been permuted
+	sortSetsOfRays(setsOfRays);
 	// Match the two sets of points and check the distance
-	matchingTriangulatedPointsWithGroundTruth(points3D, triangulatedPoints3D);
+	matchingTriangulatedPointsWithGroundTruth(triangulatedPoints3D, setsOfRays, points3D, trueCorrespondences);
 	
 	// Draw the scene in OBJ for Debugging
-	exportSceneAsOBJ(points3D, rays, "scene.obj");
+	// exportSceneAsOBJ(points3D, rays, "scene.obj");
 	// exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 

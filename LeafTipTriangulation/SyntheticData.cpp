@@ -98,7 +98,7 @@ std::vector<std::vector<glm::vec2>> addNoise(
 	return newPoints;
 }
 
-std::vector<std::vector<glm::vec2>> removePoints(
+std::pair<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<std::pair<int, int>>>> removePoints(
 	const std::vector<std::vector<glm::vec2>>& points,
 	float probabilityKeep)
 {
@@ -108,12 +108,17 @@ std::vector<std::vector<glm::vec2>> removePoints(
 	// Number of cameras on which each point is visible
 	std::vector<int> visibility(points.front().size(), 0);
 
+	// For each point retain the ground-truth correspondence
+	std::vector<std::vector<std::pair<int, int>>> correspondences(points.front().size());
+
 	// New array of camera points
 	std::vector<std::vector<glm::vec2>> newPoints;
 
 	newPoints.reserve(points.size());
-	for (const auto& cameraPoints : points)
+	for (int c = 0; c < points.size(); c++)
 	{
+		const auto& cameraPoints = points[c];
+		
 		std::vector<glm::vec2> newCameraPoints;
 
 		newCameraPoints.reserve(cameraPoints.size());
@@ -125,6 +130,7 @@ std::vector<std::vector<glm::vec2>> removePoints(
 			{
 				newCameraPoints.push_back(point);
 				visibility[i]++;
+				correspondences[i].emplace_back(c, newCameraPoints.size() - 1);
 			}
 		}
 
@@ -143,12 +149,12 @@ std::vector<std::vector<glm::vec2>> removePoints(
 
 	// Maximum number of points seen by a camera
 	const auto maximumVisibility = *std::max_element(visibility.begin(), visibility.end());
-	if (maximumVisibility < visibility.size())
+	if (maximumVisibility < points.size())
 	{
 		std::cout << "None of the cameras can see all points" << std::endl;
 	}
 
-	return newPoints;
+	return { newPoints, correspondences };
 }
 
 bool checkUnProject(
@@ -175,10 +181,14 @@ bool checkUnProject(
 }
 
 void matchingTriangulatedPointsWithGroundTruth(
+	const std::vector<glm::vec3>& triangulatedPoints3D,
+	const std::vector<std::vector<std::pair<int, int>>>& setOfRays,
 	const std::vector<glm::vec3>& points3D,
-	const std::vector<glm::vec3>& triangulatedPoints3D)
+	const std::vector<std::vector<std::pair<int, int>>>& trueCorrespondences)
 {
 	assert(points3D.size() == triangulatedPoints3D.size());
+
+	// TODO: handle the case where the number of points are not the same
 
 	// Multiplier used to convert a floating point value to an integer value
 	const float realToLongMultiplier = 1000.f;
@@ -202,8 +212,11 @@ void matchingTriangulatedPointsWithGroundTruth(
 	const auto assignment = dlib::max_cost_assignment(cost);
 
 	// Compute statistics on the assignment
-	// TODO: Compute mean, standard-deviation and minimum
+	int nbRightPoints = 0;
+	int nbWrongPoints = 0;
+	// TODO: Compute mean, standard-deviation
 	float maximumDistance = 0.0f;
+	float minimumDistance = std::numeric_limits<float>::max();
 	for (unsigned int i = 0; i < assignment.size(); i++)
 	{
 		const auto groundTruthIndex = i;
@@ -211,11 +224,40 @@ void matchingTriangulatedPointsWithGroundTruth(
 
 		const auto dist = glm::distance(points3D[groundTruthIndex], triangulatedPoints3D[triangulatedIndex]);
 		maximumDistance = std::max(maximumDistance, dist);
+		minimumDistance = std::min(minimumDistance, dist);
+
+		// Compare the correspondences
+		// from trueCorrespondences[groundTruthIndex] with setOfRays[triangulatedIndex]
+		if (trueCorrespondences[groundTruthIndex] == setOfRays[triangulatedIndex])
+		{
+			nbRightPoints++;
+		}
+		else
+		{
+			nbWrongPoints++;
+		}
+
+		// TODO: compute 
+		
+		// For each correspondence in setOfRays[triangulatedIndex]
+		// If it is present in the ground truth => true positive
+		// If it is not present in the ground truth => false positive
+
+		// For each correspondence in trueCorrespondences[groundTruthIndex]
+		// If it is not present in the ground truth => false negative
 	}
 
-	std::cout << "Maximum distance from triangulated to ground truth: " << maximumDistance << "\n"
+	const auto rateWrongPoints = float(nbWrongPoints) / float(nbRightPoints + nbWrongPoints);
+
+	// TODO: boolean for CSV output
+
+	std::cout << "Minimum distance from triangulated to ground truth: " << minimumDistance << "\n"
+			  << "Maximum distance from triangulated to ground truth: " << maximumDistance << "\n"
 		      << "Assignment cost between the ground truth and triangulation: "
-		      << dlib::assignment_cost(realCost, assignment) << std::endl;
+		      << dlib::assignment_cost(realCost, assignment) << "\n"
+		      << "Number of incorrectly/correctly matched points : "
+		      << nbWrongPoints << " / " << nbRightPoints << "\n"
+		      << "Rate of incorrectly matched points : " << 100.f * rateWrongPoints << " %\n" << std::endl;
 }
 
 void checkCorrespondenceSetsOfRays(const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
@@ -269,7 +311,8 @@ void checkCorrespondenceSetsOfRays(const std::vector<std::vector<std::pair<int, 
 	const auto rateWrongCorrespondences = float(nbWrongCorrespondences) / float(totalCorrespondences);
 	const auto rateWrongPoints = float(nbWrongPoints) / float(totalPoints);
 
-	std::cout << "Number of incorrectly/correctly matched points : " << nbWrongPoints << " / " << nbRightPoints << "\n"
+	std::cout << "Number of incorrectly/correctly matched points : "
+	          << nbWrongPoints << " / " << nbRightPoints << "\n"
 			  << "Rate of incorrectly matched points : " << 100.f * rateWrongPoints << " %\n"
 			  << "Number of incorrect/correct correspondences : "
 	          << nbWrongCorrespondences << " / " << nbRightCorrespondences << "\n"

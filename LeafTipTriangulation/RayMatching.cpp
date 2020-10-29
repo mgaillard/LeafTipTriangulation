@@ -310,16 +310,23 @@ std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 				                  currentRays[j],
 				                  currentPoints2D[j],
 								  SimilarityStrategy::OnlyPoint1);
-
-				// TODO: check dist < std::numeric_limits<float>::max()
 			}
+			
+			if (dist < 10.f) // TODO: special variable for threshold, make it twice less than for findSetsOfRays
+			{
+				// The distance is the ratio between the point distance and the longest distance in the image
+				dist /= maximumDistancePixels;
 
-			// The distance is the ratio between the point distance and the longest distance in the image
-			dist /= maximumDistancePixels;
-
-			// Make the distance integer
-			const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
-			cost(i, j) = -integerDist;
+				// Make the distance integer
+				const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
+				cost(i, j) = -integerDist;
+			}
+			else
+			{
+				// if dist == std::numeric_limits<float>::max()
+				// or if above a threshold, we push the algorithm not to match the two points
+				cost(i, j) = -maximumSimilarity;
+			}
 		}
 
 		// Add dummy columns, filled with min - 1
@@ -337,12 +344,26 @@ std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 
 	for (unsigned int i = 0; i < assignment.size(); i++)
 	{
+		// The cost of the assignment: row `i` with column `assignment[i]`
+		const auto associatedCost = cost(i, assignment[i]);
+		
 		// If the assigned ray is not one of the dummy ray we added
 		if (assignment[i] < costCols)
 		{
-			// Ray i from the reference camera is in setsOfRays[i]
-			// We add the corresponding ray assignment[i] from camera c
-			newSetsOfRays[i].emplace_back(cameraIndex, assignment[i]);
+			// If it's not a match we prevented from happening because the two rays are two different
+			if (associatedCost > -maximumSimilarity)
+			{
+				// Ray i from the reference camera is in setsOfRays[i]
+				// We add the corresponding ray assignment[i] from camera c
+				newSetsOfRays[i].emplace_back(cameraIndex, assignment[i]);
+			}
+			else
+			{
+				// We found a ray in camera c that matches to no ray in the reference camera
+				newSetsOfRays.push_back(
+					{ {cameraIndex, assignment[i]} }
+				);
+			}
 		}
 	}
 
@@ -611,6 +632,14 @@ void removeSingleRays(std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
 		{
 			++it;
 		}
+	}
+}
+
+void sortSetsOfRays(std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
+{
+	for (auto& setOfRays : setsOfRays)
+	{
+		std::sort(setOfRays.begin(), setOfRays.end());
 	}
 }
 

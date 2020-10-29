@@ -47,10 +47,11 @@ std::vector<std::vector<glm::vec2>> addNoise(const std::vector<std::vector<glm::
  * \brief Randomly remove points from the list to simulation occlusion
  * \param points A list of 2D points
  * \param probabilityKeep A probability to keep a 2D point
- * \return The list of 2D points minus some points that are removed
+ * \return The list of 2D points minus some points that are removed and the set of ground truth correspondences
  */
-std::vector<std::vector<glm::vec2>> removePoints(const std::vector<std::vector<glm::vec2>>& points,
-											     float probabilityKeep);
+std::pair<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<std::pair<int, int>>>>
+removePoints(const std::vector<std::vector<glm::vec2>>& points,
+			 float probabilityKeep);
 
 /**
  * \brief Check that each 3D point is close to a it's associated ray.
@@ -67,11 +68,16 @@ bool checkUnProject(const std::vector<glm::vec3>& points,
  *        Display the maximum distance between a 3D point and it's matching triangulated 3D point.
  *        Display the average distance between the ground truth and the triangulation.
  *        Use this function to check that the triangulation without correspondences was successful.
- * \param points3D A list of 3D points
  * \param triangulatedPoints3D A list of triangulated 3D points
+ * \param setOfRays The list of correspondences for the triangulation
+ * \param points3D A list of 3D points
+ * \param trueCorrespondences The list of true correspondences
  */
-void matchingTriangulatedPointsWithGroundTruth(const std::vector<glm::vec3>& points3D,
-	                                           const std::vector<glm::vec3>& triangulatedPoints3D);
+void matchingTriangulatedPointsWithGroundTruth(
+	const std::vector<glm::vec3>& triangulatedPoints3D,
+	const std::vector<std::vector<std::pair<int, int>>>& setOfRays,
+	const std::vector<glm::vec3>& points3D,
+	const std::vector<std::vector<std::pair<int, int>>>& trueCorrespondences);
 
 /**
  * \brief Check the correspondence of rays to make sure the matching is perfect
