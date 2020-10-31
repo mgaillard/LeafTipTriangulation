@@ -1,6 +1,7 @@
 #include "SyntheticData.h"
 
 #include <iostream>
+#include <numeric>
 
 #include <glm/gtc/random.hpp>
 #include <glm/gtx/closest_point.hpp>
@@ -100,7 +101,8 @@ std::vector<std::vector<glm::vec2>> addNoise(
 
 std::pair<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<std::pair<int, int>>>> removePoints(
 	const std::vector<std::vector<glm::vec2>>& points,
-	float probabilityKeep)
+	float probabilityKeep,
+	bool verbose)
 {
 	assert(!points.empty());
 	assert(probabilityKeep >= 0.f && probabilityKeep <= 1.f);
@@ -137,24 +139,44 @@ std::pair<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<std::pair
 		newPoints.push_back(newCameraPoints);
 	}
 
-	// Check that each point is visible from at least two cameras
-	for (unsigned int i = 0; i < visibility.size(); i++)
-	{
-		if (visibility[i] < 2)
-		{
-			std::cout << "Warning: point " << i
-			          << " can't be reconstructed because it is visible from only one camera." << std::endl;
-		}
-	}
+	// True if all points are seen from at least two views
+	bool outputIsValid = true;
 
 	// Maximum number of points seen by a camera
 	const auto maximumVisibility = *std::max_element(visibility.begin(), visibility.end());
 	if (maximumVisibility < points.size())
 	{
-		std::cout << "None of the cameras can see all points" << std::endl;
+		// outputIsValid = false;
+		if (verbose)
+		{
+			std::cout << "None of the cameras can see all points" << std::endl;
+		}
 	}
 
-	return { newPoints, correspondences };
+	// Check that each point is visible from at least two cameras
+	for (unsigned int i = 0; i < visibility.size(); i++)
+	{
+		if (visibility[i] < 2)
+		{
+			outputIsValid = false;
+
+			if (verbose)
+			{
+				std::cout << "Warning: point " << i
+					      << " can't be reconstructed because it is visible from only one camera." << std::endl;
+			}
+		}
+	}
+
+	if (outputIsValid)
+	{
+		return { newPoints, correspondences };
+	}
+	else
+	{
+		// If the output is not valid, simply output empty arrays
+		return { {}, {} };
+	}
 }
 
 bool checkUnProject(
@@ -180,84 +202,218 @@ bool checkUnProject(
 	return true;
 }
 
-void matchingTriangulatedPointsWithGroundTruth(
+GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 	const std::vector<glm::vec3>& triangulatedPoints3D,
-	const std::vector<std::vector<std::pair<int, int>>>& setOfRays,
+	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
 	const std::vector<glm::vec3>& points3D,
 	const std::vector<std::vector<std::pair<int, int>>>& trueCorrespondences)
 {
-	assert(points3D.size() == triangulatedPoints3D.size());
-
-	// TODO: handle the case where the number of points are not the same
-
 	// Multiplier used to convert a floating point value to an integer value
 	const float realToLongMultiplier = 1000.f;
 
-	dlib::matrix<long> cost(points3D.size(), points3D.size());
-	dlib::matrix<float> realCost(points3D.size(), points3D.size());
+	// TODO: better matching and see if it changes results in stats
 
-	for (int i = 0; i < points3D.size(); i++)
+	const int costRows = points3D.size();
+	const int costCols = triangulatedPoints3D.size();
+	const int costSize = std::max(costRows, costCols);
+
+	dlib::matrix<long> cost(costSize, costSize);
+	dlib::matrix<float> realCost(costSize, costSize);
+	
+	for (int i = 0; i < costSize; i++)
 	{
-		for (int j = 0; j < triangulatedPoints3D.size(); j++)
+		for (int j = 0; j < costSize; j++)
 		{
-			const auto dist = glm::distance(points3D[i], triangulatedPoints3D[j]);
-			realCost(i, j) = dist;
+			if (i < costRows && j < costCols)
+			{
+				const auto dist = glm::distance(points3D[i], triangulatedPoints3D[j]);
+				realCost(i, j) = dist;
 
-			const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
-			cost(i, j) = -integerDist;
+				const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
+				cost(i, j) = -integerDist;
+			}
+			else
+			{
+				realCost(i, j) = 0.f;
+				// TODO: replace with a better constant
+				cost(i, j) = -1000000;
+			}
 		}
 	}
 
 	// Compute best assignment between pairs of points
 	const auto assignment = dlib::max_cost_assignment(cost);
 
-	// Compute statistics on the assignment
-	int nbRightPoints = 0;
-	int nbWrongPoints = 0;
-	// TODO: Compute mean, standard-deviation
-	float maximumDistance = 0.0f;
-	float minimumDistance = std::numeric_limits<float>::max();
-	for (unsigned int i = 0; i < assignment.size(); i++)
+	GroundTruthMatchingResult result;
+	result.nbPointsTriangulated = triangulatedPoints3D.size();
+	// Number of points that were missed by the algorithm
+	result.nbPointsMissed = std::max(0, costRows - costCols);
+	// Number of points that were added by the algorithm even if they should not be present
+	result.nbPointsFalsePositive = std::max(0, costCols - costRows);
+	for (unsigned int i = 0; i < costRows; i++)
 	{
-		const auto groundTruthIndex = i;
-		const auto triangulatedIndex = assignment[i];
-
-		const auto dist = glm::distance(points3D[groundTruthIndex], triangulatedPoints3D[triangulatedIndex]);
-		maximumDistance = std::max(maximumDistance, dist);
-		minimumDistance = std::min(minimumDistance, dist);
-
-		// Compare the correspondences
-		// from trueCorrespondences[groundTruthIndex] with setOfRays[triangulatedIndex]
-		if (trueCorrespondences[groundTruthIndex] == setOfRays[triangulatedIndex])
+		// If it is a true 3D point
+		if (i < costRows)
 		{
-			nbRightPoints++;
+			const auto groundTruthIndex = i;
+
+			// If the true point has been successfully matched with a triangulated point
+			if (assignment[i] < costCols)
+			{
+				// The true point i does have an equivalent triangulated assignment[i]
+				
+				const auto triangulatedIndex = assignment[i];
+
+				result.nbPointsSuccessful++;
+
+				const auto dist = glm::distance(points3D[groundTruthIndex], triangulatedPoints3D[triangulatedIndex]);
+				result.distances.push_back(dist);
+
+				// Compare the correspondences
+				// from trueCorrespondences[groundTruthIndex] with setsOfRays[triangulatedIndex]
+				if (trueCorrespondences[groundTruthIndex] == setsOfRays[triangulatedIndex])
+				{
+					result.nbRightPointsCorrespondence++;
+				}
+				else
+				{
+					result.nbWrongPointsCorrespondence++;
+				}
+
+				// For each correspondence in setsOfRays[triangulatedIndex]
+				for (const auto& setOfRays : setsOfRays[triangulatedIndex])
+				{
+					const auto it = std::find(trueCorrespondences[groundTruthIndex].begin(),
+						trueCorrespondences[groundTruthIndex].end(),
+						setOfRays);
+
+					if (it != trueCorrespondences[groundTruthIndex].end())
+					{
+						// If it is present in the ground truth => true positive
+						result.truePositiveCorrespondence++;
+					}
+					else
+					{
+						// If it is not present in the ground truth => false positive
+						result.falsePositiveCorrespondence++;
+					}
+				}
+
+				// For each correspondence in trueCorrespondences[groundTruthIndex]
+				for (const auto& trueCorrespondence : trueCorrespondences[groundTruthIndex])
+				{
+					const auto it = std::find(setsOfRays[triangulatedIndex].begin(),
+						setsOfRays[triangulatedIndex].end(),
+						trueCorrespondence);
+
+					if (it == setsOfRays[triangulatedIndex].end())
+					{
+						// If it is not present in the computed correspondence => false negative
+						result.falseNegativeCorrespondence++;
+					}
+					// If it is present in the ground truth => true positive
+					// But it has already be counted
+				}
+			}
+			else
+			{
+				// The true point i does not have an equivalent triangulated
+				
+				// For each correspondence in trueCorrespondences[groundTruthIndex]
+				for (const auto& trueCorrespondence : trueCorrespondences[groundTruthIndex])
+				{
+					// If it is not present in the computed correspondence => false negative
+					result.falseNegativeCorrespondence++;
+				}
+			}
 		}
 		else
 		{
-			nbWrongPoints++;
+			// In the case of a triangulate point that is a false positive
+			if (assignment[i] < costCols)
+			{
+				const auto triangulatedIndex = assignment[i];
+				
+				// The true point does not have an equivalent triangulated
+				// For each correspondence in trueCorrespondences[groundTruthIndex]
+				for (const auto& setOfRays : setsOfRays[triangulatedIndex])
+				{
+					// If it is not present in the ground truth => false positive
+					result.falsePositiveCorrespondence++;
+				}
+			}
+			else
+			{
+				// This should not happen
+				assert(false);
+			}
 		}
-
-		// TODO: compute 
-		
-		// For each correspondence in setOfRays[triangulatedIndex]
-		// If it is present in the ground truth => true positive
-		// If it is not present in the ground truth => false positive
-
-		// For each correspondence in trueCorrespondences[groundTruthIndex]
-		// If it is not present in the ground truth => false negative
 	}
 
-	const auto rateWrongPoints = float(nbWrongPoints) / float(nbRightPoints + nbWrongPoints);
+	// TODO: correspondences for points that are not matched
 
-	// TODO: boolean for CSV output
+	return result;
+}
 
-	std::cout << "Minimum distance from triangulated to ground truth: " << minimumDistance << "\n"
-			  << "Maximum distance from triangulated to ground truth: " << maximumDistance << "\n"
-		      << "Assignment cost between the ground truth and triangulation: "
-		      << dlib::assignment_cost(realCost, assignment) << "\n"
-		      << "Number of incorrectly/correctly matched points : "
-		      << nbWrongPoints << " / " << nbRightPoints << "\n"
-		      << "Rate of incorrectly matched points : " << 100.f * rateWrongPoints << " %\n" << std::endl;
+AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTruthMatchingResult>& results)
+{	
+	GroundTruthMatchingResult aggregationTotal;
+	int nbRuns = 0;
+
+	for (const auto& result : results)
+	{
+		// If the result has -1 nbPointsTriangulated, it has been aborted
+		if (result.nbPointsTriangulated >= 0)
+		{
+			aggregationTotal.runtime += result.runtime;
+			nbRuns += 1;
+			aggregationTotal.nbPointsTriangulated += result.nbPointsTriangulated;
+			aggregationTotal.nbPointsMissed += result.nbPointsMissed;
+			aggregationTotal.nbPointsFalsePositive += result.nbPointsFalsePositive;
+			aggregationTotal.nbPointsSuccessful += result.nbPointsSuccessful;
+			aggregationTotal.nbRightPointsCorrespondence += result.nbRightPointsCorrespondence;
+			aggregationTotal.nbWrongPointsCorrespondence += result.nbWrongPointsCorrespondence;
+			aggregationTotal.truePositiveCorrespondence += result.truePositiveCorrespondence;
+			aggregationTotal.falsePositiveCorrespondence += result.falsePositiveCorrespondence;
+			aggregationTotal.falseNegativeCorrespondence += result.falseNegativeCorrespondence;
+			// Concat distances
+			aggregationTotal.distances.insert(aggregationTotal.distances.end(),
+				                              result.distances.begin(),
+				                              result.distances.end());
+		}
+	}
+
+	AggregatedGroundTruthMatchingResult aggregation;
+
+	// Compute mean of parameters
+	aggregation.nbRuns = nbRuns;
+	aggregation.runtime = aggregationTotal.runtime / double(nbRuns);
+	aggregation.nbPointsTriangulated = double(aggregationTotal.nbPointsTriangulated) / double(nbRuns);
+	aggregation.nbPointsMissed = double(aggregationTotal.nbPointsMissed) / double(nbRuns);
+	aggregation.nbPointsFalsePositive = double(aggregationTotal.nbPointsFalsePositive) / double(nbRuns);
+	aggregation.nbPointsSuccessful = double(aggregationTotal.nbPointsSuccessful) / double(nbRuns);
+	aggregation.nbRightPointsCorrespondence = double(aggregationTotal.nbRightPointsCorrespondence) / double(nbRuns);
+	aggregation.nbWrongPointsCorrespondence = double(aggregationTotal.nbWrongPointsCorrespondence) / double(nbRuns);
+
+	aggregation.precisionCorrespondence = double(aggregationTotal.truePositiveCorrespondence)
+	                                    / double(aggregationTotal.truePositiveCorrespondence + aggregationTotal.falsePositiveCorrespondence);
+	aggregation.recallCorrespondence = double(aggregationTotal.truePositiveCorrespondence)
+	                                 / double(aggregationTotal.truePositiveCorrespondence + aggregationTotal.falseNegativeCorrespondence);
+	aggregation.fMeasureCorrespondence = 2.f * (aggregation.precisionCorrespondence * aggregation.recallCorrespondence)
+	                                         / (aggregation.precisionCorrespondence + aggregation.recallCorrespondence);
+
+	// Sort distances
+	std::sort(aggregationTotal.distances.begin(), aggregationTotal.distances.end());
+	// Compute the min, mean and max distances
+	aggregation.minimumDistance = aggregationTotal.distances.front();
+	aggregation.firstQuartileDistance = aggregationTotal.distances[aggregationTotal.distances.size() / 4]; // TODO: Average if nb of distances is even
+	aggregation.medianDistance = aggregationTotal.distances[aggregationTotal.distances.size() / 2]; // TODO: Average if nb of distances is even
+	aggregation.thirdQuartileDistance = aggregationTotal.distances[3 * aggregationTotal.distances.size() / 4];  // TODO: Average if nb of distances is even
+	aggregation.maximumDistance = aggregationTotal.distances.back();
+	aggregation.meanDistance = std::accumulate(aggregationTotal.distances.begin(),
+		                                       aggregationTotal.distances.end(), 0.f) / aggregationTotal.distances.size();
+
+	return aggregation;
 }
 
 void checkCorrespondenceSetsOfRays(const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
