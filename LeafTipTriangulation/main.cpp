@@ -198,7 +198,7 @@ void testRuntimeWithMoreCameras()
 
 void testAccuracyWithMoreCameras(float noiseStd)
 {
-	std::cout << "Accuracy with varying number of cameras and noise " << noiseStd << std::endl;
+	std::cout << "# Accuracy with varying number of cameras and noise " << noiseStd << std::endl;
 	
 	Parameters parameters;
 	
@@ -207,14 +207,14 @@ void testAccuracyWithMoreCameras(float noiseStd)
 	parameters.probabilityKeep = 1.0f;
 	parameters.thresholdNoPair = std::numeric_limits<float>::max();
 	
-	for (int numberCameras = 3; numberCameras <= 6; numberCameras++)
+	for (int numberCameras = 2; numberCameras <= 6; numberCameras++)
 	{
 		std::vector<GroundTruthMatchingResult> results;
 
 		parameters.numberCameras = numberCameras;
 
 		#pragma omp parallel for default(none) firstprivate(parameters) shared(results)
-		for (int s = 0; s < 2000; s++) // TODO: set to 10000
+		for (int s = 0; s < 10000; s++)
 		{
 			parameters.seed = s;
 
@@ -230,6 +230,7 @@ void testAccuracyWithMoreCameras(float noiseStd)
 
 		std::cout
 			<< parameters.numberCameras << "\t"
+			<< parameters.noiseStd << "\t"
 			// Number of points to reconstruct
 			<< parameters.numberPoints3D << "\t"
 			// Number of points 100% successfully reconstructed (hopefully equal to numberPoints3D)
@@ -239,13 +240,14 @@ void testAccuracyWithMoreCameras(float noiseStd)
 			<< aggregation.medianDistance << "\t"
 			<< aggregation.thirdQuartileDistance << "\t"
 			<< aggregation.maximumDistance << "\t"
-			<< aggregation.meanDistance << "\t" << std::endl;
+			<< aggregation.meanDistance << "\t"
+			<< aggregation.stdDistance << std::endl;
 	}
 }
 
-void testCorrespondenceWithMoreCameras()
+void testCorrespondenceWithMoreNoise()
 {
-	std::cout << "Correspondence precision/recall with varying noise " << std::endl;
+	std::cout << "# Correspondence precision/recall with varying noise " << std::endl;
 
 	Parameters parameters;
 
@@ -254,14 +256,14 @@ void testCorrespondenceWithMoreCameras()
 	parameters.probabilityKeep = 1.0f;
 	parameters.thresholdNoPair = std::numeric_limits<float>::max();
 
-	for (int noiseStdInt = 0; noiseStdInt <= 20; noiseStdInt++)
+	for (int noiseStdInt = 0; noiseStdInt <= 100; noiseStdInt += 5)
 	{
 		std::vector<GroundTruthMatchingResult> results;
 
 		parameters.noiseStd = float(noiseStdInt) / 10.f;
 
 #pragma omp parallel for default(none) firstprivate(parameters) shared(results)
-		for (int s = 0; s < 50; s++) // TODO: set to 2000
+		for (int s = 0; s < 2000; s++)
 		{
 			parameters.seed = s;
 
@@ -289,7 +291,7 @@ void testCorrespondenceWithMoreCameras()
 
 void testCorrespondenceWithThreshold(float noiseStd)
 {
-	std::cout << "Correspondence precision/recall with varying threshold and noise " << noiseStd << std::endl;
+	std::cout << "# Correspondence precision/recall with varying threshold and noise " << noiseStd << std::endl;
 
 	Parameters parameters;
 
@@ -305,7 +307,7 @@ void testCorrespondenceWithThreshold(float noiseStd)
 		parameters.thresholdNoPair = float(thresholdNoPairInt);
 
 #pragma omp parallel for default(none) firstprivate(parameters) shared(results)
-		for (int s = 0; s < 500; s++) // TODO: set to 2000
+		for (int s = 0; s < 2000; s++)
 		{
 			parameters.seed = s;
 
@@ -447,22 +449,27 @@ int main(int argc, char *argv[])
 		// Runtime (single core) vs number of cameras
 		testRuntimeWithMoreCameras();
 	}
-	
-	// Accuracy vs number of cameras with noise 0.1
-	// testAccuracyWithMoreCameras(0.1f);
-	// testAccuracyWithMoreCameras(0.2f);
-	// testAccuracyWithMoreCameras(0.5f);
-	// testAccuracyWithMoreCameras(1.0f);
+	else if (command == "accuracy_cameras")
+	{
+		// Accuracy vs number of cameras
+		testAccuracyWithMoreCameras(0.1f);
+	    testAccuracyWithMoreCameras(0.5f);
+		testAccuracyWithMoreCameras(2.0f);
+	}
+	else if (command == "correspondence_noise")
+	{
+		// F-measure of correspondence vs noise with 6 cameras
+		testCorrespondenceWithMoreNoise();
+	}
+	else if (command == "correspondence_threshold")
+	{
+		// ROC curve of correspondence with vs threshold with 6 cameras
+		testCorrespondenceWithThreshold(0.1f);
+		testCorrespondenceWithThreshold(0.5f);
+		testCorrespondenceWithThreshold(2.0f);
+	}
 
-	// F-measure of correspondence vs noise with 6 cameras
-	// testCorrespondenceWithMoreCameras();
-
-	// ROC curve of correspondence with vs threshold with 6 cameras
-	// testCorrespondenceWithThreshold(1.0f);
-	// testCorrespondenceWithThreshold(2.0f);
-
-	// TODO: Accuracy vs noise with 6 cameras
-
+	// TODO: misdetection and false positive versus threshold
 
 	// TODO: example with a plant in a phenotyping facility
 	

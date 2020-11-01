@@ -1,0 +1,12 @@
+#!/usr/bin/gnuplot
+reset
+set terminal pngcairo size 800,480 
+
+set title sprintf("Quality of correspondences between views v/s noise standard deviation")
+set xlabel 'Standard deviation of Gaussian noise (px)'
+set ylabel 'Percentage (%)'
+
+set key bottom left 
+
+plot filename using 1:($6*100) with linespoints title "F-measure of correspondences", \
+     filename using 1:($3*10) with linespoints title "% of perfectly reconstructed points"

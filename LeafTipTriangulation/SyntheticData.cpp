@@ -410,9 +410,22 @@ AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTru
 	aggregation.medianDistance = aggregationTotal.distances[aggregationTotal.distances.size() / 2]; // TODO: Average if nb of distances is even
 	aggregation.thirdQuartileDistance = aggregationTotal.distances[3 * aggregationTotal.distances.size() / 4];  // TODO: Average if nb of distances is even
 	aggregation.maximumDistance = aggregationTotal.distances.back();
-	aggregation.meanDistance = std::accumulate(aggregationTotal.distances.begin(),
-		                                       aggregationTotal.distances.end(), 0.f) / aggregationTotal.distances.size();
 
+	// Compute mean and std (source: https://stackoverflow.com/a/7616783/12135531)
+	const auto sum = std::accumulate(aggregationTotal.distances.begin(), aggregationTotal.distances.end(), 0.f);
+	const auto mean = sum / float(aggregationTotal.distances.size());
+
+	std::vector<float> diff(aggregationTotal.distances.size());
+	std::transform(aggregationTotal.distances.begin(),
+		           aggregationTotal.distances.end(),
+		           diff.begin(),
+		           [aggregation](double x) { return x - aggregation.meanDistance; });
+	const double squareSum = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
+	const double std = std::sqrt(squareSum / diff.size());
+
+	aggregation.meanDistance = mean;
+	aggregation.stdDistance = std;
+	
 	return aggregation;
 }
 

@@ -1,0 +1,13 @@
+#!/usr/bin/gnuplot
+reset
+set terminal pngcairo size 800,480 
+
+set title sprintf("F-measure of correspondences with 50% occlusion v/s point association threshold")
+set xlabel 'Point association threshold (px)'
+set ylabel 'F-measure (%)'
+
+set key bottom right 
+
+plot filename using 3:($9*100) every ::0::39 with linespoints title "noise = 0.1", \
+     filename using 3:($9*100) every ::40::79 with linespoints title "noise = 1.0", \
+     filename using 3:($9*100) every ::80::119 with linespoints title "noise = 2.0"

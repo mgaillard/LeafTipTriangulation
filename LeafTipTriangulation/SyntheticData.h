@@ -144,6 +144,11 @@ struct AggregatedGroundTruthMatchingResult
 	 */
 	double meanDistance;
 
+	/**
+	 * \brief The standard deviation of distance from ground-truth to triangulation
+	 */
+	double stdDistance;
+
 	AggregatedGroundTruthMatchingResult() :
 		nbRuns(0),
 		nbPointsTriangulated(0.f),
@@ -157,7 +162,8 @@ struct AggregatedGroundTruthMatchingResult
 		medianDistance(0.f),
 		thirdQuartileDistance(0.f),
 		maximumDistance(0.f),
-		meanDistance(0.f)
+		meanDistance(0.f),
+		stdDistance(0.f)
 	
 	{
 
