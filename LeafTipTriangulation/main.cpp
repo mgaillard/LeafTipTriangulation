@@ -86,19 +86,21 @@ GroundTruthMatchingResult testWithSyntheticData(const Parameters& parameters)
 
 void testRuntimeWithMorePoints()
 {
-	std::cout << "Runtime in ms with varying number of points" << std::endl;
+	std::cout << "# Runtime in ms with varying number of points" << std::endl;
 
-	const std::vector<int> numberPoints = {
-		10,
-		20,
-		50,
-		100,
-		200,
-		500,
-		1000,
-		2000,
-		5000,
-		10000
+	// Number of points and number of runs to compute the average runtime
+	// Longer instances are ran less times than smaller ones to reduce the total
+	const std::vector<std::pair<int, int>> testHyperParameters = {
+		{ 10, 1000 },
+		{ 20, 1000 },
+		{ 50, 1000 },
+		{ 100, 500 },
+		{ 200, 200 },
+		{ 500, 100 },
+		{ 1000, 50 },
+		{ 2000, 20 },
+		{ 5000, 10 },
+		{ 10000, 5 }
 	};
 	
 	Parameters parameters;
@@ -109,13 +111,14 @@ void testRuntimeWithMorePoints()
 	parameters.probabilityKeep = 1.0f;
 	parameters.thresholdNoPair = std::numeric_limits<float>::max();
 
-	for (const auto& numberPoint : numberPoints)
+	for (const auto& testHyperParameter : testHyperParameters)
 	{
 		std::vector<GroundTruthMatchingResult> results;
 
-		parameters.numberPoints3D = numberPoint;
+		parameters.numberPoints3D = testHyperParameter.first;
+		const int nbRuns = testHyperParameter.second;
 
-		for (int s = 0; s < 100; s++)
+		for (int s = 0; s < nbRuns; s++)
 		{
 			parameters.seed = s;
 
@@ -130,6 +133,8 @@ void testRuntimeWithMorePoints()
 			<< parameters.numberPoints3D << "\t"
 			// Number of points 100% successfully reconstructed (hopefully equal to numberPoints3D)
 			<< aggregation.nbRightPointsCorrespondence << "\t"
+			// Number of runs to compute the average
+			<< aggregation.nbRuns << "\t"
 			// Average runtime
 			<< aggregation.runtime << std::endl;
 	}
@@ -137,7 +142,21 @@ void testRuntimeWithMorePoints()
 
 void testRuntimeWithMoreCameras()
 {
-	std::cout << "Runtime in ms with varying number of cameras" << std::endl;
+	std::cout << "# Runtime in ms with varying number of cameras" << std::endl;
+
+	// Number of cameras and number of runs to compute the average runtime
+	// Longer instances are ran less times than smaller ones to reduce the total
+	const std::vector<std::pair<int, int>> testHyperParameters = {
+		{ 2, 100 },
+		{ 3, 100 },
+		{ 4, 100 },
+		{ 5, 100 },
+		{ 6, 50 },
+		{ 7, 30 },
+		{ 8, 20 },
+		{ 9, 10 },
+		{ 10, 3 }
+	};
 
 	Parameters parameters;
 
@@ -147,13 +166,14 @@ void testRuntimeWithMoreCameras()
 	parameters.probabilityKeep = 1.0f;
 	parameters.thresholdNoPair = std::numeric_limits<float>::max();
 
-	for (int numberCameras = 2; numberCameras <= 10; numberCameras++)
+	for (const auto& testHyperParameter : testHyperParameters)
 	{
 		std::vector<GroundTruthMatchingResult> results;
 
-		parameters.numberCameras = numberCameras;
+		parameters.numberCameras = testHyperParameter.first;
+		const int nbRuns = testHyperParameter.second;
 
-		for (int s = 0; s < 100; s++)
+		for (int s = 0; s < nbRuns; s++)
 		{
 			parameters.seed = s;
 
@@ -169,6 +189,8 @@ void testRuntimeWithMoreCameras()
 			<< parameters.numberPoints3D << "\t"
 			// Number of points 100% successfully reconstructed (hopefully equal to numberPoints3D)
 			<< aggregation.nbRightPointsCorrespondence << "\t"
+			// Number of runs to compute the average
+			<< aggregation.nbRuns << "\t"
 			// Average runtime
 			<< aggregation.runtime << std::endl;
 	}
@@ -192,7 +214,7 @@ void testAccuracyWithMoreCameras(float noiseStd)
 		parameters.numberCameras = numberCameras;
 
 		#pragma omp parallel for default(none) firstprivate(parameters) shared(results)
-		for (int s = 0; s < 2000; s++)
+		for (int s = 0; s < 2000; s++) // TODO: set to 10000
 		{
 			parameters.seed = s;
 
@@ -328,6 +350,7 @@ void runOnRealData()
 
 	// X axis is from left to right
 	// Y axis is from bottom to top
+	// Plant: 4-9-18_Schnable_49-281-JS39-65_2018-04-11_12-09-35_9968800
 	const std::vector<std::vector<glm::vec2>> points2D = {
 		// Camera 0
 		{
@@ -406,11 +429,24 @@ void runOnRealData()
 
 int main(int argc, char *argv[])
 {
-	// Runtime (single core) vs number of points with 3 cameras
-	// testRuntimeWithMorePoints();
+	if (argc != 2)
+	{
+		std::cout << "Give the benchmark to execute as an argument." << std::endl;
+		return 1;
+	}
 
-	// Runtime (single core) vs number of cameras
-	// testRuntimeWithMoreCameras();
+	const std::string command = argv[1];
+
+	if (command == "runtime_points")
+	{
+		// Runtime (single core) vs number of points with 3 cameras
+		testRuntimeWithMorePoints();
+	}
+	else if (command == "runtime_cameras")
+	{
+		// Runtime (single core) vs number of cameras
+		testRuntimeWithMoreCameras();
+	}
 	
 	// Accuracy vs number of cameras with noise 0.1
 	// testAccuracyWithMoreCameras(0.1f);
@@ -422,12 +458,7 @@ int main(int argc, char *argv[])
 	// testCorrespondenceWithMoreCameras();
 
 	// ROC curve of correspondence with vs threshold with 6 cameras
-	// testCorrespondenceWithThreshold(0.1f);
-	// testCorrespondenceWithThreshold(0.2f);
-	// testCorrespondenceWithThreshold(0.5f);
 	// testCorrespondenceWithThreshold(1.0f);
-	// testCorrespondenceWithThreshold(1.2f);
-	// testCorrespondenceWithThreshold(1.5f);
 	// testCorrespondenceWithThreshold(2.0f);
 
 	// TODO: Accuracy vs noise with 6 cameras

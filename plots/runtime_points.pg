@@ -1,0 +1,11 @@
+#!/usr/bin/gnuplot
+reset
+set terminal pngcairo size 800,480 
+
+set title sprintf("Runtime with 3 cameras and varying number of points")
+set xlabel 'Number of points'
+set ylabel 'Runtime (ms)'
+
+set logscale xy
+
+plot filename using 1:4 with linespoints notitle
