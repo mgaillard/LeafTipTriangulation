@@ -73,7 +73,8 @@ struct AggregatedGroundTruthMatchingResult
 	/**
 	 * \brief Time needed to solve the problem
 	 */
-	double runtime;
+	double meanRuntime;
+	double stdRuntime;
 
 	/**
 	 * \brief The number of results aggregated
@@ -151,19 +152,19 @@ struct AggregatedGroundTruthMatchingResult
 
 	AggregatedGroundTruthMatchingResult() :
 		nbRuns(0),
-		nbPointsTriangulated(0.f),
-		nbPointsMissed(0.f),
-		nbPointsFalsePositive(0.f),
-		nbPointsSuccessful(0.f),
-		nbRightPointsCorrespondence(0.f),
-		nbWrongPointsCorrespondence(0.f),
-		minimumDistance(0.f),
-		firstQuartileDistance(0.f),
-		medianDistance(0.f),
-		thirdQuartileDistance(0.f),
-		maximumDistance(0.f),
-		meanDistance(0.f),
-		stdDistance(0.f)
+		nbPointsTriangulated(0.0),
+		nbPointsMissed(0.0),
+		nbPointsFalsePositive(0.0),
+		nbPointsSuccessful(0.0),
+		nbRightPointsCorrespondence(0.0),
+		nbWrongPointsCorrespondence(0.0),
+		minimumDistance(0.0),
+		firstQuartileDistance(0.0),
+		medianDistance(0.0),
+		thirdQuartileDistance(0.0),
+		maximumDistance(0.0),
+		meanDistance(0.0),
+		stdDistance(0.0)
 	
 	{
 

@@ -136,7 +136,8 @@ void testRuntimeWithMorePoints()
 			// Number of runs to compute the average
 			<< aggregation.nbRuns << "\t"
 			// Average runtime
-			<< aggregation.runtime << std::endl;
+			<< aggregation.meanRuntime << "\t"
+			<< aggregation.stdRuntime << std::endl;
 	}
 }
 
@@ -192,7 +193,8 @@ void testRuntimeWithMoreCameras()
 			// Number of runs to compute the average
 			<< aggregation.nbRuns << "\t"
 			// Average runtime
-			<< aggregation.runtime << std::endl;
+			<< aggregation.meanRuntime << "\t"
+			<< aggregation.stdRuntime << std::endl;
 	}
 }
 
@@ -336,7 +338,7 @@ void testCorrespondenceWithThreshold(float noiseStd)
 	}
 }
 
-void runOnRealData()
+void runPlantPhenotyping()
 {
 	const float imageWidth = 2454.0;
 	const float imageHeight = 2056.0;
@@ -468,10 +470,13 @@ int main(int argc, char *argv[])
 		testCorrespondenceWithThreshold(0.5f);
 		testCorrespondenceWithThreshold(2.0f);
 	}
+	else if (command == "plant_phenotyping")
+	{
+		// Example with a plant in a phenotyping facility
+		runPlantPhenotyping();
+	}
 
 	// TODO: misdetection and false positive versus threshold
-
-	// TODO: example with a plant in a phenotyping facility
 	
 	// TODO: example with a real object and a ChaRuCo calibration pattern
 	

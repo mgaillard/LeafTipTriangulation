@@ -1,6 +1,7 @@
 #include "Camera.h"
 
 #include <fstream>
+#include <iostream>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -114,6 +115,10 @@ std::vector<Camera> loadCamerasFromFiles(
 			file.close();
 
 			cameras.emplace_back(eye, at, up, matV, matP, viewportSize);
+		}
+		else
+		{
+			std::cerr << "Could not open file: " << filename << std::endl;
 		}
 	}
 

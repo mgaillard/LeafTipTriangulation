@@ -350,14 +350,30 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 		}
 	}
 
-	// TODO: correspondences for points that are not matched
-
 	return result;
+}
+
+template <typename T>
+std::pair<T, T> computeMeanAndStd(const std::vector<T>& v)
+{
+    // Source: https://stackoverflow.com/a/7616783/12135531
+	
+	const auto sum = std::accumulate(v.begin(), v.end(), T(0.0));
+	const auto mean = sum / static_cast<T>(v.size());
+
+	std::vector<T> diff(v.size());
+	std::transform(v.begin(), v.end(), diff.begin(), [mean](T x) { return x - mean; });
+	const T squareSum = std::inner_product(diff.begin(), diff.end(), diff.begin(), T(0.0));
+	// Compute the sample standard deviation
+	const T std = std::sqrt(squareSum / static_cast<T>(diff.size() - 1));
+
+	return {mean, std};
 }
 
 AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTruthMatchingResult>& results)
 {	
 	GroundTruthMatchingResult aggregationTotal;
+	std::vector<double> runtimes;
 	int nbRuns = 0;
 
 	for (const auto& result : results)
@@ -365,8 +381,8 @@ AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTru
 		// If the result has -1 nbPointsTriangulated, it has been aborted
 		if (result.nbPointsTriangulated >= 0)
 		{
-			aggregationTotal.runtime += result.runtime;
 			nbRuns += 1;
+			runtimes.push_back(result.runtime);
 			aggregationTotal.nbPointsTriangulated += result.nbPointsTriangulated;
 			aggregationTotal.nbPointsMissed += result.nbPointsMissed;
 			aggregationTotal.nbPointsFalsePositive += result.nbPointsFalsePositive;
@@ -387,7 +403,7 @@ AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTru
 
 	// Compute mean of parameters
 	aggregation.nbRuns = nbRuns;
-	aggregation.runtime = aggregationTotal.runtime / double(nbRuns);
+	std::tie(aggregation.meanRuntime, aggregation.stdRuntime) = computeMeanAndStd(runtimes);
 	aggregation.nbPointsTriangulated = double(aggregationTotal.nbPointsTriangulated) / double(nbRuns);
 	aggregation.nbPointsMissed = double(aggregationTotal.nbPointsMissed) / double(nbRuns);
 	aggregation.nbPointsFalsePositive = double(aggregationTotal.nbPointsFalsePositive) / double(nbRuns);
@@ -410,21 +426,8 @@ AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTru
 	aggregation.medianDistance = aggregationTotal.distances[aggregationTotal.distances.size() / 2]; // TODO: Average if nb of distances is even
 	aggregation.thirdQuartileDistance = aggregationTotal.distances[3 * aggregationTotal.distances.size() / 4];  // TODO: Average if nb of distances is even
 	aggregation.maximumDistance = aggregationTotal.distances.back();
-
-	// Compute mean and std (source: https://stackoverflow.com/a/7616783/12135531)
-	const auto sum = std::accumulate(aggregationTotal.distances.begin(), aggregationTotal.distances.end(), 0.f);
-	const auto mean = sum / float(aggregationTotal.distances.size());
-
-	std::vector<float> diff(aggregationTotal.distances.size());
-	std::transform(aggregationTotal.distances.begin(),
-		           aggregationTotal.distances.end(),
-		           diff.begin(),
-		           [aggregation](double x) { return x - aggregation.meanDistance; });
-	const double squareSum = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
-	const double std = std::sqrt(squareSum / diff.size());
-
-	aggregation.meanDistance = mean;
-	aggregation.stdDistance = std;
+	// Compute mean and std
+	std::tie(aggregation.meanDistance, aggregation.stdDistance) = computeMeanAndStd(aggregationTotal.distances);
 	
 	return aggregation;
 }
