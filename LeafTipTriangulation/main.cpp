@@ -156,7 +156,12 @@ void testRuntimeWithMoreCameras()
 		{ 7, 30 },
 		{ 8, 20 },
 		{ 9, 10 },
-		{ 10, 3 }
+		{ 10, 3 },
+		{ 11, 3 },
+		{ 12, 3 },
+		{ 13, 3 },
+		{ 14, 3 },
+		{ 15, 3 },
 	};
 
 	Parameters parameters;
@@ -209,7 +214,7 @@ void testAccuracyWithMoreCameras(float noiseStd)
 	parameters.probabilityKeep = 1.0f;
 	parameters.thresholdNoPair = std::numeric_limits<float>::max();
 	
-	for (int numberCameras = 2; numberCameras <= 6; numberCameras++)
+	for (int numberCameras = 2; numberCameras <= 10; numberCameras++)
 	{
 		std::vector<GroundTruthMatchingResult> results;
 
@@ -265,7 +270,7 @@ void testCorrespondenceWithMoreNoise()
 		parameters.noiseStd = float(noiseStdInt) / 10.f;
 
 #pragma omp parallel for default(none) firstprivate(parameters) shared(results)
-		for (int s = 0; s < 2000; s++)
+		for (int s = 0; s < 10000; s++)
 		{
 			parameters.seed = s;
 
@@ -309,7 +314,7 @@ void testCorrespondenceWithThreshold(float noiseStd)
 		parameters.thresholdNoPair = float(thresholdNoPairInt);
 
 #pragma omp parallel for default(none) firstprivate(parameters) shared(results)
-		for (int s = 0; s < 2000; s++)
+		for (int s = 0; s < 10000; s++)
 		{
 			parameters.seed = s;
 
