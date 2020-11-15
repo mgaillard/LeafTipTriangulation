@@ -1,9 +1,7 @@
 #!/usr/bin/gnuplot
 reset
-# set terminal pngcairo size 800,480 
 set terminal pdf
 
-set title sprintf("Percentage of perfectly reconstructed points with 50% occlusion \n v/s point association threshold")
 set xlabel 'Point association threshold (px)'
 set ylabel 'Percentage (%)'
 

@@ -63,13 +63,7 @@ cv::Vec2f projectPoint(const cv::Mat1f& H, const cv::Vec4f& m)
 	assert(H.rows == 3);
 	assert(H.cols == 4);
 
-	cv::Mat1f point(4, 1);
-	point.at<float>(0) = m[0];
-	point.at<float>(1) = m[1];
-	point.at<float>(2) = m[2];
-	point.at<float>(3) = 1.0f;
-
-	cv::Mat1f result = H * point;
+	cv::Mat1f result = H * m;
 
 	// Divide by W
 	return cv::Vec2f(
@@ -151,6 +145,26 @@ float reprojectionAdjustment(
 	return finalCost;
 }
 
+float reprojectionError(
+	const std::vector<cv::Mat1f>& homographies,
+	const std::vector<cv::Vec2f>& points,
+	cv::Vec3f& pointToAdjust)
+{
+	assert(homographies.size() == points.size());
+
+	const auto x = vectorToParameters(pointToAdjust);
+
+	// Optimization
+	float finalCost = 0.f; 
+
+	for (unsigned int i = 0; i < homographies.size(); i++)
+	{
+		finalCost += residual({ homographies[i], points[i] }, x);
+	}
+
+	return finalCost;
+}
+
 std::tuple<float, cv::Vec3f> reconstructPointFromViews(
 	const std::vector<cv::Mat1f>& homographies,
 	const std::vector<cv::Vec2f>& points)
@@ -190,6 +204,9 @@ std::tuple<float, cv::Vec3f> reconstructPointFromViews(
 	
 	// Non-linear optimization to refine the result
 	const auto finalError = reprojectionAdjustment(homographies, points, triangulatedPoint);
+
+	// Alternative: no refinement, better speed but less accuracy
+	// const auto finalError = reprojectionError(homographies, points, triangulatedPoint);
 
 	// Return the triangulated point and its reprojection error
 	return { finalError, triangulatedPoint };

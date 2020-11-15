@@ -60,6 +60,12 @@ float reprojectionAdjustment(
 	cv::Vec3f& pointToAdjust
 );
 
+float reprojectionError(
+	const std::vector<cv::Mat1f>& homographies,
+	const std::vector<cv::Vec2f>& points,
+	cv::Vec3f& pointToAdjust
+);
+
 std::tuple<float, std::vector<glm::vec3>> triangulatePoints(
 	const std::vector<Camera>& cameras,
 	const std::vector<std::vector<glm::vec2>>& points2D,

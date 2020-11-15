@@ -603,7 +603,7 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 				}
 
 				// Match rays to subPoints and update setsOfRays with the rays in camera c
-				// TODO: special variable for threshold, make it twice less than for findSetsOfRays
+				// TODO: Try to make it twice less than the value for for findSetsOfRays
 				setsOfRays = pointsRaysMatching(cameras, points2D, rays, subPoints, setsOfRays, c, thresholdNoPair);
 
 				// Re-triangulate the points with the new rays

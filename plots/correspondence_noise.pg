@@ -1,9 +1,7 @@
 #!/usr/bin/gnuplot
 reset
-# set terminal pngcairo size 800,480 
 set terminal pdf
 
-set title sprintf("Quality of correspondences between views v/s noise standard deviation")
 set xlabel 'Standard deviation of Gaussian noise (px)'
 set ylabel 'Percentage (%)'
 
