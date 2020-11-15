@@ -243,9 +243,11 @@ void testAccuracyWithMoreCameras(float noiseStd)
 			// Number of points 100% successfully reconstructed (hopefully equal to numberPoints3D)
 			<< aggregation.nbRightPointsCorrespondence << "\t"
 			<< aggregation.minimumDistance << "\t"
+			<< aggregation.firstDecileDistance << "\t"
 			<< aggregation.firstQuartileDistance << "\t"
 			<< aggregation.medianDistance << "\t"
 			<< aggregation.thirdQuartileDistance << "\t"
+			<< aggregation.lastDecileDistance << "\t"
 			<< aggregation.maximumDistance << "\t"
 			<< aggregation.meanDistance << "\t"
 			<< aggregation.stdDistance << std::endl;

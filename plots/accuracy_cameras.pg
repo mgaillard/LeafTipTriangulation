@@ -1,16 +1,26 @@
 #!/usr/bin/gnuplot
 reset
-set terminal pngcairo size 800,480 
+# set terminal pngcairo size 800,480 
+set terminal pdf
 
-set title sprintf("Median distance of from ground-truth to triangulated points \n with varying number of cameras")
+set title sprintf("Distribution of distance from ground-truth to triangulated points \n with varying number of cameras")
 set xlabel 'Number of cameras'
 set ylabel 'Distance (m)'
 
+set boxwidth  0.2
+set errorbars 4.0
+set style fill empty
+
 set xtics 1
 set grid ytics
-# set grid mytics
 set logscale y
 
-plot filename using 1:7:6:8 every ::0::4 with errorlines title 'Noise 0.1 px', \
-     filename using 1:7:6:8 every ::5::9 with errorlines title 'Noise 0.5 px', \
-     filename using 1:7:6:8 every ::10::14 with errorlines title 'Noise 2.0 px'
+plot filename using 1:7:6:10:9 every ::0::8 with candlesticks lt -1 lw 1 notitle whiskerbars 0.75, \
+     ''       using 1:8:8:8:8 every ::0::8 with candlesticks lt -1 lw 1 notitle, \
+     filename using 1:7:6:10:9 every ::9::17 with candlesticks lt -1 lw 1 notitle whiskerbars 0.75, \
+     ''       using 1:8:8:8:8 every ::9::17 with candlesticks lt -1 lw 1 notitle, \
+     filename using 1:7:6:10:9 every ::18::26 with candlesticks lt -1 lw 1 notitle whiskerbars 0.75, \
+     ''       using 1:8:8:8:8 every ::18::26 with candlesticks lt -1 lw 1 notitle, \
+     filename using 1:12 every ::0::8 with lines lt 1 title 'Noise 0.1 px', \
+     filename using 1:12 every ::9::17 with lines lt 2 title 'Noise 0.5 px', \
+     filename using 1:12 every ::18::26 with lines lt 3 title 'Noise 2.0 px'

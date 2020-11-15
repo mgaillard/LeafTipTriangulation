@@ -1,6 +1,7 @@
 #!/usr/bin/gnuplot
 reset
-set terminal pngcairo size 800,480 
+# set terminal pngcairo size 800,480 
+set terminal pdf
 
 set title sprintf("Runtime with 3 cameras and varying number of points")
 set xlabel 'Number of points'

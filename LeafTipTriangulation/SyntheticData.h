@@ -51,7 +51,7 @@ struct GroundTruthMatchingResult
 	/**
 	 * \brief A list of all distances between triangulated points and true points
 	 */
-	std::vector<float> distances;
+	std::vector<double> distances;
 
 	GroundTruthMatchingResult() :
 		nbPointsTriangulated(0),
@@ -121,6 +121,11 @@ struct AggregatedGroundTruthMatchingResult
 	double minimumDistance;
 
 	/**
+	 * \brief The first decile distance from ground-truth to triangulation
+	 */
+	double firstDecileDistance;
+
+	/**
 	 * \brief The first quartile distance from ground-truth to triangulation
 	 */
 	double firstQuartileDistance;
@@ -134,6 +139,11 @@ struct AggregatedGroundTruthMatchingResult
 	 * \brief The third quartile distance from ground-truth to triangulation
 	 */
 	double thirdQuartileDistance;
+
+	/**
+	 * \brief The last decile distance from ground-truth to triangulation
+	 */
+	double lastDecileDistance;
 
 	/**
 	 * \brief The maximum distance from ground-truth to triangulation
@@ -159,9 +169,11 @@ struct AggregatedGroundTruthMatchingResult
 		nbRightPointsCorrespondence(0.0),
 		nbWrongPointsCorrespondence(0.0),
 		minimumDistance(0.0),
+		firstDecileDistance(0.0),
 		firstQuartileDistance(0.0),
 		medianDistance(0.0),
 		thirdQuartileDistance(0.0),
+		lastDecileDistance(0.0),
 		maximumDistance(0.0),
 		meanDistance(0.0),
 		stdDistance(0.0)

@@ -354,6 +354,21 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 }
 
 template <typename T>
+T computeMedian(const std::vector<T>& v)
+{
+	assert(!v.empty());
+	
+	if ((v.size() % 2) == 0)
+	{
+		return (v[v.size() / 2 - 1] + v[v.size() / 2]) / 2.0;
+	}
+	else
+	{
+		return v[v.size() / 2];
+	}
+}
+
+template <typename T>
 std::pair<T, T> computeMeanAndStd(const std::vector<T>& v)
 {
     // Source: https://stackoverflow.com/a/7616783/12135531
@@ -422,9 +437,11 @@ AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTru
 	std::sort(aggregationTotal.distances.begin(), aggregationTotal.distances.end());
 	// Compute the min, mean and max distances
 	aggregation.minimumDistance = aggregationTotal.distances.front();
-	aggregation.firstQuartileDistance = aggregationTotal.distances[aggregationTotal.distances.size() / 4]; // TODO: Average if nb of distances is even
-	aggregation.medianDistance = aggregationTotal.distances[aggregationTotal.distances.size() / 2]; // TODO: Average if nb of distances is even
-	aggregation.thirdQuartileDistance = aggregationTotal.distances[3 * aggregationTotal.distances.size() / 4];  // TODO: Average if nb of distances is even
+	aggregation.firstDecileDistance = aggregationTotal.distances[aggregationTotal.distances.size() / 10];
+	aggregation.firstQuartileDistance = aggregationTotal.distances[aggregationTotal.distances.size() / 4];
+	aggregation.medianDistance = computeMedian(aggregationTotal.distances);
+	aggregation.thirdQuartileDistance = aggregationTotal.distances[3 * aggregationTotal.distances.size() / 4];
+	aggregation.lastDecileDistance = aggregationTotal.distances[9 * aggregationTotal.distances.size() / 10];
 	aggregation.maximumDistance = aggregationTotal.distances.back();
 	// Compute mean and std
 	std::tie(aggregation.meanDistance, aggregation.stdDistance) = computeMeanAndStd(aggregationTotal.distances);
