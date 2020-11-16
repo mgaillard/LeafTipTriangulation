@@ -9,4 +9,12 @@ set grid xtics
 set grid ytics
 set logscale y
 
-plot filename using 1:5:6 with errorlines notitle
+set key bottom right
+
+f(x) = exp(a*x)
+fit f(x) filename using 1:5 via a
+an_value = sprintf("y = exp(%.3f * x)", a)
+set label 1 at graph 0.1, graph 0.9 an_value
+
+plot f(x) linestyle 2 title 'Exponential regression', \
+     filename using 1:5:6 with yerrorbars linestyle 1 notitle

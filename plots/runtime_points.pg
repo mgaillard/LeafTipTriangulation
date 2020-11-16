@@ -9,4 +9,12 @@ set grid xtics
 set grid ytics
 set logscale xy
 
-plot filename using 1:4:5 with linespoints notitle
+set key bottom right
+
+f(x) = a*x**3 + b*x**2 + c*x
+fit f(x) filename using 1:4 via a, b, c
+abc_value = sprintf("y = %.3e*x^3 + %.3e*x^2 + %.3e*x", a, b, c)
+set label 1 at graph 0.1, graph 0.9 abc_value
+
+plot f(x) linestyle 2 title 'Polynomial regression', \
+     filename using 1:4:5 with yerrorbars linestyle 1 notitle
