@@ -15,6 +15,13 @@ public:
 	Camera(const glm::vec3& eye,
 		   const glm::vec3& at,
 		   const glm::vec3& up,
+		   float fovy,
+		   float aspectRatio,
+		   const glm::vec2& viewportSize);
+
+	Camera(const glm::vec3& eye,
+		   const glm::vec3& at,
+		   const glm::vec3& up,
 		   const glm::mat4& matV,
 		   const glm::mat4& matP,
 		   const glm::vec2& viewportSize);

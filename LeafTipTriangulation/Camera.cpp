@@ -20,9 +20,26 @@ Camera::Camera(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up):
 Camera::Camera(const glm::vec3& eye,
 	           const glm::vec3& at,
 	           const glm::vec3& up,
-	           const glm::mat4& matV,
-	           const glm::mat4& matP,
+	           float fovy,
+	           float aspectRatio,
 	           const glm::vec2& viewportSize) :
+	m_eye(eye),
+	m_at(at),
+	m_up(up),
+	m_matV(glm::lookAt(eye, at, up)), // Generate the view matrix
+	m_matP(glm::perspective(fovy, aspectRatio, 0.001f, 10.f)), // Generate the projection matrix
+	m_mat(m_matP * m_matV),
+	m_viewport(0, 0, viewportSize.x, viewportSize.y)
+{
+	
+}
+
+Camera::Camera(const glm::vec3& eye,
+               const glm::vec3& at,
+               const glm::vec3& up,
+               const glm::mat4& matV,
+               const glm::mat4& matP,
+               const glm::vec2& viewportSize) :
 	m_eye(eye),
 	m_at(at),
 	m_up(up),

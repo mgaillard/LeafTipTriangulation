@@ -48,23 +48,23 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../external;$(OPENCVDIR)\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external;$(OPENCVDIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(OPENCVDIR)\build\x64\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OPENCVDIR)\x64\vc16\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opencv_world440d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../external;$(OPENCVDIR)\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external;$(OPENCVDIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(OPENCVDIR)\build\x64\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world440.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OPENCVDIR)\x64\vc16\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_core450.lib;opencv_imgcodecs450.lib;opencv_imgproc450.lib;opencv_highgui450.lib;opencv_calib3d450.lib;opencv_features2d450.lib;opencv_flann450.lib;opencv_aruco450.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
@@ -112,6 +112,7 @@
     <ClCompile Include="OBJWriter.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="RayMatching.cpp" />
+    <ClCompile Include="Reconstruction.cpp" />
     <ClCompile Include="SyntheticData.cpp" />
     <ClCompile Include="Triangulation.cpp" />
   </ItemGroup>
@@ -121,6 +122,7 @@
     <ClInclude Include="OBJWriter.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RayMatching.h" />
+    <ClInclude Include="Reconstruction.h" />
     <ClInclude Include="SyntheticData.h" />
     <ClInclude Include="Triangulation.h" />
   </ItemGroup>

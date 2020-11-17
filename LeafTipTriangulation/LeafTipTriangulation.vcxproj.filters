@@ -50,6 +50,9 @@
     <ClCompile Include="RayMatching.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Reconstruction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OBJWriter.h">
@@ -71,6 +74,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RayMatching.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reconstruction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

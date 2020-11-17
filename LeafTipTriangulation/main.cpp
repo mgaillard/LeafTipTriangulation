@@ -8,6 +8,7 @@
 #include "SyntheticData.h"
 #include "ExportScene.h"
 #include "RayMatching.h"
+#include "Reconstruction.h"
 #include "Triangulation.h"
 
 struct Parameters
@@ -438,6 +439,50 @@ void runPlantPhenotyping()
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 
+void runCrocodileMeasurement()
+{
+	// Image files
+	const std::vector<std::string> imageFiles = {
+		"1.jpg",
+		"2.jpg",
+		"3.jpg",
+		"4.jpg",
+		"5.jpg",
+	};
+
+	// X axis is from left to right
+	// Y axis is from bottom to top
+	std::vector<std::vector<glm::vec2>> points2D = {
+		// Camera 0
+		{
+			{1877, 1237},
+			{2185, 1056},
+		},
+		// Camera 1
+		{
+			{1687, 1164},
+			{2108, 1147},
+		},
+		// Camera 2
+		{
+			{1352, 1078},
+			{1701, 1154},
+		},
+		// Camera 3
+		{
+			{1714, 821},
+			{1944, 1067},
+		},
+		// Camera 4
+		{
+			{2198, 1334},
+			{2300, 1102},
+		},
+	};
+
+	std::cout << "Length: " << measureTwoPointsCharuco(imageFiles, points2D) << " m" << std::endl;
+}
+
 int main(int argc, char *argv[])
 {
 	if (argc != 2)
@@ -482,7 +527,12 @@ int main(int argc, char *argv[])
 		// Example with a plant in a phenotyping facility
 		runPlantPhenotyping();
 	}
-
+	else if (command == "measure_crocodile")
+	{
+		// Example when measuring the length between two points in a LEGO set
+		runCrocodileMeasurement();
+	}
+	
 	// TODO: misdetection and false positive versus threshold
 	
 	// TODO: example with a real object and a ChaRuCo calibration pattern
