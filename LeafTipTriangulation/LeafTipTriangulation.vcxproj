@@ -53,7 +53,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(OPENCVDIR)\x64\vc16\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world440d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_core450d.lib;opencv_imgcodecs450d.lib;opencv_imgproc450d.lib;opencv_highgui450d.lib;opencv_calib3d450d.lib;opencv_features2d450d.lib;opencv_flann450d.lib;opencv_aruco450d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
