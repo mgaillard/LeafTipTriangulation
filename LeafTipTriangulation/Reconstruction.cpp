@@ -267,6 +267,7 @@ float measureTwoPointsCharuco(
 
 		// Undistort each image
 		cv::undistort(imagesRaw[i], images[i], cameraMatrix, distCoeffs);
+		// TODO: Translate images according to the optical center
 		cv::imwrite(directoryUndistorted + imageFiles[i], images[i]);
 	}
 
