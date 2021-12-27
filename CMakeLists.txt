@@ -24,6 +24,7 @@ include(CTest)
 
 add_subdirectory(LeafTipTriangulationLib)
 add_subdirectory(LeafTipTriangulation)
+add_subdirectory(LeafTipTriangulationTest)
 
 # Set the project as startup project in Visual Studio
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT LeafTipTriangulation)
