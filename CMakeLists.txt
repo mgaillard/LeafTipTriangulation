@@ -21,6 +21,8 @@ include(opencv)
 include(catch2)
 include(CTest)
 
+
+add_subdirectory(LeafTipTriangulationLib)
 add_subdirectory(LeafTipTriangulation)
 
 # Set the project as startup project in Visual Studio

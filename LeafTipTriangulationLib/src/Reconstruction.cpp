@@ -10,7 +10,6 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d.hpp>
 
-#include "ExportScene.h"
 #include "RayMatching.h"
 #include "Triangulation.h"
 
@@ -265,9 +264,6 @@ float measureTwoPointsCharuco(const std::vector<std::vector<glm::vec2>>& inputPo
 	std::vector<glm::vec3> triangulatedPoints3D;
 	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
 	std::tie(triangulatedPoints3D, setsOfRays) = matchRaysAndTriangulate(cameras, points2D, rays);
-
-	// Export the scene
-	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 
 	return glm::distance(triangulatedPoints3D[0], triangulatedPoints3D[1]);
 }

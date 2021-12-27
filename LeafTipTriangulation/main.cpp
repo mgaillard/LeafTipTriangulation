@@ -1,4 +1,6 @@
+#include <chrono>
 #include <iostream>
+#include <tuple>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -9,7 +11,6 @@
 #include "ExportScene.h"
 #include "RayMatching.h"
 #include "Reconstruction.h"
-#include "Triangulation.h"
 
 struct Parameters
 {
