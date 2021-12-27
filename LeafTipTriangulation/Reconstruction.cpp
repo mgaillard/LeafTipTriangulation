@@ -9,8 +9,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d.hpp>
-#include <opencv2/aruco/charuco.hpp>
-
 
 #include "ExportScene.h"
 #include "RayMatching.h"
@@ -185,6 +183,7 @@ float measureTwoPointsCharuco(
 	const std::vector<std::string>& imageFiles,
 	const std::vector<std::vector<glm::vec2>>& inputPoints2D)
 {
+	/*
 	// Configuration of the Charuco board
 	const auto dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_250);
 	const auto board = cv::aruco::CharucoBoard::create(11, 8, 0.02f, 0.015f, dictionary);
@@ -324,4 +323,7 @@ float measureTwoPointsCharuco(
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 
 	return glm::distance(triangulatedPoints3D[0], triangulatedPoints3D[1]);
+	*/
+
+	return 0.0;
 }
