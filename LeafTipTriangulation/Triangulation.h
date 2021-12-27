@@ -36,6 +36,13 @@ cv::Vec2f convertToOpenCV(const glm::vec2& v);
 glm::vec3 convertToGlm(const cv::Vec3f& v);
 
 /**
+ * \brief Convert a 3D OpenCV vector to glm vector
+ * \param v A cv::Vec3d vector
+ * \return A glm vector
+ */
+glm::vec3 convertToGlm(const cv::Vec3d& v);
+
+/**
  * \brief Project a 3D point in homogeneous coordinates to 2D.
  * \param H A 3x4 projection matrix.
  * \param m A 3D point in homogeneous coordinates

@@ -441,15 +441,6 @@ void runPlantPhenotyping()
 
 void runCrocodileMeasurement()
 {
-	// Image files
-	const std::vector<std::string> imageFiles = {
-		"1.jpg",
-		"2.jpg",
-		"3.jpg",
-		"4.jpg",
-		"5.jpg",
-	};
-
 	// X axis is from left to right
 	// Y axis is from bottom to top
 	std::vector<std::vector<glm::vec2>> points2D = {
@@ -480,7 +471,7 @@ void runCrocodileMeasurement()
 		},
 	};
 
-	std::cout << "Length: " << measureTwoPointsCharuco(imageFiles, points2D) << " m" << std::endl;
+	std::cout << "Length: " << measureTwoPointsCharuco(points2D) << " m" << std::endl;
 }
 
 int main(int argc, char *argv[])

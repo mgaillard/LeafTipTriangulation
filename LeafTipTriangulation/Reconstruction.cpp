@@ -18,64 +18,64 @@
 #define M_PI (3.14159265358979323846)
 #endif
 
-float radiansToDegrees(float radians)
+double radiansToDegrees(double radians)
 {
-	return radians * float(180.0 / M_PI);
+	return radians * double(180.0 / M_PI);
 }
 
-std::pair<float, float> focalLengthInMm(const cv::Mat1f& cameraMatrix, const cv::Size& imageSize, const cv::Size2f& sensorSize)
+std::pair<double, double> focalLengthInMm(const cv::Mat1d& cameraMatrix, const cv::Size& imageSize, const cv::Size2f& sensorSize)
 {
 	return {
-		cameraMatrix.at<float>(0, 0) * sensorSize.width / imageSize.width,
-		cameraMatrix.at<float>(1, 1) * sensorSize.height / imageSize.height
+		cameraMatrix.at<double>(0, 0) * sensorSize.width / imageSize.width,
+		cameraMatrix.at<double>(1, 1) * sensorSize.height / imageSize.height
 	};
 }
 
-cv::Mat rotationX180(const cv::Mat1f& matrix)
+cv::Mat rotationX180(const cv::Mat1d& matrix)
 {
 	// 180 degrees rotation matrix
-	cv::Mat1f R(3, 3, 0.0f);
+	cv::Mat1d R(3, 3, 0.0f);
 
-	R.at<float>(0, 0) = 1.0f;
-	R.at<float>(1, 1) = -1.0f;
-	R.at<float>(2, 2) = -1.0f;
+	R.at<double>(0, 0) = 1.0f;
+	R.at<double>(1, 1) = -1.0f;
+	R.at<double>(2, 2) = -1.0f;
 
-	const cv::Mat1f rotationResult = R * matrix;
+	const cv::Mat1d rotationResult = R * matrix;
 
 	return rotationResult.clone();
 }
 
-cv::Mat1f removeZProjectionMatrix(const cv::Mat& projectionMatrix)
+cv::Mat1d removeZProjectionMatrix(const cv::Mat& projectionMatrix)
 {
-	cv::Mat1f H(3, 3, 0.0f);
+	cv::Mat1d H(3, 3, 0.0f);
 
-	H.at<float>(0, 0) = projectionMatrix.at<float>(0, 0);
-	H.at<float>(1, 0) = projectionMatrix.at<float>(1, 0);
-	H.at<float>(2, 0) = projectionMatrix.at<float>(2, 0);
+	H.at<double>(0, 0) = projectionMatrix.at<double>(0, 0);
+	H.at<double>(1, 0) = projectionMatrix.at<double>(1, 0);
+	H.at<double>(2, 0) = projectionMatrix.at<double>(2, 0);
 
-	H.at<float>(0, 1) = projectionMatrix.at<float>(0, 1);
-	H.at<float>(1, 1) = projectionMatrix.at<float>(1, 1);
-	H.at<float>(2, 1) = projectionMatrix.at<float>(2, 1);
+	H.at<double>(0, 1) = projectionMatrix.at<double>(0, 1);
+	H.at<double>(1, 1) = projectionMatrix.at<double>(1, 1);
+	H.at<double>(2, 1) = projectionMatrix.at<double>(2, 1);
 
-	H.at<float>(0, 2) = projectionMatrix.at<float>(0, 3);
-	H.at<float>(1, 2) = projectionMatrix.at<float>(1, 3);
-	H.at<float>(2, 2) = projectionMatrix.at<float>(2, 3);
+	H.at<double>(0, 2) = projectionMatrix.at<double>(0, 3);
+	H.at<double>(1, 2) = projectionMatrix.at<double>(1, 3);
+	H.at<double>(2, 2) = projectionMatrix.at<double>(2, 3);
 
-	H /= H.at<float>(2, 2);
+	H /= H.at<double>(2, 2);
 
 	return H;
 }
 
 
-cv::Mat1f cameraPose(const cv::Mat1f& rvec, const cv::Mat1f& tvec)
+cv::Mat1d cameraPose(const cv::Mat1d& rvec, const cv::Mat1d& tvec)
 {
-	cv::Mat1f R;
+	cv::Mat1d R;
 	cv::Rodrigues(rvec, R); // R is 3x3
 
 	auto invTvec = -R.t() * tvec; // translation of inverse
 	R = rotationX180(R.t());  // rotation of inverse
 
-	cv::Mat1f T = cv::Mat1f::eye(4, 4); // T is 4x4
+	cv::Mat1d T = cv::Mat1d::eye(4, 4); // T is 4x4
 	T(cv::Range(0, 3), cv::Range(0, 3)) = R.t() * 1; // copies R into T
 	T(cv::Range(0, 3), cv::Range(3, 4)) = invTvec * 1; // copies tvec into T
 
@@ -87,25 +87,25 @@ cv::Mat1f cameraPose(const cv::Mat1f& rvec, const cv::Mat1f& tvec)
 	return T;
 }
 
-cv::Vec3f cameraPoseVectorX(const cv::Mat1f& rvec)
+cv::Vec3d cameraPoseVectorX(const cv::Mat1d& rvec)
 {
-	cv::Mat1f R;
+	cv::Mat1d R;
 	cv::Rodrigues(rvec, R); // R is 3x3
 
 	// X is the first column of the R transposed matrix
-	cv::Mat1f T = R.t() * 1.f; // copies R into T
+	cv::Mat1d T = R.t() * 1.f; // copies R into T
 
 	return {
-		T.at<float>(0, 0),
-		T.at<float>(1, 0),
-		T.at<float>(2, 0)
+		T.at<double>(0, 0),
+		T.at<double>(1, 0),
+		T.at<double>(2, 0)
 	};
 }
 
 // Source: https://answers.opencv.org/question/162932/create-a-stereo-projection-matrix-using-rvec-and-tvec/
-cv::Mat1f computeProjectionMatrix(const cv::Mat1f& cameraMatrix, const cv::Mat1f& rvec, const cv::Mat1f& tvec)
+cv::Mat1d computeProjectionMatrix(const cv::Mat1d& cameraMatrix, const cv::Mat1d& rvec, const cv::Mat1d& tvec)
 {
-	cv::Mat1f rotMat(3, 3), rotTransMat(3, 4);
+	cv::Mat1d rotMat(3, 3), rotTransMat(3, 4);
 	// Convert rotation vector into rotation matrix 
 	cv::Rodrigues(rvec, rotMat);
 	// Append translation vector to rotation matrix
@@ -116,45 +116,45 @@ cv::Mat1f computeProjectionMatrix(const cv::Mat1f& cameraMatrix, const cv::Mat1f
 	return cameraMatrix * rotTransMat;
 }
 
-cv::Vec3f lookAtPoint(const cv::Mat1f& homography, const cv::Mat1f& cameraMatrix)
+cv::Vec3d lookAtPoint(const cv::Mat1d& homography, const cv::Mat1d& cameraMatrix)
 {
 	assert(homography.rows == 3);
 	assert(homography.cols == 4);
 
 	// For the linear system Ax=b to solve
-	cv::Mat1f A(3, 3, 0.0f);
-	A.at<float>(0, 0) = homography.at<float>(0, 0);
-	A.at<float>(0, 1) = homography.at<float>(0, 1);
-	A.at<float>(1, 0) = homography.at<float>(1, 0);
-	A.at<float>(1, 1) = homography.at<float>(1, 1);
-	A.at<float>(2, 0) = homography.at<float>(2, 0);
-	A.at<float>(2, 1) = homography.at<float>(2, 1);
+	cv::Mat1d A(3, 3, 0.0f);
+	A.at<double>(0, 0) = homography.at<double>(0, 0);
+	A.at<double>(0, 1) = homography.at<double>(0, 1);
+	A.at<double>(1, 0) = homography.at<double>(1, 0);
+	A.at<double>(1, 1) = homography.at<double>(1, 1);
+	A.at<double>(2, 0) = homography.at<double>(2, 0);
+	A.at<double>(2, 1) = homography.at<double>(2, 1);
 
-	A.at<float>(0, 2) = -cameraMatrix.at<float>(0, 2);
-	A.at<float>(1, 2) = -cameraMatrix.at<float>(1, 2);
-	A.at<float>(2, 2) = -1.0f;
+	A.at<double>(0, 2) = -cameraMatrix.at<double>(0, 2);
+	A.at<double>(1, 2) = -cameraMatrix.at<double>(1, 2);
+	A.at<double>(2, 2) = -1.0f;
 
-	cv::Mat1f b(3, 1, 0.0f);
-	b.at<float>(0) = -homography.at<float>(0, 3);
-	b.at<float>(1) = -homography.at<float>(1, 3);
-	b.at<float>(2) = -homography.at<float>(2, 3);
+	cv::Mat1d b(3, 1, 0.0f);
+	b.at<double>(0) = -homography.at<double>(0, 3);
+	b.at<double>(1) = -homography.at<double>(1, 3);
+	b.at<double>(2) = -homography.at<double>(2, 3);
 
 	// Solve for linear least squares
-	cv::Mat1f x;
+	cv::Mat1d x;
 	cv::solve(A, b, x, cv::DECOMP_SVD);
 
 	// Convert to vector
 	return {
-		x.at<float>(0),
-		x.at<float>(1),
+		x.at<double>(0),
+		x.at<double>(1),
 		0.0
 	};
 }
 
 std::tuple<glm::vec3, glm::vec3, glm::vec3> cameraEyeAtUpFromPose(
-	const cv::Mat1f& cameraMatrix,
-	const cv::Mat1f& rvec,
-	const cv::Mat1f& tvec
+	const cv::Mat1d& cameraMatrix,
+	const cv::Mat1d& rvec,
+	const cv::Mat1d& tvec
 )
 {
 	const auto homography = computeProjectionMatrix(cameraMatrix, rvec, tvec);
@@ -162,9 +162,9 @@ std::tuple<glm::vec3, glm::vec3, glm::vec3> cameraEyeAtUpFromPose(
 
 	// Find position of the camera in world coordinates
 	const glm::vec3 eye(
-		pose.at<float>(0, 3),
-		pose.at<float>(1, 3),
-		pose.at<float>(2, 3)
+		pose.at<double>(0, 3),
+		pose.at<double>(1, 3),
+		pose.at<double>(2, 3)
 	);
 	
 	// Find the look at point (intersection between optical center and plane z=0)
@@ -179,96 +179,43 @@ std::tuple<glm::vec3, glm::vec3, glm::vec3> cameraEyeAtUpFromPose(
 	return std::make_tuple(eye, at, up);
 }
 
-float measureTwoPointsCharuco(
-	const std::vector<std::string>& imageFiles,
-	const std::vector<std::vector<glm::vec2>>& inputPoints2D)
+float measureTwoPointsCharuco(const std::vector<std::vector<glm::vec2>>& inputPoints2D)
 {
-	/*
-	// Configuration of the Charuco board
-	const auto dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_250);
-	const auto board = cv::aruco::CharucoBoard::create(11, 8, 0.02f, 0.015f, dictionary);
-	auto params = cv::aruco::DetectorParameters::create();
-	params->cornerRefinementMethod = cv::aruco::CORNER_REFINE_CONTOUR;
-
-	// Directories for images
-	const std::string directory = "crocodile/pictures/";
-	const std::string directoryDetected = "crocodile/detected/";
-	const std::string directoryUndistorted = "crocodile/undistorted/";
-
-	// Generate a board image
-	cv::Mat boardImage;
-	board->draw(cv::Size(2159, 2794), boardImage, 10, 1);
-	cv::imwrite("crocodile/charuco_pattern.png", boardImage);
-
-	// Original images
-	std::vector<cv::Mat> imagesRaw(imageFiles.size());
-	// Undistorded images
-	std::vector<cv::Mat> images(imageFiles.size());
-
-	// Markers and corners for calibration patterns
-	std::vector<std::vector<std::vector<cv::Point2f>>> markerCorners(imageFiles.size());
-	std::vector<std::vector<int>> markerIds(imageFiles.size());
-	std::vector<std::vector<cv::Point2f>> charucoCorners(imageFiles.size());
-	std::vector<std::vector<int>> charucoIds(imageFiles.size());
-
-	// Camera calibration
-	cv::Mat cameraMatrix, distCoeffs;
-	// Cameras poses
-	std::vector<cv::Mat> rvecs, tvecs;
-
-	// Load original images
-#pragma omp parallel for
-	for (int i = 0; i < imageFiles.size(); i++)
-	{
-		// Read image from file
-		imagesRaw[i] = cv::imread(directory + imageFiles[i]);
-
-		// Detect markers
-		cv::aruco::detectMarkers(imagesRaw[i],
-			board->dictionary,
-			markerCorners[i],
-			markerIds[i],
-			params);
-
-		// If markers are available
-		if (!markerIds[i].empty())
-		{
-			// Detect corners
-			cv::aruco::interpolateCornersCharuco(markerCorners[i],
-				markerIds[i],
-				imagesRaw[i],
-				board,
-				charucoCorners[i],
-				charucoIds[i]);
-		}
-	}
-
 	// Camera properties
-	const auto imageWidth = imagesRaw.front().cols;
-	const auto imageHeight = imagesRaw.front().rows;
+	const int nbImages = 5;
+	const int imageWidth = 4032;
+	const int imageHeight = 3024;
 	const cv::Size imageSize(imageWidth, imageHeight);
 
-	// Run calibration
-	cv::aruco::calibrateCameraCharuco(charucoCorners, charucoIds, board, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs);
+	// Camera calibration
+	cv::Mat1d cameraMatrix = (cv::Mat1d(3, 3) <<
+		3153.273013526734, 0.0, 2005.9916092061376, // fx, 0, cx
+		0.0, 3105.260406995229, 1540.0981727685203, // 0, fy, cy
+		0.0, 0.0, 1.0);
 
-	// Undistort images and save diagnostic images
-#pragma omp parallel for
-	for (int i = 0; i < imagesRaw.size(); i++)
-	{
-		cv::Mat diagImage;
-		imagesRaw[i].copyTo(diagImage);
-		// Draw information on diagnostic image
-		cv::aruco::drawDetectedMarkers(diagImage, markerCorners[i], markerIds[i]);
-		cv::aruco::drawDetectedCornersCharuco(diagImage, charucoCorners[i], charucoIds[i], cv::Scalar(255, 0, 0));
-		cv::aruco::drawAxis(diagImage, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1f);
-		// Save diagnostic image
-		cv::imwrite(directoryDetected + imageFiles[i], diagImage);
+	cv::Mat1d distCoeffs = (cv::Mat1d(5, 1) <<
+		0.280605688854058, // k1
+		-1.6945809491702621, // k2
+		0.0024575553828127643, // p1
+		-0.0021983284657425975, // p2
+		3.2574845170325277); // k3
 
-		// Undistort each image
-		cv::undistort(imagesRaw[i], images[i], cameraMatrix, distCoeffs);
-		// TODO: Translate images according to the optical center
-		cv::imwrite(directoryUndistorted + imageFiles[i], images[i]);
-	}
+	// Cameras poses
+	std::vector<cv::Mat1d> rvecs = {
+		(cv::Mat1d(3, 1) << 2.40327, -0.457555, 0.335426),
+		(cv::Mat1d(3, 1) << 2.40059, 0.350462, -0.116547),
+		(cv::Mat1d(3, 1) << 2.2446, 0.816225, -0.373654),
+		(cv::Mat1d(3, 1) << 2.16444, 1.58991, -0.220916),
+		(cv::Mat1d(3, 1) << 2.21499, -1.05024, 0.374562),
+	};
+
+	std::vector<cv::Mat1d> tvecs = {
+		(cv::Mat1d(3, 1) << -0.0581547, 0.0542219, 0.163637),
+		(cv::Mat1d(3, 1) << -0.119149, 0.0101526, 0.220561),
+		(cv::Mat1d(3, 1) << -0.156187, -0.0288829, 0.281005),
+		(cv::Mat1d(3, 1) << -0.112906, -0.111428, 0.307856),
+		(cv::Mat1d(3, 1) << 0.0137574, 0.0700162, 0.207419),
+	};
 
 	// Undistort 2D points and change the frame of reference
 	// Copy points
@@ -298,10 +245,10 @@ float measureTwoPointsCharuco(
 	// For a Google Pixel 3, the sensor is 5.76 mm by 4.29 mm
 	const cv::Size2f sensorSize(5.76f, 4.29f);
 	const auto focalLength = focalLengthInMm(cameraMatrix, imageSize, sensorSize);
-	const auto fovy = 2.0f * std::atan(sensorSize.height / (2.0f * focalLength.second));
+	const auto fovy = 2.0f * std::atan(sensorSize.height / (2.0f * focalLength.second)); 
 
 	std::vector<Camera> cameras;
-	for (int i = 0; i < images.size(); i++)
+	for (int i = 0; i < nbImages; i++)
 	{
 		glm::vec3 eye, at, up;
 		std::tie(eye, at, up) = cameraEyeAtUpFromPose(cameraMatrix, rvecs[i], tvecs[i]);
@@ -323,7 +270,4 @@ float measureTwoPointsCharuco(
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 
 	return glm::distance(triangulatedPoints3D[0], triangulatedPoints3D[1]);
-	*/
-
-	return 0.0;
 }

@@ -58,6 +58,11 @@ glm::vec3 convertToGlm(const cv::Vec3f& v)
 	return {v[0], v[1], v[2]};
 }
 
+glm::vec3 convertToGlm(const cv::Vec3d& v)
+{
+	return { v[0], v[1], v[2] };
+}
+
 cv::Vec2f projectPoint(const cv::Mat1f& H, const cv::Vec4f& m)
 {
 	assert(H.rows == 3);
