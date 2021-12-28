@@ -119,7 +119,7 @@ std::pair<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<std::pair
 	std::vector<std::vector<glm::vec2>> newPoints;
 
 	newPoints.reserve(points.size());
-	for (int c = 0; c < points.size(); c++)
+	for (unsigned int c = 0; c < points.size(); c++)
 	{
 		const auto& cameraPoints = points[c];
 		
@@ -146,7 +146,7 @@ std::pair<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<std::pair
 
 	// Maximum number of points seen by a camera
 	const auto maximumVisibility = *std::max_element(visibility.begin(), visibility.end());
-	if (maximumVisibility < points.size())
+	if (maximumVisibility < static_cast<int>(points.size()))
 	{
 		// outputIsValid = false;
 		if (verbose)
@@ -252,7 +252,7 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 	result.nbPointsMissed = std::max(0, costRows - costCols);
 	// Number of points that were added by the algorithm even if they should not be present
 	result.nbPointsFalsePositive = std::max(0, costCols - costRows);
-	for (unsigned int i = 0; i < costRows; i++)
+	for (int i = 0; i < costRows; i++)
 	{
 		// If it is a true 3D point
 		if (i < costRows)
@@ -454,7 +454,7 @@ void checkCorrespondenceSetsOfRays(const std::vector<std::vector<std::pair<int, 
 	int nbWrongPoints = 0;
 	
 	// If rays have been generated, all rays of a point are associated to the same point on all cameras
-	for (int i = 0; i < setsOfRays.size(); i++)
+	for (unsigned int i = 0; i < setsOfRays.size(); i++)
 	{
 		const auto& setOfRays = setsOfRays[i];
 
@@ -464,7 +464,7 @@ void checkCorrespondenceSetsOfRays(const std::vector<std::vector<std::pair<int, 
 		{
 			const auto& pointIndex = ray.second;
 
-			if (pointIndex == i)
+			if (pointIndex == static_cast<int>(i))
 			{
 				nbRightCorrespondences++;
 			}

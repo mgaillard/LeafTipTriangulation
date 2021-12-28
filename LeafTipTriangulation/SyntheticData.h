@@ -55,18 +55,17 @@ struct GroundTruthMatchingResult
 	 */
 	std::vector<double> distances;
 
-	GroundTruthMatchingResult() :
-		nbPointsTriangulated(0),
-		nbPointsMissed(0),
-		nbPointsFalsePositive(0),
-		nbPointsSuccessful(0),
-		nbRightPointsCorrespondence(0),
-		nbWrongPointsCorrespondence(0),
-		truePositiveCorrespondence(0),
-		falsePositiveCorrespondence(0),
-		falseNegativeCorrespondence(0)
+	GroundTruthMatchingResult() : runtime(0.0),
+	                              nbPointsTriangulated(0),
+	                              nbPointsMissed(0),
+	                              nbPointsFalsePositive(0),
+	                              nbPointsSuccessful(0),
+	                              nbRightPointsCorrespondence(0),
+	                              nbWrongPointsCorrespondence(0),
+	                              truePositiveCorrespondence(0),
+	                              falsePositiveCorrespondence(0),
+	                              falseNegativeCorrespondence(0)
 	{
-		
 	}
 };
 
