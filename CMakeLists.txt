@@ -28,3 +28,9 @@ add_subdirectory(LeafTipTriangulationTest)
 
 # Set the project as startup project in Visual Studio
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT LeafTipTriangulation)
+
+# Copy the ReSharper config file
+configure_file(
+    "${CMAKE_SOURCE_DIR}/LeafTipTriangulationProject.sln.DotSettings"
+    ${CMAKE_BINARY_DIR} COPYONLY
+)

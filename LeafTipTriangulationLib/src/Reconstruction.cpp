@@ -1,7 +1,10 @@
 #include "Reconstruction.h"
 
 #include <iostream>
+#define  _USE_MATH_DEFINES
+#include <cmath>
 
+#include <utils/warnoff.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 
@@ -9,20 +12,18 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d.hpp>
+#include <utils/warnon.h>
 
 #include "RayMatching.h"
 #include "Triangulation.h"
 
-#ifndef M_PI
-#define M_PI (3.14159265358979323846)
-#endif
 
 double radiansToDegrees(double radians)
 {
-	return radians * double(180.0 / M_PI);
+	return radians * (180.0 / M_PI);
 }
 
-std::pair<double, double> focalLengthInMm(const cv::Mat1d& cameraMatrix, const cv::Size& imageSize, const cv::Size2f& sensorSize)
+std::pair<double, double> focalLengthInMm(const cv::Mat1d& cameraMatrix, const cv::Size& imageSize, const cv::Size2d& sensorSize)
 {
 	return {
 		cameraMatrix.at<double>(0, 0) * sensorSize.width / imageSize.width,
@@ -33,11 +34,11 @@ std::pair<double, double> focalLengthInMm(const cv::Mat1d& cameraMatrix, const c
 cv::Mat rotationX180(const cv::Mat1d& matrix)
 {
 	// 180 degrees rotation matrix
-	cv::Mat1d R(3, 3, 0.0f);
+	cv::Mat1d R(3, 3, 0.0);
 
-	R.at<double>(0, 0) = 1.0f;
-	R.at<double>(1, 1) = -1.0f;
-	R.at<double>(2, 2) = -1.0f;
+	R.at<double>(0, 0) = 1.0;
+	R.at<double>(1, 1) = -1.0;
+	R.at<double>(2, 2) = -1.0;
 
 	const cv::Mat1d rotationResult = R * matrix;
 
@@ -46,7 +47,7 @@ cv::Mat rotationX180(const cv::Mat1d& matrix)
 
 cv::Mat1d removeZProjectionMatrix(const cv::Mat& projectionMatrix)
 {
-	cv::Mat1d H(3, 3, 0.0f);
+	cv::Mat1d H(3, 3, 0.0);
 
 	H.at<double>(0, 0) = projectionMatrix.at<double>(0, 0);
 	H.at<double>(1, 0) = projectionMatrix.at<double>(1, 0);
@@ -92,7 +93,7 @@ cv::Vec3d cameraPoseVectorX(const cv::Mat1d& rvec)
 	cv::Rodrigues(rvec, R); // R is 3x3
 
 	// X is the first column of the R transposed matrix
-	cv::Mat1d T = R.t() * 1.f; // copies R into T
+	cv::Mat1d T = R.t() * 1.0; // copies R into T
 
 	return {
 		T.at<double>(0, 0),
@@ -121,7 +122,7 @@ cv::Vec3d lookAtPoint(const cv::Mat1d& homography, const cv::Mat1d& cameraMatrix
 	assert(homography.cols == 4);
 
 	// For the linear system Ax=b to solve
-	cv::Mat1d A(3, 3, 0.0f);
+	cv::Mat1d A(3, 3, 0.0);
 	A.at<double>(0, 0) = homography.at<double>(0, 0);
 	A.at<double>(0, 1) = homography.at<double>(0, 1);
 	A.at<double>(1, 0) = homography.at<double>(1, 0);
@@ -131,9 +132,9 @@ cv::Vec3d lookAtPoint(const cv::Mat1d& homography, const cv::Mat1d& cameraMatrix
 
 	A.at<double>(0, 2) = -cameraMatrix.at<double>(0, 2);
 	A.at<double>(1, 2) = -cameraMatrix.at<double>(1, 2);
-	A.at<double>(2, 2) = -1.0f;
+	A.at<double>(2, 2) = -1.0;
 
-	cv::Mat1d b(3, 1, 0.0f);
+	cv::Mat1d b(3, 1, 0.0);
 	b.at<double>(0) = -homography.at<double>(0, 3);
 	b.at<double>(1) = -homography.at<double>(1, 3);
 	b.at<double>(2) = -homography.at<double>(2, 3);
@@ -200,7 +201,7 @@ float measureTwoPointsCharuco(const std::vector<std::vector<glm::vec2>>& inputPo
 		3.2574845170325277); // k3
 
 	// Cameras poses
-	std::vector<cv::Mat1d> rvecs = {
+	const std::vector<cv::Mat1d> rvecs = {
 		(cv::Mat1d(3, 1) << 2.40327, -0.457555, 0.335426),
 		(cv::Mat1d(3, 1) << 2.40059, 0.350462, -0.116547),
 		(cv::Mat1d(3, 1) << 2.2446, 0.816225, -0.373654),
@@ -208,7 +209,7 @@ float measureTwoPointsCharuco(const std::vector<std::vector<glm::vec2>>& inputPo
 		(cv::Mat1d(3, 1) << 2.21499, -1.05024, 0.374562),
 	};
 
-	std::vector<cv::Mat1d> tvecs = {
+	const std::vector<cv::Mat1d> tvecs = {
 		(cv::Mat1d(3, 1) << -0.0581547, 0.0542219, 0.163637),
 		(cv::Mat1d(3, 1) << -0.119149, 0.0101526, 0.220561),
 		(cv::Mat1d(3, 1) << -0.156187, -0.0288829, 0.281005),
@@ -230,21 +231,21 @@ float measureTwoPointsCharuco(const std::vector<std::vector<glm::vec2>>& inputPo
 			cv::undistortPoints(inputDistortedPoints, outputUndistortedPoints, cameraMatrix, distCoeffs, cv::noArray(), cameraMatrix);
 
 			// Save undistorted point
-			point2D.x = outputUndistortedPoints.front().x;
-			point2D.y = float(imageHeight) - outputUndistortedPoints.front().y;
+			point2D.x = static_cast<float>(outputUndistortedPoints.front().x);
+			point2D.y = static_cast<float>(imageHeight) - static_cast<float>(outputUndistortedPoints.front().y);
 		}
 	}
 
 	// Since images are undistorted, we can now set the distortion coefficients to zero
-	distCoeffs.setTo(0.0f);
+	distCoeffs.setTo(0.0);
 
 	// Compute aspect ratio from images
 	const auto aspectRatio = float(imageWidth) / float(imageHeight);
 
 	// For a Google Pixel 3, the sensor is 5.76 mm by 4.29 mm
-	const cv::Size2f sensorSize(5.76f, 4.29f);
+	const cv::Size2d sensorSize(5.76, 4.29);
 	const auto focalLength = focalLengthInMm(cameraMatrix, imageSize, sensorSize);
-	const auto fovy = 2.0f * std::atan(sensorSize.height / (2.0f * focalLength.second)); 
+	const auto fovy = 2.0 * std::atan(sensorSize.height / (2.0 * focalLength.second)); 
 
 	std::vector<Camera> cameras;
 	for (int i = 0; i < nbImages; i++)
@@ -253,7 +254,8 @@ float measureTwoPointsCharuco(const std::vector<std::vector<glm::vec2>>& inputPo
 		std::tie(eye, at, up) = cameraEyeAtUpFromPose(cameraMatrix, rvecs[i], tvecs[i]);
 
 		cameras.emplace_back(eye, at, up,
-			                 fovy, aspectRatio,
+			                 static_cast<float>(fovy),
+			                 static_cast<float>(aspectRatio),
 			                 glm::vec2(imageWidth, imageHeight));
 	}
 

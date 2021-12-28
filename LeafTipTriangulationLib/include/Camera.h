@@ -3,7 +3,9 @@
 #include <string>
 #include <vector>
 
+#include <utils/warnoff.h>
 #include <glm/glm.hpp>
+#include <utils/warnon.h>
 
 #include "Ray.h"
 

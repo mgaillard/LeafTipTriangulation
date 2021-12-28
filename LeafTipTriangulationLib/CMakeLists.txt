@@ -3,6 +3,8 @@ add_library(LeafTipTriangulationLib STATIC)
 message(STATUS "Creating target 'LeafTipTriangulationLib'")
 
 set(HEADER_FILES
+    include/utils/warnoff.h
+    include/utils/warnon.h
     include/Camera.h
     include/Ray.h
     include/RayMatching.h
@@ -21,6 +23,14 @@ set(SRC_FILES
 # Setup filters in Visual Studio
 source_group("Header Files" FILES ${HEADER_FILES})
 source_group("Source Files" FILES ${SRC_FILES})
+
+if (MSVC)
+    # warning level 4 and all warnings as errors
+    target_compile_options(LeafTipTriangulationLib PRIVATE /W4 /WX)
+else()
+    # lots of warnings and all warnings as errors
+    target_compile_options(LeafTipTriangulationLib PRIVATE -Wall -Wextra -pedantic -Werror)
+endif()
 
 target_sources(LeafTipTriangulationLib
     PUBLIC

@@ -1,8 +1,10 @@
 #include "Triangulation.h"
 
+#include <utils/warnoff.h>
 #include <glm/gtc/matrix_access.hpp>
 
 #include <dlib/optimization.h>
+#include <utils/warnon.h>
 
 using parameterVector = dlib::matrix<float, 3, 1>;
 

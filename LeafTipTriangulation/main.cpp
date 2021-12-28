@@ -3,8 +3,10 @@
 #include <tuple>
 #include <vector>
 
+#include <utils/warnoff.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <utils/warnon.h>
 
 #include "Camera.h"
 #include "SyntheticData.h"

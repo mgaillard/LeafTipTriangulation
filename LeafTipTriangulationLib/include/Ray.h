@@ -1,6 +1,8 @@
 #pragma once
 
+#include <utils/warnoff.h>
 #include <glm/glm.hpp>
+#include <utils/warnon.h>
 
 struct Ray
 {

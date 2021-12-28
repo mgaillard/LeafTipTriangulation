@@ -2,9 +2,11 @@
 
 #include <numeric>
 
+#include <utils/warnoff.h>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <dlib/optimization/max_cost_assignment.h>
+#include <utils/warnon.h>
 
 #include "Triangulation.h"
 

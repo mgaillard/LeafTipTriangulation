@@ -19,11 +19,13 @@ set(SRC_FILES
 source_group("Header Files" FILES ${HEADER_FILES})
 source_group("Source Files" FILES ${SRC_FILES})
 
-# Copy the ReSharper config file
-configure_file(
-    "${CMAKE_SOURCE_DIR}/LeafTipTriangulation.sln.DotSettings"
-    ${CMAKE_BINARY_DIR} COPYONLY
-)
+if (MSVC)
+    # warning level 4 and all warnings as errors
+    target_compile_options(LeafTipTriangulation PRIVATE /W4 /WX)
+else()
+    # lots of warnings and all warnings as errors
+    target_compile_options(LeafTipTriangulation PRIVATE -Wall -Wextra -pedantic -Werror)
+endif()
 
 target_sources(LeafTipTriangulation
     PUBLIC

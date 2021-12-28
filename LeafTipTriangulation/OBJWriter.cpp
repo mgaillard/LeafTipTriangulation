@@ -105,7 +105,7 @@ int OBJWriter::findVertex(const glm::vec3& vertex) const
 
     if (it != m_vertices.end())
     {
-        return std::distance(m_vertices.begin(), it);
+        return static_cast<int>(std::distance(m_vertices.begin(), it));
     }
 
     return -1;
@@ -127,14 +127,14 @@ int OBJWriter::addVertex(const glm::vec3& vertex)
 {
     m_vertices.push_back(vertex);
 
-    return m_vertices.size() - 1;
+    return static_cast<int>(m_vertices.size()) - 1;
 }
 
 int OBJWriter::addNormal(const glm::vec3& normal)
 {
     m_normals.push_back(normal);
 
-    return m_normals.size() - 1;
+    return static_cast<int>(m_normals.size()) - 1;
 }
 
 void OBJWriter::addLine(int a, int b)

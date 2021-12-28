@@ -3,10 +3,12 @@
 #include <iostream>
 #include <numeric>
 
+#include <utils/warnoff.h>
 #include <glm/gtc/random.hpp>
 #include <glm/gtx/closest_point.hpp>
 
 #include <dlib/optimization/max_cost_assignment.h>
+#include <utils/warnon.h>
 
 std::vector<glm::vec3> generatePointsInSphere(int n, float radius)
 {
@@ -54,7 +56,7 @@ std::vector<std::vector<glm::vec2>> projectPoints(
 
 	for (unsigned int c = 0; c < cameras.size(); c++)
 	{
-		for (auto point : points)
+		for (const auto& point : points)
 		{
 			const auto point2D = cameras[c].project(point);
 
@@ -320,11 +322,8 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 				// The true point i does not have an equivalent triangulated
 				
 				// For each correspondence in trueCorrespondences[groundTruthIndex]
-				for (const auto& trueCorrespondence : trueCorrespondences[groundTruthIndex])
-				{
-					// If it is not present in the computed correspondence => false negative
-					result.falseNegativeCorrespondence++;
-				}
+				// If it is not present in the computed correspondence => false negative
+				result.falseNegativeCorrespondence += static_cast<int>(trueCorrespondences[groundTruthIndex].size());
 			}
 		}
 		else
@@ -336,11 +335,8 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 				
 				// The true point does not have an equivalent triangulated
 				// For each correspondence in trueCorrespondences[groundTruthIndex]
-				for (const auto& setOfRays : setsOfRays[triangulatedIndex])
-				{
-					// If it is not present in the ground truth => false positive
-					result.falsePositiveCorrespondence++;
-				}
+				// If it is not present in the ground truth => false positive
+				result.falsePositiveCorrespondence += static_cast<int>(setsOfRays[triangulatedIndex].size());
 			}
 			else
 			{
@@ -466,7 +462,6 @@ void checkCorrespondenceSetsOfRays(const std::vector<std::vector<std::pair<int, 
 
 		for (const auto& ray : setOfRays)
 		{
-			const auto& cameraIndex = ray.first;
 			const auto& pointIndex = ray.second;
 
 			if (pointIndex == i)
