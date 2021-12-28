@@ -1,3 +1,6 @@
+#define  _USE_MATH_DEFINES
+#include <cmath>
+
 #include <catch2/catch.hpp>
 
 #include "Camera.h"
@@ -64,15 +67,40 @@ TEST_CASE("Triangulation of one point from 2 views", "[triangulation]")
 		glm::vec3(0.0, 0.0, 0.0),
 		glm::vec3(0.0, 0.0, 1.0));
 
+	const std::vector<Camera> cameras = {
+		camera1,
+		camera2
+	};
+
 	// Test the triangulation with several points
-	testTriangulationOnePoint({camera1, camera2}, glm::vec3(0.1, -0.2, 0.15));
-	testTriangulationOnePoint({ camera1, camera2 }, glm::vec3(0.298, -0.767, -0.881));
-	testTriangulationOnePoint({ camera1, camera2 }, glm::vec3(0.154, 0.715, -0.733));
-	testTriangulationOnePoint({ camera1, camera2 }, glm::vec3(0.339, 0.957, -0.331));
-	testTriangulationOnePoint({ camera1, camera2 }, glm::vec3(-0.346, 0.887, -0.869));
+	testTriangulationOnePoint(cameras, glm::vec3(0.1, -0.2, 0.15));
+	testTriangulationOnePoint(cameras, glm::vec3(0.298, -0.767, -0.881));
+	testTriangulationOnePoint(cameras, glm::vec3(0.154, 0.715, -0.733));
+	testTriangulationOnePoint(cameras, glm::vec3(0.339, 0.957, -0.331));
+	testTriangulationOnePoint(cameras, glm::vec3(-0.346, 0.887, -0.869));
 }
 
 TEST_CASE("Triangulation of one point from multiple views", "[triangulation]")
 {
-	// TODO
+	// Define twelve cameras in a circle around the origin
+	const int nbCameras = 12;
+	std::vector<Camera> cameras;
+
+	for (int i = 0; i < nbCameras; i++)
+	{
+		const auto angle = 2 * M_PI * (static_cast<double>(i) / static_cast<double>(nbCameras));
+
+		cameras.emplace_back(
+			glm::vec3(2.0 * std::cos(angle), 2.0 * std::sin(angle), 0.0),
+			glm::vec3(0.0, 0.0, 0.0),
+			glm::vec3(0.0, 0.0, 1.0)
+		);
+	}
+
+	// Test the triangulation with several points
+	testTriangulationOnePoint(cameras, glm::vec3(0.1, -0.2, 0.15));
+	testTriangulationOnePoint(cameras, glm::vec3(0.298, -0.767, -0.881));
+	testTriangulationOnePoint(cameras, glm::vec3(0.154, 0.715, -0.733));
+	testTriangulationOnePoint(cameras, glm::vec3(0.339, 0.957, -0.331));
+	testTriangulationOnePoint(cameras, glm::vec3(-0.346, 0.887, -0.869));
 }
