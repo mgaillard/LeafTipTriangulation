@@ -124,7 +124,7 @@ float residual(const std::pair<cv::Mat1f, cv::Vec2f>& data, const parameterVecto
 
 	const auto error = cv::norm(projectedPoint, trueProjectedPoint, cv::NORM_L2SQR);
 
-	if (isnan(error))
+	if (std::isnan(error))
 	{
 		std::cout << trans(parameters) << std::endl;
 		std::cout << projectedPoint << " " << trueProjectedPoint << " " << error << std::endl;
