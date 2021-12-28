@@ -53,6 +53,17 @@ cv::Vec2f convertToOpenCV(const glm::vec2& v)
 	return output;
 }
 
+cv::Vec3f convertToOpenCV(const glm::vec3& v)
+{
+	cv::Vec3f output;
+
+	output[0] = v.x;
+	output[1] = v.y;
+	output[2] = v.z;
+
+	return output;
+}
+
 glm::vec3 convertToGlm(const cv::Vec3f& v)
 {
 	return {v[0], v[1], v[2]};
@@ -153,11 +164,11 @@ float reprojectionAdjustment(
 float reprojectionError(
 	const std::vector<cv::Mat1f>& homographies,
 	const std::vector<cv::Vec2f>& points,
-	cv::Vec3f& pointToAdjust)
+	const cv::Vec3f& point3d)
 {
 	assert(homographies.size() == points.size());
 
-	const auto x = vectorToParameters(pointToAdjust);
+	const auto x = vectorToParameters(point3d);
 
 	// Optimization
 	float finalCost = 0.f; 
