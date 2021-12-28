@@ -3,7 +3,55 @@
 #include "Camera.h"
 #include "Triangulation.h"
 
-TEST_CASE("Triangulation from 2 views", "[triangulation]")
+/**
+ * \brief Test the triangulation from multiple views:
+ *         - Project the 3D point on all views
+ *         - Check that the re-projection on views is correct
+ *         - Check that the re-projection error is close to zero
+ *         - Check that the point is accurately triangulated from all views
+ * \param cameras A set of cameras
+ * \param point A 3D point
+ */
+void testTriangulationOnePoint(const std::vector<Camera>& cameras, const glm::vec3& point)
+{
+	// Matrices to project a 3D point to 2D point in viewport coordinates
+	std::vector<cv::Mat1f> homographies;
+	std::vector<cv::Vec2f> points;
+
+	for (const auto& camera : cameras)
+	{
+		const auto homography = convertToOpenCV(removeZRow(camera.mat()));
+		const auto projectedPoint = camera.project(point);
+		const auto projectedPointOpenCV = convertToOpenCV(camera.windowToViewport(projectedPoint));
+		
+		// Check that re-projecting the point with the homography gives the right result
+		const cv::Vec4f homogeneousPoint(point[0], point[1], point[2], 1.0f);
+		const auto reProjectedPoint = projectPoint(homography, homogeneousPoint);
+		REQUIRE(reProjectedPoint[0] == Approx(projectedPointOpenCV[0]));
+		REQUIRE(reProjectedPoint[1] == Approx(projectedPointOpenCV[1]));
+
+		// Projection matrix
+		homographies.push_back(homography);
+		// Projected point in viewport coordinates
+		points.push_back(projectedPointOpenCV);
+	}
+
+	// Error when re-projecting the ground truth should almost 0
+	const auto pointOpenCV = convertToOpenCV(point);
+	const auto groundTruthError = reprojectionError(homographies, points, pointOpenCV);
+	REQUIRE(groundTruthError == Approx(0.0).margin(1e-12));
+
+	float error;
+	cv::Vec3f triangulatedPoint;
+
+	std::tie(error, triangulatedPoint) = reconstructPointFromViews(homographies, points);
+
+	REQUIRE(triangulatedPoint[0] == Approx(point.x));
+	REQUIRE(triangulatedPoint[1] == Approx(point.y));
+	REQUIRE(triangulatedPoint[2] == Approx(point.z));
+}
+
+TEST_CASE("Triangulation of one point from 2 views", "[triangulation]")
 {
 	// Define two cameras
 	const Camera camera1(
@@ -16,45 +64,15 @@ TEST_CASE("Triangulation from 2 views", "[triangulation]")
 		glm::vec3(0.0, 0.0, 0.0),
 		glm::vec3(0.0, 0.0, 1.0));
 
-	// Define a point to project on all views
-	const glm::vec3 point(0.1, -0.2, 0.15);
-	const auto pointOpenCV = convertToOpenCV(point);
+	// Test the triangulation with several points
+	testTriangulationOnePoint({camera1, camera2}, glm::vec3(0.1, -0.2, 0.15));
+	testTriangulationOnePoint({ camera1, camera2 }, glm::vec3(0.298, -0.767, -0.881));
+	testTriangulationOnePoint({ camera1, camera2 }, glm::vec3(0.154, 0.715, -0.733));
+	testTriangulationOnePoint({ camera1, camera2 }, glm::vec3(0.339, 0.957, -0.331));
+	testTriangulationOnePoint({ camera1, camera2 }, glm::vec3(-0.346, 0.887, -0.869));
+}
 
-	// Project a point on the two views
-	const glm::vec2 projectedPoint1(camera1.project(point));
-	const glm::vec2 projectedPoint2(camera2.project(point));
-
-	// Matrices to project a 3D point to 2D point in viewport coordinates
-	const std::vector<cv::Mat1f> homographies = {
-		convertToOpenCV(removeZRow(camera1.mat())),
-		convertToOpenCV(removeZRow(camera2.mat()))
-	};
-
-	// Projections of the point in 2D in viewport coordinates
-	const std::vector<cv::Vec2f> points = {
-		convertToOpenCV(camera1.windowToViewport(projectedPoint1)),
-		convertToOpenCV(camera1.windowToViewport(projectedPoint2))
-	};
-
-	// Check that re-projecting the point with the homographies gives the right result
-	const cv::Vec4f homogeneousPoint(point[0], point[1], point[2], 1.0f);
-	const auto reProjectedPoint1 = projectPoint(homographies[0], homogeneousPoint);
-	const auto reProjectedPoint2 = projectPoint(homographies[1], homogeneousPoint);
-	REQUIRE(reProjectedPoint1[0] == Approx(points[0][0]));
-	REQUIRE(reProjectedPoint1[1] == Approx(points[0][1]));
-	REQUIRE(reProjectedPoint2[0] == Approx(points[1][0]));
-	REQUIRE(reProjectedPoint2[1] == Approx(points[1][1]));
-
-	// Error when re-projecting the ground truth should almost 0
-	const auto groundTruthError = reprojectionError(homographies, points, pointOpenCV);
-	REQUIRE(groundTruthError == Approx(0.0).margin(1e-12));
-
-	float error;
-	cv::Vec3f triangulatedPoint;
-
-	std::tie(error, triangulatedPoint) = reconstructPointFromViews(homographies, points);
-
-	REQUIRE(triangulatedPoint[0] == Approx(point.x));
-	REQUIRE(triangulatedPoint[1] == Approx(point.y));
-	REQUIRE(triangulatedPoint[2] == Approx(point.z));
+TEST_CASE("Triangulation of one point from multiple views", "[triangulation]")
+{
+	// TODO
 }
