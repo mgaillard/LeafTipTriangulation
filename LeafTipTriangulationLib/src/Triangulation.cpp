@@ -76,6 +76,40 @@ glm::vec3 convertToGlm(const cv::Vec3d& v)
 	return { v[0], v[1], v[2] };
 }
 
+glm::vec4 convertToGlm(const cv::Vec4f& v)
+{
+	return { v[0], v[1], v[2], v[3] };
+}
+
+glm::mat4x3 convertToGlm(const cv::Mat1f& v)
+{
+	assert(v.rows == 3);
+	assert(v.cols == 4);
+
+	// OpenCV is row major, glm is column major
+	return glm::mat4x3(
+		// Column X
+		v.at<float>(0, 0),
+		v.at<float>(1, 0),
+		v.at<float>(2, 0),
+
+		// Column Y
+		v.at<float>(0, 1),
+		v.at<float>(1, 1),
+		v.at<float>(2, 1),
+
+		// Column Z
+		v.at<float>(0, 2),
+		v.at<float>(1, 2),
+		v.at<float>(2, 2),
+
+		// Column W
+		v.at<float>(0, 3),
+		v.at<float>(1, 3),
+		v.at<float>(2, 3)
+	);
+}
+
 cv::Vec2f projectPoint(const cv::Mat1f& H, const cv::Vec4f& m)
 {
 	assert(H.rows == 3);
@@ -87,6 +121,16 @@ cv::Vec2f projectPoint(const cv::Mat1f& H, const cv::Vec4f& m)
 	return cv::Vec2f(
 		result.at<float>(0) / result.at<float>(2),
 		result.at<float>(1) / result.at<float>(2)
+	);
+}
+
+glm::vec2 projectPoint(const glm::mat4x3& H, const glm::vec4& m)
+{
+	const auto result = H * m;
+
+	return glm::vec2(
+		result[0] / result[2],
+		result[1] / result[2]
 	);
 }
 
@@ -120,14 +164,18 @@ float residual(const std::pair<cv::Mat1f, cv::Vec2f>& data, const parameterVecto
 	const auto& homography = data.first;
 	const auto& trueProjectedPoint = data.second;
 
-	const auto projectedPoint = projectPoint(homography, homogeneousPoint);
+	// Run the projection using glm, which is much faster
+	const auto projectedPoint = projectPoint(
+		convertToGlm(homography),
+		convertToGlm(homogeneousPoint)
+	);
 
-	const auto error = cv::norm(projectedPoint, trueProjectedPoint, cv::NORM_L2SQR);
+	const auto error = cv::norm(convertToOpenCV(projectedPoint), trueProjectedPoint, cv::NORM_L2SQR);
 
 	if (std::isnan(error))
 	{
 		std::cout << trans(parameters) << std::endl;
-		std::cout << projectedPoint << " " << trueProjectedPoint << " " << error << std::endl;
+		// std::cout << projectedPoint << " " << trueProjectedPoint << " " << error << std::endl;
 		std::cout << std::endl << std::endl;
 	}
 

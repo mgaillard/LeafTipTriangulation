@@ -52,12 +52,34 @@ glm::vec3 convertToGlm(const cv::Vec3f& v);
 glm::vec3 convertToGlm(const cv::Vec3d& v);
 
 /**
+ * \brief Convert a 4D OpenCV vector to glm vector
+ * \param v A cv::Vec4f vector
+ * \return A glm vector
+ */
+glm::vec4 convertToGlm(const cv::Vec4f& v);
+
+/**
+ * \brief Convert a 3-by-4 OpenCV matrix to glm matrix
+ * \param v A cv::Mat1f matrix of size (3, 4)
+ * \return A glm matrix
+ */
+glm::mat4x3 convertToGlm(const cv::Mat1f& v);
+
+/**
  * \brief Project a 3D point in homogeneous coordinates to 2D.
  * \param H A 3x4 projection matrix.
  * \param m A 3D point in homogeneous coordinates
  * \return A 2D point
  */
 cv::Vec2f projectPoint(const cv::Mat1f& H, const cv::Vec4f& m);
+
+/**
+ * \brief Project a 3D point in homogeneous coordinates to 2D.
+ * \param H A 3x4 projection matrix.
+ * \param m A 3D point in homogeneous coordinates
+ * \return A 2D point
+ */
+glm::vec2 projectPoint(const glm::mat4x3& H, const glm::vec4& m);
 
 /**
  * \brief Triangulate a point in 3D 
