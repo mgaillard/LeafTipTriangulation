@@ -10,6 +10,9 @@ else()
     target_compile_options(LeafTipTriangulationTest PRIVATE -Wall -Wextra -pedantic -Werror)
 endif()
 
+# Activate benchmark in Catch2
+target_compile_definitions(LeafTipTriangulationTest PRIVATE CATCH_CONFIG_ENABLE_BENCHMARKING)
+
 target_sources(LeafTipTriangulationTest
     PRIVATE
     main.cpp

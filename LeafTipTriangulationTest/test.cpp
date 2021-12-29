@@ -54,6 +54,24 @@ void testTriangulationOnePoint(const std::vector<Camera>& cameras, const glm::ve
 	REQUIRE(triangulatedPoint[2] == Approx(point.z));
 }
 
+std::vector<Camera> generateCamerasAroundOrigin(int nbCameras)
+{
+	std::vector<Camera> cameras;
+
+	for (int i = 0; i < nbCameras; i++)
+	{
+		const auto angle = 2 * M_PI * (static_cast<double>(i) / static_cast<double>(nbCameras));
+
+		cameras.emplace_back(
+			glm::vec3(2.0 * std::cos(angle), 2.0 * std::sin(angle), 0.0),
+			glm::vec3(0.0, 0.0, 0.0),
+			glm::vec3(0.0, 0.0, 1.0)
+		);
+	}
+
+	return cameras;
+}
+
 TEST_CASE("Triangulation of one point from 2 views", "[triangulation]")
 {
 	// Define two cameras
@@ -84,18 +102,7 @@ TEST_CASE("Triangulation of one point from multiple views", "[triangulation]")
 {
 	// Define twelve cameras in a circle around the origin
 	const int nbCameras = 12;
-	std::vector<Camera> cameras;
-
-	for (int i = 0; i < nbCameras; i++)
-	{
-		const auto angle = 2 * M_PI * (static_cast<double>(i) / static_cast<double>(nbCameras));
-
-		cameras.emplace_back(
-			glm::vec3(2.0 * std::cos(angle), 2.0 * std::sin(angle), 0.0),
-			glm::vec3(0.0, 0.0, 0.0),
-			glm::vec3(0.0, 0.0, 1.0)
-		);
-	}
+	const auto cameras = generateCamerasAroundOrigin(nbCameras);
 
 	// Test the triangulation with several points
 	testTriangulationOnePoint(cameras, glm::vec3(0.1, -0.2, 0.15));
@@ -104,3 +111,37 @@ TEST_CASE("Triangulation of one point from multiple views", "[triangulation]")
 	testTriangulationOnePoint(cameras, glm::vec3(0.339, 0.957, -0.331));
 	testTriangulationOnePoint(cameras, glm::vec3(-0.346, 0.887, -0.869));
 }
+
+#ifdef CATCH_CONFIG_ENABLE_BENCHMARKING
+TEST_CASE("Benchmark triangulation of one point", "[triangulation][benchmark]")
+{
+	// Define twelve cameras in a circle around the origin
+	const int nbCameras = 12;
+	const auto cameras = generateCamerasAroundOrigin(nbCameras);
+
+	// Get the first N cameras
+	const std::vector<Camera> cameras2(cameras.begin(), cameras.begin() + 2);
+	const std::vector<Camera> cameras3(cameras.begin(), cameras.begin() + 3);
+	const std::vector<Camera> cameras6(cameras.begin(), cameras.begin() + 6);
+
+	BENCHMARK("Number of cameras: 2")
+	{
+		testTriangulationOnePoint(cameras2, glm::vec3(0.1, -0.2, 0.15));
+	};
+	
+	BENCHMARK("Number of cameras: 3")
+	{
+		testTriangulationOnePoint(cameras3, glm::vec3(0.1, -0.2, 0.15));
+	};
+	
+	BENCHMARK("Number of cameras: 6")
+	{
+		testTriangulationOnePoint(cameras6, glm::vec3(0.1, -0.2, 0.15));
+	};
+
+	BENCHMARK("Number of cameras: 12")
+	{
+		testTriangulationOnePoint(cameras, glm::vec3(0.1, -0.2, 0.15));
+	};
+}
+#endif
