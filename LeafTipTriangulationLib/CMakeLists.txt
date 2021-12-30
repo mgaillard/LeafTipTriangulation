@@ -6,6 +6,7 @@ set(HEADER_FILES
     include/utils/warnoff.h
     include/utils/warnon.h
     include/Camera.h
+    include/ConvertUtils.h
     include/Ray.h
     include/RayMatching.h
     include/Reconstruction.h
@@ -14,6 +15,7 @@ set(HEADER_FILES
 
 set(SRC_FILES
     src/Camera.cpp
+    src/ConvertUtils.cpp
     src/Ray.cpp
     src/RayMatching.cpp
     src/Reconstruction.cpp

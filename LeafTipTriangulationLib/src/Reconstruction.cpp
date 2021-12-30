@@ -14,6 +14,7 @@
 #include <opencv2/calib3d.hpp>
 #include <utils/warnon.h>
 
+#include "ConvertUtils.h"
 #include "RayMatching.h"
 #include "Triangulation.h"
 
