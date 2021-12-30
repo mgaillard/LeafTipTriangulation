@@ -563,7 +563,7 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 
 		float triangulationError;
 		std::vector<glm::vec3> triangulatedPoints3D;
-		std::tie(triangulationError, triangulatedPoints3D) = triangulatePoints(cameras, points2D, setsOfRays);
+		std::tie(triangulationError, triangulatedPoints3D) = triangulateManyPointsFromMultipleViews(cameras, points2D, setsOfRays);
 
 		// Store in cache
 		cacheDP[cacheIndex].set(triangulatedPoints3D, setsOfRays);
@@ -612,7 +612,7 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 				// TODO: maybe just bundle adjusting is necessary
 				float triangulationError;
 				std::vector<glm::vec3> triangulatedPoints;
-				std::tie(triangulationError, triangulatedPoints) = triangulatePoints(cameras, points2D, setsOfRays);
+				std::tie(triangulationError, triangulatedPoints) = triangulateManyPointsFromMultipleViews(cameras, points2D, setsOfRays);
 
 				// Compute the total re-projection error and update the best solution
 				if (triangulationError < bestReprojError)
