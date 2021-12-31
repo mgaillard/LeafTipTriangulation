@@ -32,7 +32,7 @@ GroundTruthMatchingResult testWithSyntheticData(const Parameters& parameters)
 	// Set the random seed
 	srand(parameters.seed);
 
-	const bool outputCsv = true; // TODO: deprecated
+	const bool verboseRemovePoints = false;
 	const float spherePointsRadius = 1.f;
 	const float sphereCamerasRadius = 3.f;
 	// TODO: give the threshold for not pairing a ray and a point as a parameter (and make it a function of the noise)
@@ -47,7 +47,7 @@ GroundTruthMatchingResult testWithSyntheticData(const Parameters& parameters)
 	// One point must be visible from at least two cameras
 	std::vector<std::vector<glm::vec2>> points2D;
 	std::vector<std::vector<std::pair<int, int>>> trueCorrespondences;
-	std::tie(points2D, trueCorrespondences) = removePoints(noisyPoints2D, parameters.probabilityKeep, !outputCsv);
+	std::tie(points2D, trueCorrespondences) = removePoints(noisyPoints2D, parameters.probabilityKeep, !verboseRemovePoints);
 
 	// TODO: maybe let the single ray points and check that they are not matched with something else
 	
