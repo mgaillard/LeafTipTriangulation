@@ -51,7 +51,7 @@ float triangulationBundleAdjustmentResidual(
 	const auto projectedPoint = projectPoint(projectionMatrix, homogeneousPoint);
 
 	// Squared distance
-	const auto error = glm::distance2(projectedPoint, trueProjectedPoint);
+	const auto error = glm::distance(projectedPoint, trueProjectedPoint);
 
 	if (std::isnan(error))
 	{
@@ -137,10 +137,13 @@ float reprojectionErrorFromMultipleViews(
 	float finalCost = 0.f;
 	for (unsigned int i = 0; i < projectionMatrices.size(); i++)
 	{
-		finalCost += triangulationBundleAdjustmentResidual({ projectionMatrices[i], points2d[i] }, x);
+		// Reprojection error of the point3d with the point2d
+		const auto dist = triangulationBundleAdjustmentResidual({ projectionMatrices[i], points2d[i] }, x);
+		// Squared distance to compute the non-linear least square objective function
+		finalCost += dist * dist;
 	}
 
-	return finalCost;
+	return finalCost / 2;
 }
 
 std::tuple<float, glm::vec3> triangulatePointFromMultipleViews(
@@ -198,6 +201,59 @@ std::tuple<float, glm::vec3> triangulatePointFromMultipleViews(
 	const auto finalError = triangulationBundleAdjustment(projectionMatrices, points2d, triangulatedPoint);
 
 	return { finalError, triangulatedPoint};
+}
+
+float reprojectionErrorManyPointsFromMultipleViews(
+	const std::vector<Camera>& cameras,
+	const std::vector<std::vector<glm::vec2>>& points2d,
+	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
+	const std::vector<glm::vec3>& points3d)
+{
+	float totalError = 0.f;
+
+	// TODO: refactor this portion with the function triangulateManyPointsFromMultipleViews()
+	for (unsigned int i = 0; i < setsOfRays.size(); i++)
+	{
+		const auto& pointProjections = setsOfRays[i];
+
+		if (pointProjections.size() <= 1)
+		{
+			// Go on with the next point to triangulate
+			continue;
+		}
+
+		// A point should at least have two projections to be triangulated
+		assert(pointProjections.size() >= 2);
+
+		std::vector<glm::mat4> currentProjectionMatrices;
+		std::vector<glm::vec2> currentPoints2d;
+
+		currentProjectionMatrices.reserve(pointProjections.size());
+		currentPoints2d.reserve(pointProjections.size());
+
+		for (const auto& pointProjection : pointProjections)
+		{
+			const auto& cameraIndex = pointProjection.first;
+			const auto& pointIndex = pointProjection.second;
+
+			const auto& camera = cameras[cameraIndex];
+			// Camera matrix from 3D to viewport coordinates
+			const auto& projectionMatrix = camera.mat();
+			// 2D point in viewport coordinates
+			auto point2D = camera.windowToViewport(points2d[cameraIndex][pointIndex]);
+
+			currentProjectionMatrices.push_back(projectionMatrix);
+			currentPoints2d.push_back(point2D);
+		}
+
+		// Triangulate the point
+		float error = reprojectionErrorFromMultipleViews(currentProjectionMatrices, currentPoints2d, points3d[i]);
+
+		// Sum up the re-projection errors
+		totalError += error;
+	}
+	
+	return totalError;
 }
 
 std::tuple<float, std::vector<glm::vec3>> triangulateManyPointsFromMultipleViews(
