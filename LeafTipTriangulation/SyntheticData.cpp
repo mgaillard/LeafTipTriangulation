@@ -401,7 +401,7 @@ AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTru
 	int nbRuns = 0;
 
 	double totalAverageDifferenceInReprojectionError = 0.0;
-	int totalProportionOfBetterReprojectionError = 0.0;
+	int totalProportionOfBetterReprojectionError = 0;
 
 	for (const auto& result : results)
 	{
@@ -419,9 +419,9 @@ AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTru
 			aggregationTotal.truePositiveCorrespondence += result.truePositiveCorrespondence;
 			aggregationTotal.falsePositiveCorrespondence += result.falsePositiveCorrespondence;
 			aggregationTotal.falseNegativeCorrespondence += result.falseNegativeCorrespondence;
-			totalAverageDifferenceInReprojectionError += (aggregationTotal.measuredReprojectionError - aggregationTotal.trueReprojectionError);
+			totalAverageDifferenceInReprojectionError += (result.measuredReprojectionError - result.trueReprojectionError);
 			
-			if (aggregationTotal.measuredReprojectionError < aggregationTotal.trueReprojectionError)
+			if (result.measuredReprojectionError < result.trueReprojectionError)
 			{
 				totalProportionOfBetterReprojectionError += 1;
 			}
@@ -451,7 +451,7 @@ AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTru
 	aggregation.fMeasureCorrespondence = 2.f * (aggregation.precisionCorrespondence * aggregation.recallCorrespondence)
 	                                         / (aggregation.precisionCorrespondence + aggregation.recallCorrespondence);
 
-	aggregation.averageDifferenceInReprojectionError = totalAverageDifferenceInReprojectionError > double(nbRuns);
+	aggregation.averageDifferenceInReprojectionError = totalAverageDifferenceInReprojectionError / double(nbRuns);
 	aggregation.proportionOfBetterReprojectionError = double(totalProportionOfBetterReprojectionError) / double(nbRuns);
 
 	// Sort distances
