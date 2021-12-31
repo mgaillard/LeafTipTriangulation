@@ -49,6 +49,16 @@ struct GroundTruthMatchingResult
 	int truePositiveCorrespondence;
 	int falsePositiveCorrespondence;
 	int falseNegativeCorrespondence;
+
+	/**
+	 * \brief Reprojection error of the 3D points to triangulate with the true correspondences
+	 */
+	double trueReprojectionError;
+
+	/**
+	 * \brief Reprojection error of the triangulated 3D points with the matched correspondences
+	 */
+	double measuredReprojectionError;
 	
 	/**
 	 * \brief A list of all distances between triangulated points and true points
@@ -64,7 +74,9 @@ struct GroundTruthMatchingResult
 	                              nbWrongPointsCorrespondence(0),
 	                              truePositiveCorrespondence(0),
 	                              falsePositiveCorrespondence(0),
-	                              falseNegativeCorrespondence(0)
+	                              falseNegativeCorrespondence(0),
+	                              trueReprojectionError(0.0),
+	                              measuredReprojectionError(0.0)
 	{
 	}
 };
@@ -117,6 +129,17 @@ struct AggregatedGroundTruthMatchingResult
 	double fMeasureCorrespondence;
 
 	/**
+	 * \brief Average difference between the measured reprojection error and the true reprojection error
+	 *        A negative value means that the measured reprojection error is better than the true reprojection error
+	 */
+	double averageDifferenceInReprojectionError;
+
+	/**
+	 * \brief Proportion of the solutions that give better reprojection error than 
+	 */
+	double proportionOfBetterReprojectionError;
+
+	/**
 	 * \brief The minimum distance from ground-truth to triangulation
 	 */
 	double minimumDistance;
@@ -161,26 +184,31 @@ struct AggregatedGroundTruthMatchingResult
 	 */
 	double stdDistance;
 
-	AggregatedGroundTruthMatchingResult() :
-		nbRuns(0),
-		nbPointsTriangulated(0.0),
-		nbPointsMissed(0.0),
-		nbPointsFalsePositive(0.0),
-		nbPointsSuccessful(0.0),
-		nbRightPointsCorrespondence(0.0),
-		nbWrongPointsCorrespondence(0.0),
-		minimumDistance(0.0),
-		firstDecileDistance(0.0),
-		firstQuartileDistance(0.0),
-		medianDistance(0.0),
-		thirdQuartileDistance(0.0),
-		lastDecileDistance(0.0),
-		maximumDistance(0.0),
-		meanDistance(0.0),
-		stdDistance(0.0)
-	
-	{
+	AggregatedGroundTruthMatchingResult() : meanRuntime(0.0),
+	                                        stdRuntime(0.0),
+	                                        nbRuns(0),
+	                                        nbPointsTriangulated(0.0),
+	                                        nbPointsMissed(0.0),
+	                                        nbPointsFalsePositive(0.0),
+	                                        nbPointsSuccessful(0.0),
+	                                        nbRightPointsCorrespondence(0.0),
+	                                        nbWrongPointsCorrespondence(0.0),
+	                                        precisionCorrespondence(0.0),
+	                                        recallCorrespondence(0.0),
+	                                        fMeasureCorrespondence(0.0),
+	                                        averageDifferenceInReprojectionError(0.0),
+	                                        proportionOfBetterReprojectionError(0.0),
+	                                        minimumDistance(0.0),
+	                                        firstDecileDistance(0.0),
+	                                        firstQuartileDistance(0.0),
+	                                        medianDistance(0.0),
+	                                        thirdQuartileDistance(0.0),
+	                                        lastDecileDistance(0.0),
+	                                        maximumDistance(0.0),
+	                                        meanDistance(0.0),
+	                                        stdDistance(0.0)
 
+	{
 	}
 };
 
@@ -247,18 +275,21 @@ bool checkUnProject(const std::vector<glm::vec3>& points,
  *        Display the maximum distance between a 3D point and it's matching triangulated 3D point.
  *        Display the average distance between the ground truth and the triangulation.
  *        Use this function to check that the triangulation without correspondences was successful.
+ * \param cameras Cameras used to project points
+ * \param points2d The list of 2D points seen on the cameras
+ * \param points3d The list of true 3D points
+ * \param trueCorrespondences The list of true correspondences
  * \param triangulatedPoints3D A list of triangulated 3D points
  * \param setsOfRays The list of correspondences for the triangulation
- * \param points3D A list of 3D points
- * \param trueCorrespondences The list of true correspondences
- * \param outputCsv Whether to output the results in CSV format or in human readable format
  * \return A struct that stores statistics
  */
 GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
+	const std::vector<Camera>& cameras,
+	const std::vector<std::vector<glm::vec2>>& points2d,
+	const std::vector<glm::vec3>& points3d,
+	const std::vector<std::vector<std::pair<int, int>>>& trueCorrespondences,
 	const std::vector<glm::vec3>& triangulatedPoints3D,
-	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
-	const std::vector<glm::vec3>& points3D,
-	const std::vector<std::vector<std::pair<int, int>>>& trueCorrespondences);
+	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays);
 
 /**
  * \brief Aggregate and compute statistics on a list of results

@@ -10,6 +10,8 @@
 #include <dlib/optimization/max_cost_assignment.h>
 #include <utils/warnon.h>
 
+#include "Triangulation.h"
+
 std::vector<glm::vec3> generatePointsInSphere(int n, float radius)
 {
 	std::vector<glm::vec3> points3D;
@@ -205,17 +207,19 @@ bool checkUnProject(
 }
 
 GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
+	const std::vector<Camera>& cameras,
+	const std::vector<std::vector<glm::vec2>>& points2d,
+	const std::vector<glm::vec3>& points3d,
+	const std::vector<std::vector<std::pair<int, int>>>& trueCorrespondences,
 	const std::vector<glm::vec3>& triangulatedPoints3D,
-	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
-	const std::vector<glm::vec3>& points3D,
-	const std::vector<std::vector<std::pair<int, int>>>& trueCorrespondences)
+	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
 {
 	// Multiplier used to convert a floating point value to an integer value
 	const float realToLongMultiplier = 1000.f;
 
 	// TODO: better matching and see if it changes results in stats
 
-	const int costRows = points3D.size();
+	const int costRows = points3d.size();
 	const int costCols = triangulatedPoints3D.size();
 	const int costSize = std::max(costRows, costCols);
 
@@ -228,7 +232,7 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 		{
 			if (i < costRows && j < costCols)
 			{
-				const auto dist = glm::distance(points3D[i], triangulatedPoints3D[j]);
+				const auto dist = glm::distance(points3d[i], triangulatedPoints3D[j]);
 				realCost(i, j) = dist;
 
 				const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
@@ -252,6 +256,15 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 	result.nbPointsMissed = std::max(0, costRows - costCols);
 	// Number of points that were added by the algorithm even if they should not be present
 	result.nbPointsFalsePositive = std::max(0, costCols - costRows);
+
+	// Compute the reprojection error with the true correspondences
+	// This is a lower bound on the error if the algorithm managed to find the true correspondences
+	// What can happen though is that the algorithm finds correspondences that have even a lower reprojection error
+	// This happens when the noise added to the 3D points changes what corresponds to the optimum set of correspondences
+	// In this case, the algorithm finds "better correspondences" even if they are not the true correspondences
+	result.trueReprojectionError = reprojectionErrorManyPointsFromMultipleViews(cameras, points2d, trueCorrespondences, points3d);
+	result.measuredReprojectionError = reprojectionErrorManyPointsFromMultipleViews(cameras, points2d, setsOfRays, triangulatedPoints3D);
+
 	for (int i = 0; i < costRows; i++)
 	{
 		// If it is a true 3D point
@@ -268,7 +281,7 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 
 				result.nbPointsSuccessful++;
 
-				const auto dist = glm::distance(points3D[groundTruthIndex], triangulatedPoints3D[triangulatedIndex]);
+				const auto dist = glm::distance(points3d[groundTruthIndex], triangulatedPoints3D[triangulatedIndex]);
 				result.distances.push_back(dist);
 
 				// Compare the correspondences
@@ -387,6 +400,9 @@ AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTru
 	std::vector<double> runtimes;
 	int nbRuns = 0;
 
+	double totalAverageDifferenceInReprojectionError = 0.0;
+	int totalProportionOfBetterReprojectionError = 0.0;
+
 	for (const auto& result : results)
 	{
 		// If the result has -1 nbPointsTriangulated, it has been aborted
@@ -403,6 +419,12 @@ AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTru
 			aggregationTotal.truePositiveCorrespondence += result.truePositiveCorrespondence;
 			aggregationTotal.falsePositiveCorrespondence += result.falsePositiveCorrespondence;
 			aggregationTotal.falseNegativeCorrespondence += result.falseNegativeCorrespondence;
+			totalAverageDifferenceInReprojectionError += (aggregationTotal.measuredReprojectionError - aggregationTotal.trueReprojectionError);
+			
+			if (aggregationTotal.measuredReprojectionError < aggregationTotal.trueReprojectionError)
+			{
+				totalProportionOfBetterReprojectionError += 1;
+			}
 			// Concat distances
 			aggregationTotal.distances.insert(aggregationTotal.distances.end(),
 				                              result.distances.begin(),
@@ -428,6 +450,9 @@ AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTru
 	                                 / double(aggregationTotal.truePositiveCorrespondence + aggregationTotal.falseNegativeCorrespondence);
 	aggregation.fMeasureCorrespondence = 2.f * (aggregation.precisionCorrespondence * aggregation.recallCorrespondence)
 	                                         / (aggregation.precisionCorrespondence + aggregation.recallCorrespondence);
+
+	aggregation.averageDifferenceInReprojectionError = totalAverageDifferenceInReprojectionError > double(nbRuns);
+	aggregation.proportionOfBetterReprojectionError = double(totalProportionOfBetterReprojectionError) / double(nbRuns);
 
 	// Sort distances
 	std::sort(aggregationTotal.distances.begin(), aggregationTotal.distances.end());

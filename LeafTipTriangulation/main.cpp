@@ -9,10 +9,10 @@
 #include <utils/warnon.h>
 
 #include "Camera.h"
-#include "SyntheticData.h"
 #include "ExportScene.h"
 #include "RayMatching.h"
 #include "Reconstruction.h"
+#include "SyntheticData.h"
 
 struct Parameters
 {
@@ -81,7 +81,12 @@ GroundTruthMatchingResult testWithSyntheticData(const Parameters& parameters)
 	// Sort the set of rays to make it uniquely identifiable even if it has been permuted
 	sortSetsOfRays(setsOfRays);
 	// Match the two sets of points and check the distance
-	auto result = matchingTriangulatedPointsWithGroundTruth(triangulatedPoints3D, setsOfRays, points3D, trueCorrespondences);
+	auto result = matchingTriangulatedPointsWithGroundTruth(cameras,
+	                                                        points2D,
+	                                                        points3D,
+	                                                        trueCorrespondences,
+	                                                        triangulatedPoints3D,
+	                                                        setsOfRays);
 	// Update run time
 	result.runtime = std::chrono::duration<double, std::milli>(endTime - startTime).count();
 	
@@ -298,7 +303,9 @@ void testCorrespondenceWithMoreNoise()
 			<< aggregation.nbRightPointsCorrespondence << "\t"
 			<< aggregation.precisionCorrespondence << "\t"
 			<< aggregation.recallCorrespondence << "\t"
-			<< aggregation.fMeasureCorrespondence << "\t" << std::endl;
+			<< aggregation.fMeasureCorrespondence << "\t"
+			<< aggregation.proportionOfBetterReprojectionError << "\t"
+			<< aggregation.averageDifferenceInReprojectionError << std::endl;
 	}
 }
 
