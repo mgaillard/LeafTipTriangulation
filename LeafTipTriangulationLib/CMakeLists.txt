@@ -9,7 +9,6 @@ set(HEADER_FILES
     include/ConvertUtils.h
     include/Ray.h
     include/RayMatching.h
-    include/Reconstruction.h
     include/Triangulation.h
 )
 
@@ -18,7 +17,6 @@ set(SRC_FILES
     src/ConvertUtils.cpp
     src/Ray.cpp
     src/RayMatching.cpp
-    src/Reconstruction.cpp
     src/Triangulation.cpp
 )
 
