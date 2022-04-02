@@ -73,7 +73,7 @@ float triangulationBundleAdjustmentResidual(
  * \param pointToAdjust The 3D point to refine
  * \return The final reprojection error
  */
-float triangulationBundleAdjustment(
+double triangulationBundleAdjustment(
 	const std::vector<glm::mat4>& projectionMatrices,
 	const std::vector<glm::vec2>& points2d,
 	glm::vec3& pointToAdjust
@@ -91,11 +91,11 @@ float triangulationBundleAdjustment(
 	auto x = glmVec3ToParameters(pointToAdjust);
 
 	// Optimization
-	const float finalCost = dlib::solve_least_squares(dlib::objective_delta_stop_strategy(1e-8),
-	                                                  triangulationBundleAdjustmentResidual,
-	                                                  derivative(triangulationBundleAdjustmentResidual, 1e-6),
-	                                                  data,
-	                                                  x);
+	const auto finalCost = dlib::solve_least_squares(dlib::objective_delta_stop_strategy(1e-8),
+	                                                 triangulationBundleAdjustmentResidual,
+	                                                 derivative(triangulationBundleAdjustmentResidual, 1e-6),
+	                                                 data,
+	                                                 x);
 
 	// Override the initial guess with the adjusted point
 	pointToAdjust = parametersToGlmVec3(x);

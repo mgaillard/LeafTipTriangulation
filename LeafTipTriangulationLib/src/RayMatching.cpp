@@ -260,7 +260,7 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 	// Compute an upper bound on the maximum distance between two pixel with the camera
 	const auto maximumDistancePixels = computeMaximumCameraResolution(cameras) * std::sqrt(2.f);
 	// Make sure that this distance is about 1G for the maximum distance in the image
-	const long maximumSimilarity = 1e9;
+	constexpr long maximumSimilarity = 1000000000;
 
 	// Multiplier used to convert a floating point value to an integer value
 	const double realToLongMultiplier = static_cast<double>(maximumSimilarity) / maximumDistancePixels;
@@ -295,8 +295,8 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 			continue;
 		}
 
-		const int costSize = rays[referenceCamera].size();
-		const int costCols = rays[c].size();
+		const int costSize = static_cast<int>(rays[referenceCamera].size());
+		const int costCols = static_cast<int>(rays[c].size());
 
 		assert(costSize >= costCols);
 
@@ -397,15 +397,15 @@ std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 	// Compute an upper bound on the maximum distance between two pixel with the camera
 	const auto maximumDistancePixels = computeMaximumCameraResolution(currentCamera) * std::sqrt(2.f);
 	// Make sure that this distance is about 1G for the maximum distance in the image
-	const long maximumSimilarity = 1e9;
+	constexpr long maximumSimilarity = 1000000000;
 
 	// Multiplier used to convert a floating point value to an integer value
 	const double realToLongMultiplier = static_cast<double>(maximumSimilarity) / maximumDistancePixels;
 
 	// Number of 3D points and single rays available for matching
-	const int costSize = setsOfRays.size();
+	const int costSize = static_cast<int>(setsOfRays.size());
 	// Number of 2D points to match 
-	const int costCols = currentPoints2D.size();
+	const int costCols = static_cast<int>(currentPoints2D.size());
 
 	dlib::matrix<long> cost(costSize, costSize);
 	for (int i = 0; i < costSize; i++)

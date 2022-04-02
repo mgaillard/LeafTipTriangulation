@@ -136,7 +136,8 @@ std::pair<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<std::pair
 			{
 				newCameraPoints.push_back(point);
 				visibility[i]++;
-				correspondences[i].emplace_back(c, newCameraPoints.size() - 1);
+				const auto lastCameraIndex = static_cast<int>(newCameraPoints.size()) - 1;
+				correspondences[i].emplace_back(c, lastCameraIndex);
 			}
 		}
 
@@ -219,8 +220,8 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 
 	// TODO: better matching and see if it changes results in stats
 
-	const int costRows = points3d.size();
-	const int costCols = triangulatedPoints3D.size();
+	const int costRows = static_cast<int>(points3d.size());
+	const int costCols = static_cast<int>(triangulatedPoints3D.size());
 	const int costSize = std::max(costRows, costCols);
 
 	dlib::matrix<long> cost(costSize, costSize);
@@ -251,7 +252,7 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 	const auto assignment = dlib::max_cost_assignment(cost);
 
 	GroundTruthMatchingResult result;
-	result.nbPointsTriangulated = triangulatedPoints3D.size();
+	result.nbPointsTriangulated = static_cast<int>(triangulatedPoints3D.size());
 	// Number of points that were missed by the algorithm
 	result.nbPointsMissed = std::max(0, costRows - costCols);
 	// Number of points that were added by the algorithm even if they should not be present
