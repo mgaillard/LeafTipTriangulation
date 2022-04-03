@@ -432,10 +432,7 @@ void runPlantPhenotyping()
 	// Compute rays in 3D from camera matrices and 2D points
 	const auto rays = computeRays(setup.cameras, points2D);
 
-	// Matching and triangulation of points
-	std::vector<glm::vec3> triangulatedPoints3D;
-	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
-	std::tie(triangulatedPoints3D, setsOfRays) = matchRaysAndTriangulate(setup.cameras, points2D, rays);
+	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(setup.cameras, points2D, rays);
 
 	// Export the scene
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);

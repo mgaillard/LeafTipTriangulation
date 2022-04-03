@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <utils/warnoff.h>
@@ -14,15 +15,45 @@ struct PhenotypingSetup
 	double imageWidth;
 	double imageHeight;
 
+	std::vector<std::string> views;
+
 	std::vector<Camera> cameras;
 };
 
-struct PlantLeafTips
+class PlantLeafTips
 {
-	std::string plantName;
+public:
+	PlantLeafTips() = default;
+	explicit PlantLeafTips(std::string plantName);
+
+	/**
+	 * \brief Return the name of the plant
+	 * \return The name of the plant
+	 */
+	const std::string& plantName() const;
+
+	/**
+	 * \brief Add 2D points seen from a view
+	 * \param viewName The name of the view
+	 * \param points The list of 2D points seen from this view
+	 */
+	void addPointsFromView(const std::string& viewName, const std::vector<glm::vec2>& points);
+
+	/**
+	 * \brief Return a list of lists of points ordered by view
+	 * \param viewNames The list of views where points are required, for example: {SV_0, SV_36, SV_72}
+	 * \return A list of lists of 2D points
+	 */
+	std::vector<std::vector<glm::vec2>> pointsFromViews(const std::vector<std::string>& viewNames) const;
+
+private:
+
+	std::string m_plantName;
 
 	// For each view, a list of 2D points corresponding to leaf tips
-	std::vector<std::vector<glm::vec2>> tips;
+	// Views can be named: SV_0, SV_36, SV_72, ..., TV_90
+	std::unordered_map<std::string, std::vector<glm::vec2>> m_points;
+
 };
 
 /**
@@ -40,6 +71,8 @@ std::vector<PlantLeafTips> readLeafTipsFromCSV(const std::string& filename);
 
 // TODO: Read translation for each plant in another file
 // TODO: Apply translations to a list of plants
+// TODO: flip the Y axis according to a setup
+// TODO: discard plants if they do not include all views in a list
 
 /**
  * \brief Find the 3D position of leaf tips in a plant
