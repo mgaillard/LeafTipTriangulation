@@ -6,6 +6,7 @@
 #include <utils/warnoff.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <opencv2/core/core.hpp>
 #include <utils/warnon.h>
 
 #include "Camera.h"
@@ -453,7 +454,7 @@ void runCrocodileMeasurement()
 {
 	// X axis is from left to right
 	// Y axis is from bottom to top
-	std::vector<std::vector<glm::vec2>> points2D = {
+	const std::vector<std::vector<glm::vec2>> points2D = {
 		// Camera 0
 		{
 			{1877, 1237},
@@ -481,7 +482,48 @@ void runCrocodileMeasurement()
 		},
 	};
 
-	std::cout << "Length: " << measureTwoPointsCharuco(points2D) << " m" << std::endl;
+	constexpr int imageWidth = 4032;
+	constexpr int imageHeight = 3024;
+
+	// Camera calibration
+	cv::Mat1d cameraMatrix = (cv::Mat1d(3, 3) <<
+		3153.273013526734, 0.0, 2005.9916092061376, // fx, 0, cx
+		0.0, 3105.260406995229, 1540.0981727685203, // 0, fy, cy
+		0.0, 0.0, 1.0);
+
+	cv::Mat1d distCoeffs = (cv::Mat1d(5, 1) <<
+		0.280605688854058, // k1
+		-1.6945809491702621, // k2
+		0.0024575553828127643, // p1
+		-0.0021983284657425975, // p2
+		3.2574845170325277); // k3
+
+	// Cameras poses
+	const std::vector<cv::Mat1d> rvecs = {
+		(cv::Mat1d(3, 1) << 2.40327, -0.457555, 0.335426),
+		(cv::Mat1d(3, 1) << 2.40059, 0.350462, -0.116547),
+		(cv::Mat1d(3, 1) << 2.2446, 0.816225, -0.373654),
+		(cv::Mat1d(3, 1) << 2.16444, 1.58991, -0.220916),
+		(cv::Mat1d(3, 1) << 2.21499, -1.05024, 0.374562),
+	};
+
+	const std::vector<cv::Mat1d> tvecs = {
+		(cv::Mat1d(3, 1) << -0.0581547, 0.0542219, 0.163637),
+		(cv::Mat1d(3, 1) << -0.119149, 0.0101526, 0.220561),
+		(cv::Mat1d(3, 1) << -0.156187, -0.0288829, 0.281005),
+		(cv::Mat1d(3, 1) << -0.112906, -0.111428, 0.307856),
+		(cv::Mat1d(3, 1) << 0.0137574, 0.0700162, 0.207419),
+	};
+
+	const auto pointsDistance = measureTwoPointsCharuco(imageWidth,
+	                                                    imageHeight,
+	                                                    cameraMatrix,
+	                                                    distCoeffs,
+	                                                    rvecs,
+	                                                    tvecs,
+	                                                    points2D);
+
+	std::cout << "Length: " << pointsDistance << " m" << std::endl;
 }
 
 int main(int argc, char *argv[])
@@ -530,7 +572,8 @@ int main(int argc, char *argv[])
 	}
 	else if (command == "measure_crocodile")
 	{
-		// Example when measuring the length between two points in a LEGO set
+		// Example of measuring the length between two points in a LEGO set
+		// Reference images are in the folder /Images/crocodile/*.jpg
 		runCrocodileMeasurement();
 	}
 	

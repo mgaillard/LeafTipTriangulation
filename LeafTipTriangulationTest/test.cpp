@@ -1,8 +1,6 @@
-#define  _USE_MATH_DEFINES
-#include <cmath>
-
 #include <catch2/catch.hpp>
 
+#include "Constants.h"
 #include "Camera.h"
 #include "Triangulation.h"
 
@@ -57,7 +55,7 @@ std::vector<Camera> generateCamerasAroundOrigin(int nbCameras)
 
 	for (int i = 0; i < nbCameras; i++)
 	{
-		const auto angle = 2 * M_PI * (static_cast<double>(i) / static_cast<double>(nbCameras));
+		const auto angle = 2 * constants::pi * (static_cast<double>(i) / static_cast<double>(nbCameras));
 
 		cameras.emplace_back(
 			glm::vec3(2.0 * std::cos(angle), 2.0 * std::sin(angle), 0.0),

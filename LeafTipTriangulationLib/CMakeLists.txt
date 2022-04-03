@@ -6,6 +6,7 @@ set(HEADER_FILES
     include/utils/warnoff.h
     include/utils/warnon.h
     include/Camera.h
+    include/Constants.h
     include/ConvertUtils.h
     include/Ray.h
     include/RayMatching.h
