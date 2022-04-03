@@ -5,6 +5,7 @@ message(STATUS "Creating target 'LeafTipTriangulation'")
 set(HEADER_FILES 
     ExportScene.h
     OBJWriter.h
+    Phenotyping.h
     Reconstruction.h
     SyntheticData.h
 )
@@ -13,6 +14,7 @@ set(SRC_FILES
     ExportScene.cpp
     main.cpp
     OBJWriter.cpp
+    Phenotyping.cpp
     Reconstruction.cpp
     SyntheticData.cpp
 )

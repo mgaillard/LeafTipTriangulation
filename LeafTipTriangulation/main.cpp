@@ -11,6 +11,7 @@
 
 #include "Camera.h"
 #include "ExportScene.h"
+#include "Phenotyping.h"
 #include "RayMatching.h"
 #include "Reconstruction.h"
 #include "SyntheticData.h"
@@ -359,17 +360,7 @@ void testCorrespondenceWithThreshold(float noiseStd)
 
 void runPlantPhenotyping()
 {
-	const float imageWidth = 2454.0;
-	const float imageHeight = 2056.0;
-
-	const auto cameras = loadCamerasFromFiles({
-		"cameras/camera_0.txt",
-		"cameras/camera_72.txt",
-		"cameras/camera_144.txt",
-		"cameras/camera_216.txt",
-		"cameras/camera_288.txt",
-		"cameras/camera_top.txt"
-		}, glm::vec2(imageWidth, imageHeight));
+	const auto setup = loadPhenotypingSetup();
 
 	// X axis is from left to right
 	// Y axis is from bottom to top
@@ -439,12 +430,12 @@ void runPlantPhenotyping()
 	};
 
 	// Compute rays in 3D from camera matrices and 2D points
-	const auto rays = computeRays(cameras, points2D);
+	const auto rays = computeRays(setup.cameras, points2D);
 
 	// Matching and triangulation of points
 	std::vector<glm::vec3> triangulatedPoints3D;
 	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
-	std::tie(triangulatedPoints3D, setsOfRays) = matchRaysAndTriangulate(cameras, points2D, rays);
+	std::tie(triangulatedPoints3D, setsOfRays) = matchRaysAndTriangulate(setup.cameras, points2D, rays);
 
 	// Export the scene
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
