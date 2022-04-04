@@ -33,6 +33,12 @@ public:
 	const std::string& plantName() const;
 
 	/**
+	 * \brief Return the list of all views that have points
+	 * \return The list of all views that have points
+	 */
+	std::vector<std::string> getAllViews() const;
+
+	/**
 	 * \brief Check if the plant has all views in a list
 	 * \param viewNames A list of view names
 	 * \return True if the plant has all views, false otherwise
@@ -89,12 +95,14 @@ std::vector<PlantLeafTips> readLeafTipsFromCSV(const std::string& filename);
  */
 void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantLeafTips>& plants);
 
-// TODO: Get the list of cameras available for a plant
 // TODO: Get a subset of cameras from a setup
-// TODO: Read translation for each plant in another file
-// TODO: Apply translations to a list of plants
+// TODO: Read and apply translations to a list of plants
 
-// TODO: keepOnlyPlantsWithMultipleViews(std::vector<PlantLeafTips>& plants);
+/**
+ * \brief Only keep plants in the list with at least two views (required for 3D triangulation)
+ * \param plants The list of plants to filter
+ */
+void keepOnlyPlantsWithMultipleViews(std::vector<PlantLeafTips>& plants);
 
 /**
  * \brief Only keep plants in the list with all views

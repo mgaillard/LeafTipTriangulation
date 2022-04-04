@@ -17,6 +17,18 @@ const std::string& PlantLeafTips::plantName() const
 	return m_plantName;
 }
 
+std::vector<std::string> PlantLeafTips::getAllViews() const
+{
+	std::vector<std::string> viewNames;
+
+	for (const auto& [viewName, viewPoints] : m_points)
+	{
+		viewNames.push_back(viewName);
+	}
+
+	return viewNames;
+}
+
 bool PlantLeafTips::hasAllViews(const std::vector<std::string>& viewNames) const
 {
 	for (const auto& viewName : viewNames)
@@ -189,6 +201,20 @@ void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantLeafTi
 	{
 		plant.flipYAxis(setup.imageHeight);
 	}
+}
+
+void keepOnlyPlantsWithMultipleViews(std::vector<PlantLeafTips>& plants)
+{
+	// Send plants without all views at the end of the list
+	const auto endIt = std::remove_if(plants.begin(),
+	                                  plants.end(),
+	                                  [](const PlantLeafTips& p) -> bool
+	                                  {
+		                                  return p.getAllViews().size() > 1;
+	                                  });
+
+	// Remove plants at the end of the list
+	plants.erase(endIt, plants.end());
 }
 
 void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::vector<PlantLeafTips>& plants)
