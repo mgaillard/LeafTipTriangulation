@@ -47,6 +47,12 @@ public:
 	void addPointsFromView(const std::string& viewName, const std::vector<glm::vec2>& points);
 
 	/**
+	 * \brief Flip the coordinates of points on the Y axis
+	 * \param imageHeight Resolution of the image on the Y axis
+	 */
+	void flipYAxis(double imageHeight);
+
+	/**
 	 * \brief Return a list of lists of points ordered by view
 	 * \param viewNames The list of views where points are required, for example: {SV_0, SV_36, SV_72}
 	 * \return A list of lists of 2D points
@@ -76,11 +82,19 @@ PhenotypingSetup loadPhenotypingSetup();
  */
 std::vector<PlantLeafTips> readLeafTipsFromCSV(const std::string& filename);
 
-// TODO: Flip the Y axis according to a setup
+/**
+ * \brief Flip the Y axis coordinates of a list of plants according to a phenotyping setup
+ * \param setup The phenotyping setup used to image the plants
+ * \param plants The list of plants to modify
+ */
+void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantLeafTips>& plants);
+
 // TODO: Get the list of cameras available for a plant
 // TODO: Get a subset of cameras from a setup
 // TODO: Read translation for each plant in another file
 // TODO: Apply translations to a list of plants
+
+// TODO: keepOnlyPlantsWithMultipleViews(std::vector<PlantLeafTips>& plants);
 
 /**
  * \brief Only keep plants in the list with all views

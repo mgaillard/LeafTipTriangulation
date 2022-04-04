@@ -44,6 +44,17 @@ void PlantLeafTips::addPointsFromView(const std::string& viewName, const std::ve
 	}	
 }
 
+void PlantLeafTips::flipYAxis(double imageHeight)
+{
+	for (auto& points : m_points)
+	{
+		for (auto& point : points.second)
+		{
+			point.y = static_cast<float>(imageHeight) - point.y;
+		}
+	}
+}
+
 std::vector<std::vector<glm::vec2>> PlantLeafTips::pointsFromViews(const std::vector<std::string>& viewNames) const
 {
 	std::vector<std::vector<glm::vec2>> points;
@@ -102,7 +113,7 @@ std::vector<PlantLeafTips> readLeafTipsFromCSV(const std::string& filename)
 	// Regex to match the list of leaf tips of a plant
 	const std::string matchLeafTips = R"(\[((?:(?:\[(?:\d+,\s\d+)\])(?:,\s)?)+)\])";
 	// Regex to match the list of junctions of a plant
-	const std::string matchJunctions = R"(\[((?:(?:\[(?:\d+,\s\d+)\])(?:,\s)?)+)\])";
+	const std::string matchJunctions = R"(\[((?:(?:\[(?:\d+,\s\d+)\])(?:,\s)?)*)\])";
 	// Regex to match a space between sequences
 	const std::string matchSpace = R"(\s)";
 	// Regex to match a full line
@@ -170,6 +181,14 @@ std::vector<PlantLeafTips> readLeafTipsFromCSV(const std::string& filename)
 		});
 
 	return plantList;
+}
+
+void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantLeafTips>& plants)
+{
+	for (auto& plant : plants)
+	{
+		plant.flipYAxis(setup.imageHeight);
+	}
 }
 
 void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::vector<PlantLeafTips>& plants)
