@@ -17,6 +17,19 @@ const std::string& PlantLeafTips::plantName() const
 	return m_plantName;
 }
 
+bool PlantLeafTips::hasAllViews(const std::vector<std::string>& viewNames) const
+{
+	for (const auto& viewName : viewNames)
+	{
+		if (m_points.count(viewName) == 0)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 void PlantLeafTips::addPointsFromView(const std::string& viewName, const std::vector<glm::vec2>& points)
 {
 	if (m_points.count(viewName) > 0)
@@ -157,6 +170,20 @@ std::vector<PlantLeafTips> readLeafTipsFromCSV(const std::string& filename)
 		});
 
 	return plantList;
+}
+
+void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::vector<PlantLeafTips>& plants)
+{
+	// Send plants without all views at the end of the list
+	const auto endIt = std::remove_if(plants.begin(),
+	                                  plants.end(),
+	                                  [&viewNames](const PlantLeafTips& p) -> bool
+	                                  {
+		                                  return !p.hasAllViews(viewNames);
+	                                  });
+
+	// Remove plants at the end of the list
+	plants.erase(endIt, plants.end());
 }
 
 std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const PlantLeafTips& plantLeafTips)

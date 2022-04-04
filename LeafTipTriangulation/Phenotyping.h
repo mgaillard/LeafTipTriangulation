@@ -33,6 +33,13 @@ public:
 	const std::string& plantName() const;
 
 	/**
+	 * \brief Check if the plant has all views in a list
+	 * \param viewNames A list of view names
+	 * \return True if the plant has all views, false otherwise
+	 */
+	bool hasAllViews(const std::vector<std::string>& viewNames) const;
+
+	/**
 	 * \brief Add 2D points seen from a view
 	 * \param viewName The name of the view
 	 * \param points The list of 2D points seen from this view
@@ -69,10 +76,18 @@ PhenotypingSetup loadPhenotypingSetup();
  */
 std::vector<PlantLeafTips> readLeafTipsFromCSV(const std::string& filename);
 
+// TODO: Flip the Y axis according to a setup
+// TODO: Get the list of cameras available for a plant
+// TODO: Get a subset of cameras from a setup
 // TODO: Read translation for each plant in another file
 // TODO: Apply translations to a list of plants
-// TODO: flip the Y axis according to a setup
-// TODO: discard plants if they do not include all views in a list
+
+/**
+ * \brief Only keep plants in the list with all views
+ * \param viewNames A list of name of views
+ * \param plants The list of plants to filter
+ */
+void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::vector<PlantLeafTips>& plants);
 
 /**
  * \brief Find the 3D position of leaf tips in a plant
