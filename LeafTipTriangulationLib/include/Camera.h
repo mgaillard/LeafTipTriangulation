@@ -73,11 +73,9 @@ float computeMaximumCameraResolution(const std::vector<Camera>& cameras);
 /**
  * \brief Load camera from a list of files
  * \param files A list of files containing the camera information
- * \param viewportSize Size of the viewport of images in pixels
  * \return A vector of camera
  */
-std::vector<Camera> loadCamerasFromFiles(const std::vector<std::string>& files,
-								         const glm::vec2& viewportSize);
+std::vector<Camera> loadCamerasFromFiles(const std::vector<std::string>& files);
 
 /**
  * \brief Compute rays going from camera to the 3D space

@@ -10,14 +10,29 @@
 
 #include "Camera.h"
 
-struct PhenotypingSetup
+class PhenotypingSetup
 {
-	double imageWidth;
-	double imageHeight;
+public:
+	PhenotypingSetup(double imageWidth,
+	                 double imageHeight,
+	                 std::vector<std::string> views,
+	                 std::vector<Camera> cameras);
 
-	std::vector<std::string> views;
+	double imageWidth() const;
 
-	std::vector<Camera> cameras;
+	double imageHeight() const;
+
+	const std::vector<std::string>& views() const;
+
+	const std::vector<Camera>& cameras() const;
+
+private:
+	double m_imageWidth;
+	double m_imageHeight;
+
+	std::vector<std::string> m_views;
+
+	std::vector<Camera> m_cameras;
 };
 
 class PlantLeafTips

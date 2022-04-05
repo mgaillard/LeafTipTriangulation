@@ -100,9 +100,7 @@ float computeMaximumCameraResolution(const std::vector<Camera>& cameras)
 	return maximumResolution;
 }
 
-std::vector<Camera> loadCamerasFromFiles(
-	const std::vector<std::string>& files,
-	const glm::vec2& viewportSize)
+std::vector<Camera> loadCamerasFromFiles(const std::vector<std::string>& files)
 {
 	std::vector<Camera> cameras;
 
@@ -114,12 +112,22 @@ std::vector<Camera> loadCamerasFromFiles(
 
 		if (file.is_open())
 		{
+			int imageWidth, imageHeight;
 			glm::vec3 eye, at, up;
+			// These are not used by our camera model, but are still part of the file
+			double fovy, aspectRatio, nearPlane, farPlane;
 			glm::mat4 matV, matP;
+
+			file >> imageWidth >> imageHeight;
 
 			file >> eye.x >> eye.y >> eye.z;
 			file >> at.x >> at.y >> at.z;
 			file >> up.x >> up.y >> up.z;
+
+			file >> fovy;
+			file >> aspectRatio;
+			file >> nearPlane;
+			file >> farPlane;
 
 			file >> matV[0][0] >> matV[1][0] >> matV[2][0] >> matV[3][0];
 			file >> matV[0][1] >> matV[1][1] >> matV[2][1] >> matV[3][1];
@@ -133,7 +141,7 @@ std::vector<Camera> loadCamerasFromFiles(
 
 			file.close();
 
-			cameras.emplace_back(eye, at, up, matV, matP, viewportSize);
+			cameras.emplace_back(eye, at, up, matV, matP, glm::vec2(imageWidth, imageHeight));
 		}
 		else
 		{

@@ -430,9 +430,9 @@ void runPlantPhenotyping()
 	};
 
 	// Compute rays in 3D from camera matrices and 2D points
-	const auto rays = computeRays(setup.cameras, points2D);
+	const auto rays = computeRays(setup.cameras(), points2D);
 
-	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(setup.cameras, points2D, rays);
+	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(setup.cameras(), points2D, rays);
 
 	// Export the scene
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);

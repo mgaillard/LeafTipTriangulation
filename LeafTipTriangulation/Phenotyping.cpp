@@ -7,6 +7,39 @@
 
 #include "RayMatching.h"
 
+PhenotypingSetup::PhenotypingSetup(
+	double imageWidth,
+	double imageHeight,
+	std::vector<std::string> views,
+	std::vector<Camera> cameras) :
+	m_imageWidth(imageWidth),
+	m_imageHeight(imageHeight),
+	m_views(std::move(views)),
+	m_cameras(std::move(cameras))
+{
+
+}
+
+double PhenotypingSetup::imageWidth() const
+{
+	return m_imageWidth;
+}
+
+double PhenotypingSetup::imageHeight() const
+{
+	return m_imageHeight;
+}
+
+const std::vector<std::string>& PhenotypingSetup::views() const
+{
+	return m_views;
+}
+
+const std::vector<Camera>& PhenotypingSetup::cameras() const
+{
+	return m_cameras;
+}
+
 PlantLeafTips::PlantLeafTips(std::string plantName) : m_plantName(std::move(plantName))
 {
 	
@@ -89,9 +122,6 @@ std::vector<std::vector<glm::vec2>> PlantLeafTips::pointsFromViews(const std::ve
 
 PhenotypingSetup loadPhenotypingSetup()
 {
-	constexpr double imageWidth = 2454.0;
-	constexpr double imageHeight = 2056.0;
-
 	const std::vector<std::string> views = {
 		"SV_0",
 		"SV_72",
@@ -102,13 +132,17 @@ PhenotypingSetup loadPhenotypingSetup()
 	};
 
 	const auto cameras = loadCamerasFromFiles({
-		"cameras/camera_0.txt",
-		"cameras/camera_72.txt",
-		"cameras/camera_144.txt",
-		"cameras/camera_216.txt",
-		"cameras/camera_288.txt",
-		"cameras/camera_top.txt"
-		}, glm::vec2(imageWidth, imageHeight));
+		"cameras/camera_0_0_0.txt",
+		"cameras/camera_0_72_0.txt",
+		"cameras/camera_0_144_0.txt",
+		"cameras/camera_0_216_0.txt",
+		"cameras/camera_0_288_0.txt",
+		"cameras/camera_top_0_90_0.txt"
+	});
+
+	// Read the resolution from the first image
+	const auto imageWidth = static_cast<double>(cameras[0].viewport().z);
+	const auto imageHeight = static_cast<double>(cameras[0].viewport().w);
 
 	return {
 		imageWidth,
@@ -199,7 +233,7 @@ void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantLeafTi
 {
 	for (auto& plant : plants)
 	{
-		plant.flipYAxis(setup.imageHeight);
+		plant.flipYAxis(setup.imageHeight());
 	}
 }
 
@@ -210,7 +244,7 @@ void keepOnlyPlantsWithMultipleViews(std::vector<PlantLeafTips>& plants)
 	                                  plants.end(),
 	                                  [](const PlantLeafTips& p) -> bool
 	                                  {
-		                                  return p.getAllViews().size() > 1;
+		                                  return p.getAllViews().size() <= 1;
 	                                  });
 
 	// Remove plants at the end of the list
@@ -233,12 +267,12 @@ void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::
 
 std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const PlantLeafTips& plantLeafTips)
 {
-	const auto points = plantLeafTips.pointsFromViews(setup.views);
+	const auto points = plantLeafTips.pointsFromViews(setup.views());
 
 	// Compute rays in 3D from camera matrices and 2D points
-	const auto rays = computeRays(setup.cameras, points);
+	const auto rays = computeRays(setup.cameras(), points);
 
-	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(setup.cameras, points, rays);
+	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(setup.cameras(), points, rays);
 
 	return triangulatedPoints3D;
 }
