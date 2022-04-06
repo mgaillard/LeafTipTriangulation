@@ -181,12 +181,10 @@ std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const 
 /**
  * \brief Draw a list of points in 2D image
  * \param filename The filename of the image
- * \param imageWidth The resolution of the image on the X axis
- * \param imageHeight The resolution of the image on the Y axis
+ * \param backgroundImage Image to load as background
  * \param points A list of 2D points to draw in the image
  * \return True if the image was successfully saved, false otherwise
  */
 bool drawPointsInImage(const std::string& filename,
-                       int imageWidth,
-                       int imageHeight,
+					   const std::string& backgroundImage,
                        const std::vector<glm::vec2>& points);

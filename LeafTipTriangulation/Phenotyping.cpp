@@ -143,6 +143,10 @@ void PlantLeafTips::apply90DegreesRotationToView(const std::string& viewName, do
 			point.x = -point.x;
 			
 			// Translate the points back to the center of rotation
+			// We apply the opposite transformation
+			//  - width/2 is added to the X axis
+			//  - height/2 is added to the Y axis
+			// We do this because the image is rotated, but the canvas stays the same
 			point.x += static_cast<float>(imageWidth) / 2.f;
 			point.y += static_cast<float>(imageHeight) / 2.f;
 		}
@@ -400,16 +404,21 @@ std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const 
 }
 
 bool drawPointsInImage(const std::string& filename,
-                       int imageWidth,
-                       int imageHeight,
+                       const std::string& backgroundImage,
                        const std::vector<glm::vec2>& points)
 {
-	cv::Mat image(imageHeight, imageWidth, CV_8UC3, cv::Scalar(255, 255, 255));
+	auto image = cv::imread(backgroundImage);
+
+	// Could not open the background image
+	if (image.data == nullptr)
+	{
+		return false;
+	}
 
 	for (const auto& point : points)
 	{
 		cv::circle(image,
-		           cv::Point2f(point.x, imageHeight - point.y),
+		           cv::Point2f(point.x, static_cast<float>(image.rows) - point.y),
 		           5,
 		           cv::Scalar(255, 0, 0),
 		           2);
