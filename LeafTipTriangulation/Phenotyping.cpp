@@ -5,6 +5,12 @@
 #include <regex>
 #include <tuple>
 
+#include <utils/warnoff.h>
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <utils/warnon.h>
+
 #include "RayMatching.h"
 
 PhenotypingSetup::PhenotypingSetup(
@@ -38,6 +44,26 @@ const std::vector<std::string>& PhenotypingSetup::views() const
 const std::vector<Camera>& PhenotypingSetup::cameras() const
 {
 	return m_cameras;
+}
+
+std::vector<Camera> PhenotypingSetup::camerasFromViews(const std::vector<std::string>& viewNames) const
+{
+	std::vector<Camera> cameras;
+
+	for (const auto& viewName : viewNames)
+	{
+		// Find the name in the list of names
+		const auto viewIt = std::find(m_views.begin(), m_views.end(), viewName);
+
+		if (viewIt != m_views.end())
+		{
+			// Add the corresponding camera
+			const auto index = std::distance(m_views.begin(), viewIt);
+			cameras.push_back(m_cameras[index]);
+		}
+	}
+
+	return cameras;
 }
 
 PlantLeafTips::PlantLeafTips(std::string plantName) : m_plantName(std::move(plantName))
@@ -89,6 +115,40 @@ void PlantLeafTips::addPointsFromView(const std::string& viewName, const std::ve
 	}	
 }
 
+void PlantLeafTips::applyTranslationToView(const std::string& viewName, const glm::vec2& translation)
+{
+	if (m_points.count(viewName) > 0)
+	{
+		for (auto& point : m_points[viewName])
+		{
+			point += translation;
+		}
+	}
+}
+
+void PlantLeafTips::apply90DegreesRotationToView(const std::string& viewName, double imageWidth, double imageHeight)
+{
+	if (m_points.count(viewName) > 0)
+	{
+		for (auto& point : m_points[viewName])
+		{
+			// Inverse translate the points from the center of rotation
+			point.x -= static_cast<float>(imageWidth) / 2.f;
+			point.y -= static_cast<float>(imageHeight) / 2.f;
+
+			// Apply the following transformation (rotation 90 deg clockwise)
+			// x' = -y
+			// y' = x
+			std::swap(point.x, point.y);
+			point.x = -point.x;
+			
+			// Translate the points back to the center of rotation
+			point.x += static_cast<float>(imageWidth) / 2.f;
+			point.y += static_cast<float>(imageHeight) / 2.f;
+		}
+	}
+}
+
 void PlantLeafTips::flipYAxis(double imageHeight)
 {
 	for (auto& points : m_points)
@@ -100,21 +160,24 @@ void PlantLeafTips::flipYAxis(double imageHeight)
 	}
 }
 
+std::vector<glm::vec2> PlantLeafTips::pointsFromView(const std::string& viewName) const
+{
+	if (m_points.count(viewName) > 0)
+	{
+		return m_points.at(viewName);
+	}
+
+	// An empty array because there are no points visible from this view
+	return {};
+}
+
 std::vector<std::vector<glm::vec2>> PlantLeafTips::pointsFromViews(const std::vector<std::string>& viewNames) const
 {
 	std::vector<std::vector<glm::vec2>> points;
 
 	for (const auto& viewName : viewNames)
 	{
-		if (m_points.count(viewName) > 0)
-		{
-			points.push_back(m_points.at(viewName));
-		}
-		else
-		{
-			// Add an empty array because there are no points visible from this view
-			points.emplace_back();
-		}
+		points.push_back(pointsFromView(viewName));
 	}
 
 	return points;
@@ -237,6 +300,65 @@ void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantLeafTi
 	}
 }
 
+void apply90DegreesRotationToViews(const std::string& viewName,
+	                               const PhenotypingSetup& setup,
+	                               std::vector<PlantLeafTips>& plants)
+{
+	for (auto& plant : plants)
+	{
+		plant.apply90DegreesRotationToView(viewName, setup.imageWidth(), setup.imageHeight());
+	}
+}
+
+void readAndApplyTranslationsFromCsv(const std::string& filename, std::vector<PlantLeafTips>& plants)
+{
+	// Regex to match the name of the plant
+	const std::string matchPlantName = R"((.+)_Vis_(\w{2}_\d+)\.(?:png|jpg))";
+	// Regex to match a float number
+	const std::string matchFloatNumber = R"(([-+]?[0-9]*\.?[0-9]+))";
+	// Regex to match a space between sequences
+	const std::string matchSpace = R"(\s)";
+	// Regex to match a full line
+	const std::regex matchTranslationLine(matchPlantName + matchSpace + matchFloatNumber + matchSpace + matchFloatNumber);
+
+	std::ifstream file(filename);
+
+	if (file.is_open())
+	{
+		std::string line;
+		while (std::getline(file, line))
+		{
+			// Match the current line and extract information
+			std::smatch matchesInLine;
+			if (std::regex_match(line, matchesInLine, matchTranslationLine) && matchesInLine.size() == 5)
+			{
+				const std::string plantName = matchesInLine[1];
+				const std::string plantView = matchesInLine[2];
+				const std::string translationStrX = matchesInLine[3];
+				const std::string translationStrY = matchesInLine[4];
+
+				const auto x = std::stod(translationStrX);
+				const auto y = std::stod(translationStrY);
+
+				// Find the plant whose name is plantName in the list
+				auto plantIt = std::find_if(plants.begin(), plants.end(),
+					[&plantName](const PlantLeafTips& plant)
+					{
+						return plant.plantName() == plantName;
+					});
+
+				// If the plant is found
+				if (plantIt != plants.end())
+				{
+					plantIt->applyTranslationToView(plantView, { x, y });
+				}
+			}
+		}
+
+		file.close();
+	}
+}
+
 void keepOnlyPlantsWithMultipleViews(std::vector<PlantLeafTips>& plants)
 {
 	// Send plants without all views at the end of the list
@@ -275,4 +397,23 @@ std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const 
 	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(setup.cameras(), points, rays);
 
 	return triangulatedPoints3D;
+}
+
+bool drawPointsInImage(const std::string& filename,
+                       int imageWidth,
+                       int imageHeight,
+                       const std::vector<glm::vec2>& points)
+{
+	cv::Mat image(imageHeight, imageWidth, CV_8UC3, cv::Scalar(255, 255, 255));
+
+	for (const auto& point : points)
+	{
+		cv::circle(image,
+		           cv::Point2f(point.x, imageHeight - point.y),
+		           5,
+		           cv::Scalar(255, 0, 0),
+		           2);
+	}
+
+	return cv::imwrite(filename, image);
 }
