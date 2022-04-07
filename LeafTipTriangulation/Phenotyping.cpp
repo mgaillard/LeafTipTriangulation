@@ -230,7 +230,8 @@ std::vector<PlantLeafTips> readLeafTipsFromCSV(const std::string& filename)
 	// Regex to match a space between sequences
 	const std::string matchSpace = R"(\s)";
 	// Regex to match a full line
-	const std::regex matchLeafTipLine(matchPlantName + matchSpace + matchLeafTips + matchSpace + matchJunctions);
+	const std::regex matchLeafTipLine(matchPlantName + matchSpace +
+		                              matchLeafTips + matchSpace + matchJunctions);
 	// Regex to match a 2D point
 	const std::regex matchPoint(R"(\[(\d+),\s(\d+)\])");
 
@@ -314,6 +315,64 @@ void apply90DegreesRotationToViews(const std::string& viewName,
 	}
 }
 
+void convertCalibrationOutputToCsv(const std::string& inputFilename, const std::string& outputFilename)
+{
+	// Conversion between the name of the view in the calibration output and the name of the view in the CSV file
+	const std::unordered_map<std::string, std::string> viewName = {
+		{"0_0_0", "_Vis_SV_0.png"},
+		{"0_72_0", "_Vis_SV_72.png"},
+		{"0_144_0", "_Vis_SV_144.png"},
+		{"0_216_0", "_Vis_SV_216.png"},
+		{"0_288_0", "_Vis_SV_288.png"},
+		{"top_0_90_0", "_Vis_TV_90.png"},
+	};
+
+	// Prefix to the name of the plant
+	const std::string plantPrefix = "4-9-18_Schnable_";
+	// Regex to match the name of the plant in the format of the output of the calibration script
+	const std::string matchPlantName = R"((.+)_\d{2}-\d{2}-\d{2}_\d+_((?:top_)?0_\d+_0))";
+	// Regex to match a float number
+	const std::string matchFloatNumber = R"(([-+]?[0-9]*\.?[0-9]+))";
+	// Regex to match a space between sequences
+	const std::string matchSpace = R"(\s)";
+	// Regex to match a full line
+	const std::regex matchTranslationLine(plantPrefix + matchPlantName + matchSpace +
+		                                  matchFloatNumber + matchSpace + matchFloatNumber);
+
+	std::ifstream inputFile(inputFilename);
+	std::ofstream outputFile(outputFilename);
+
+	if (!inputFile.is_open() || !outputFile.is_open())
+	{
+		return;
+	}
+
+	std::string line;
+	while (std::getline(inputFile, line))
+	{
+		// Match the current line and extract information
+		std::smatch matchesInLine;
+		if (std::regex_match(line, matchesInLine, matchTranslationLine) && matchesInLine.size() == 5)
+		{
+			const std::string plantName = matchesInLine[1];
+			std::string plantView = matchesInLine[2];
+			const std::string translationX = matchesInLine[3];
+			const std::string translationY = matchesInLine[4];
+
+			// Convert the plant view to the right format if a translation rule exists
+			if (viewName.count(plantView) > 0)
+			{
+				plantView = viewName.at(plantView);
+			}
+
+			outputFile << plantName << plantView << "\t" << translationX << "\t" << translationY << "\n";
+		}
+	}
+
+	inputFile.close();
+	outputFile.close();
+}
+
 void readAndApplyTranslationsFromCsv(const std::string& filename, std::vector<PlantLeafTips>& plants)
 {
 	// Regex to match the name of the plant
@@ -323,7 +382,8 @@ void readAndApplyTranslationsFromCsv(const std::string& filename, std::vector<Pl
 	// Regex to match a space between sequences
 	const std::string matchSpace = R"(\s)";
 	// Regex to match a full line
-	const std::regex matchTranslationLine(matchPlantName + matchSpace + matchFloatNumber + matchSpace + matchFloatNumber);
+	const std::regex matchTranslationLine(matchPlantName + matchSpace +
+		                                  matchFloatNumber + matchSpace + matchFloatNumber);
 
 	std::ifstream file(filename);
 

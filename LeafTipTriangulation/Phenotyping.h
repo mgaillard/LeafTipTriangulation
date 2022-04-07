@@ -151,6 +151,14 @@ void apply90DegreesRotationToViews(const std::string& viewName,
 	                               std::vector<PlantLeafTips>& plants);
 
 /**
+ * \brief Convert the output of the calibration script to a CSV file
+ *        that can be read with the function readAndApplyTranslationsFromCsv()
+ * \param inputFilename Path to the input TXT file
+ * \param outputFilename Path to the output CSV file
+ */
+void convertCalibrationOutputToCsv(const std::string& inputFilename, const std::string& outputFilename);
+
+/**
  * \brief Read and apply translations used for calibration of views from a CSV file
  * \param filename Path to the CSV file
  * \param plants List of plants on which to apply the transformations
