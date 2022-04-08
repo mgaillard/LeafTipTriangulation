@@ -604,7 +604,5 @@ int main(int argc, char *argv[])
 	
 	// TODO: misdetection and false positive versus threshold
 	
-	// TODO: example with a real object and a ChaRuCo calibration pattern
-	
     return 0;
 }
