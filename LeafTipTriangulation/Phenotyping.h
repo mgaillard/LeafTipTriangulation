@@ -122,9 +122,10 @@ private:
 
 /**
  * \brief Load a phenotyping setup
+ * \param cameraFolder Path to the folder containing the camera calibration files
  * \return A phenotyping setup
  */
-PhenotypingSetup loadPhenotypingSetup();
+PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder);
 
 /**
  * \brief Read leaf tips data from a CSV file

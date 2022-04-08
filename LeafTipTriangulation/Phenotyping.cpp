@@ -187,7 +187,7 @@ std::vector<std::vector<glm::vec2>> PlantLeafTips::pointsFromViews(const std::ve
 	return points;
 }
 
-PhenotypingSetup loadPhenotypingSetup()
+PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder)
 {
 	const std::vector<std::string> views = {
 		"SV_0",
@@ -199,12 +199,12 @@ PhenotypingSetup loadPhenotypingSetup()
 	};
 
 	const auto cameras = loadCamerasFromFiles({
-		"cameras/camera_0_0_0.txt",
-		"cameras/camera_0_72_0.txt",
-		"cameras/camera_0_144_0.txt",
-		"cameras/camera_0_216_0.txt",
-		"cameras/camera_0_288_0.txt",
-		"cameras/camera_top_0_90_0.txt"
+		cameraFolder + "camera_0_0_0.txt",
+		cameraFolder + "camera_0_72_0.txt",
+		cameraFolder + "camera_0_144_0.txt",
+		cameraFolder + "camera_0_216_0.txt",
+		cameraFolder + "camera_0_288_0.txt",
+		cameraFolder + "camera_top_0_90_0.txt"
 	});
 
 	// Read the resolution from the first image
@@ -453,12 +453,16 @@ void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::
 
 std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const PlantLeafTips& plantLeafTips)
 {
-	const auto points = plantLeafTips.pointsFromViews(setup.views());
-
-	// Compute rays in 3D from camera matrices and 2D points
-	const auto rays = computeRays(setup.cameras(), points);
-
-	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(setup.cameras(), points, rays);
+	// Get the list of views from which the plant was annotated, order does matter
+	const auto viewNames = plantLeafTips.getAllViews();
+	// Get the 2D points in the same order as the views
+	const auto points = plantLeafTips.pointsFromViews(viewNames);
+	// Get the cameras in the same order as the views
+	const auto cameras = setup.camerasFromViews(viewNames);
+	// Un-project annotated 2D points and get 3D rays
+	const auto rays = computeRays(cameras, points);
+	// Triangulate the 3D points
+	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays);
 
 	return triangulatedPoints3D;
 }

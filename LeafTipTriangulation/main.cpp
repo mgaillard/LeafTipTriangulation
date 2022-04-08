@@ -6,7 +6,6 @@
 #include <utils/warnoff.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
-#include <opencv2/core/core.hpp>
 #include <utils/warnon.h>
 
 #include "Camera.h"
@@ -360,7 +359,7 @@ void testCorrespondenceWithThreshold(float noiseStd)
 
 void runPlantPhenotyping()
 {
-	const auto setup = loadPhenotypingSetup();
+	const auto setup = loadPhenotypingSetup("cameras/");
 
 	// X axis is from left to right
 	// Y axis is from bottom to top
@@ -436,6 +435,39 @@ void runPlantPhenotyping()
 
 	// Export the scene
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
+}
+
+void runLeafCounting()
+{
+	// Convert the output of the calibration script to a CSV file that can be read by readAndApplyTranslationsFromCsv()
+	// Use the following line (and replace the name of files)
+	// convertCalibrationOutputToCsv(folder + "calibration_output.txt", folder + "calibration.csv");
+	
+	const auto setup = loadPhenotypingSetup("cameras/");
+	auto plants = readLeafTipsFromCSV("sorghum_2018_leaf_tips.csv");
+	keepOnlyPlantsWithMultipleViews(plants);
+	// Apply the transformation from the image-based calibration
+	readAndApplyTranslationsFromCsv("calibration.csv", plants);
+	// Only for top views there is a 90 degrees clockwise rotation
+	// TODO: apply the exact rotation from the SorghumReconstruction app (89.33f clockwise)
+	apply90DegreesRotationToViews("TV_90", setup, plants);
+	// Flip Y axis because our camera model origin is on the bottom left
+	flipYAxisOnAllPlants(setup, plants);
+
+	std::vector<std::pair<std::string, int>> numberLeafTips(plants.size());
+
+	#pragma omp parallel for
+	for (int i = 0; i < static_cast<int>(plants.size()); i++)
+	{
+		const auto triangulatedPoints3D = triangulateLeafTips(setup, plants[i]);
+		numberLeafTips[i].first = plants[i].plantName();
+		numberLeafTips[i].second = static_cast<int>(triangulatedPoints3D.size());
+	}
+
+	for (const auto& [plantName, number] : numberLeafTips)
+	{
+		std::cout << plantName << "\t" << number << std::endl;
+	}
 }
 
 void runCrocodileMeasurement()
@@ -557,6 +589,11 @@ int main(int argc, char *argv[])
 	{
 		// Example with a plant in a phenotyping facility
 		runPlantPhenotyping();
+	}
+	else if (command == "leaf_counting")
+	{
+		// Example with counting leaves for a set of manually annotated plants
+		runLeafCounting();
 	}
 	else if (command == "measure_crocodile")
 	{
