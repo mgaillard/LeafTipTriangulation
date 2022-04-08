@@ -197,7 +197,6 @@ PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder)
 		"SV_144",
 		"SV_216",
 		"SV_288",
-		"SV_324",
 		"TV_90",
 	};
 
@@ -209,7 +208,6 @@ PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder)
 		cameraFolder + "camera_0_144_0.txt",
 		cameraFolder + "camera_0_216_0.txt",
 		cameraFolder + "camera_0_288_0.txt",
-		cameraFolder + "camera_0_324_0.txt",
 		cameraFolder + "camera_top_0_90_0.txt"
 	});
 
