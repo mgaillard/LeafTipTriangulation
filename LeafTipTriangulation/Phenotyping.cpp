@@ -191,19 +191,25 @@ PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder)
 {
 	const std::vector<std::string> views = {
 		"SV_0",
+		"SV_36",
 		"SV_72",
+		"SV_108",
 		"SV_144",
 		"SV_216",
 		"SV_288",
+		"SV_324",
 		"TV_90",
 	};
 
 	const auto cameras = loadCamerasFromFiles({
 		cameraFolder + "camera_0_0_0.txt",
+		cameraFolder + "camera_0_36_0.txt",
 		cameraFolder + "camera_0_72_0.txt",
+		cameraFolder + "camera_0_108_0.txt",
 		cameraFolder + "camera_0_144_0.txt",
 		cameraFolder + "camera_0_216_0.txt",
 		cameraFolder + "camera_0_288_0.txt",
+		cameraFolder + "camera_0_324_0.txt",
 		cameraFolder + "camera_top_0_90_0.txt"
 	});
 
@@ -320,10 +326,13 @@ void convertCalibrationOutputToCsv(const std::string& inputFilename, const std::
 	// Conversion between the name of the view in the calibration output and the name of the view in the CSV file
 	const std::unordered_map<std::string, std::string> viewName = {
 		{"0_0_0", "_Vis_SV_0.png"},
+		{"0_36_0", "_Vis_SV_36.png"},
 		{"0_72_0", "_Vis_SV_72.png"},
+		{"0_108_0", "_Vis_SV_108.png"},
 		{"0_144_0", "_Vis_SV_144.png"},
 		{"0_216_0", "_Vis_SV_216.png"},
 		{"0_288_0", "_Vis_SV_288.png"},
+		{"0_324_0", "_Vis_SV_324.png"},
 		{"top_0_90_0", "_Vis_TV_90.png"},
 	};
 
