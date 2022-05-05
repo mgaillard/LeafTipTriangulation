@@ -443,11 +443,11 @@ void runLeafCounting()
 	// Use the following line (and replace the name of files)
 	// convertCalibrationOutputToCsv(folder + "calibration_output.txt", folder + "calibration.csv");
 	
-	const auto setup = loadPhenotypingSetup("cameras/");
-	auto plants = readLeafTipsFromCSV("sorghum_2018_leaf_tips.csv");
+	const auto setup = loadPhenotypingSetup("sorghum_2018/cameras/");
+	auto plants = readLeafTipsFromCSV("sorghum_2018/leaf_tips.csv");
 	keepOnlyPlantsWithMultipleViews(plants);
 	// Apply the transformation from the image-based calibration
-	readAndApplyTranslationsFromCsv("calibration.csv", plants);
+	readAndApplyTranslationsFromCsv("sorghum_2018/calibration.csv", plants);
 	// Only for top views there is a 90 degrees clockwise rotation
 	// TODO: apply the exact rotation from the SorghumReconstruction app (89.33f clockwise)
 	apply90DegreesRotationToViews("TV_90", setup, plants);
