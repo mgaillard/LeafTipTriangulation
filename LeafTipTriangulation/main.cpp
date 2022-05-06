@@ -437,19 +437,19 @@ void runPlantPhenotyping()
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 
-void runLeafCounting()
+void runLeafCounting(const std::string& folder)
 {
 	// Convert the output of the calibration script to a CSV file that can be read by readAndApplyTranslationsFromCsv()
 	// Use the following line (and replace the name of files)
 	// convertCalibrationOutputToCsv(folder + "calibration_output.txt", folder + "calibration.csv");
-	
-	const auto setup = loadPhenotypingSetup("sorghum_2018/cameras/");
-	auto plants = readLeafTipsFromCSV("sorghum_2018/leaf_tips.csv");
+
+	const auto setup = loadPhenotypingSetup(folder + "/cameras/");
+	auto plants = readLeafTipsFromCSV(folder + "/leaf_tips.csv");
 	keepOnlyPlantsWithMultipleViews(plants);
 	// Apply the transformation from the image-based calibration
-	readAndApplyTranslationsFromCsv("sorghum_2018/calibration.csv", plants);
+	readAndApplyTranslationsFromCsv(folder + "/calibration.csv", plants);
 	// Only for top views there is a 90 degrees clockwise rotation
-	// TODO: apply the exact rotation from the SorghumReconstruction app (89.33f clockwise)
+	// TODO: apply the exact rotation from the SorghumReconstruction app (89.33f clockwise) with 2018 data set
 	apply90DegreesRotationToViews("TV_90", setup, plants);
 	// Flip Y axis because our camera model origin is on the bottom left
 	flipYAxisOnAllPlants(setup, plants);
@@ -593,7 +593,7 @@ int main(int argc, char *argv[])
 	else if (command == "leaf_counting")
 	{
 		// Example with counting leaves for a set of manually annotated plants
-		runLeafCounting();
+		runLeafCounting("sorghum_2018");
 	}
 	else if (command == "measure_crocodile")
 	{

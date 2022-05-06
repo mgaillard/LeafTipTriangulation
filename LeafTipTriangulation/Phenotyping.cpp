@@ -1,6 +1,7 @@
 #include "Phenotyping.h"
 
 #include <fstream>
+#include <filesystem>
 #include <iostream>
 #include <regex>
 #include <tuple>
@@ -189,31 +190,34 @@ std::vector<std::vector<glm::vec2>> PlantLeafTips::pointsFromViews(const std::ve
 
 PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder)
 {
-	const std::vector<std::string> views = {
-		"SV_0",
-		"SV_36",
-		"SV_72",
-		"SV_108",
-		"SV_144",
-		"SV_216",
-		// "SV_252",
-		"SV_288",
-		// "SV_324",
-		"TV_90",
-	};
+	const std::array<std::pair<std::string, std::string>, 10> viewCameraNames = {{
+		{"SV_0", cameraFolder + "camera_0_0_0.txt"},
+		{"SV_36", cameraFolder + "camera_0_36_0.txt"},
+		{"SV_72", cameraFolder + "camera_0_72_0.txt"},
+		{"SV_108", cameraFolder + "camera_0_108_0.txt"},
+		{"SV_144", cameraFolder + "camera_0_144_0.txt"},
+		{"SV_216", cameraFolder + "camera_0_216_0.txt"},
+		{"SV_252", cameraFolder + "camera_0_252_0.txt"},
+		{"SV_288", cameraFolder + "camera_0_288_0.txt"},
+		{"SV_324", cameraFolder + "camera_0_324_0.txt"},
+		{"TV_90", cameraFolder + "camera_top_0_90_0.txt"}
+	}};
 
-	const auto cameras = loadCamerasFromFiles({
-		cameraFolder + "camera_0_0_0.txt",
-		cameraFolder + "camera_0_36_0.txt",
-		cameraFolder + "camera_0_72_0.txt",
-		cameraFolder + "camera_0_108_0.txt",
-		cameraFolder + "camera_0_144_0.txt",
-		cameraFolder + "camera_0_216_0.txt",
-		// cameraFolder + "camera_0_252_0.txt",
-		cameraFolder + "camera_0_288_0.txt",
-		// cameraFolder + "camera_0_324_0.txt",
-		cameraFolder + "camera_top_0_90_0.txt"
-	});
+	std::vector<std::string> views;
+	std::vector<std::string> cameraFiles;
+
+	// List views that are defined
+	// and discard views that could not be loaded because the txt file does not exist
+	for (const auto& viewCameraName : viewCameraNames)
+	{
+		if (std::filesystem::exists(viewCameraName.second))
+		{
+			views.push_back(viewCameraName.first);
+			cameraFiles.push_back(viewCameraName.second);
+		}
+	}
+
+	const auto cameras = loadCamerasFromFiles(cameraFiles);
 
 	// Read the resolution from the first image
 	const auto imageWidth = static_cast<double>(cameras[0].viewport().z);
