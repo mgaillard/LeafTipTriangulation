@@ -1,0 +1,1516 @@
+<?xml version="1.0" encoding="utf-8"?>
+<annotations>
+  <version>1.1</version>
+  <meta>
+    <project>
+      <id>37408</id>
+      <name>Sorghum annotations</name>
+      <bugtracker></bugtracker>
+      <created>2022-05-12 20:10:43.228062+01:00</created>
+      <updated>2022-05-12 21:13:25.309825+01:00</updated>
+      <tasks>
+        <task>
+          <id>258559</id>
+          <name>3-10-22-Schnable-Sorghum_310-201-9-2-44M_2022-03-11_14-35-56.963_5207500</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:13:03.464172+01:00</created>
+          <updated>2022-05-12 20:38:46.099898+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383203</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383203</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </assignee>
+        </task>
+        <task>
+          <id>258571</id>
+          <name>3-10-22-Schnable-Sorghum_310-202-11-1-SC_500_2022-03-11_14-37-52.731_5207600</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:42:41.479378+01:00</created>
+          <updated>2022-05-12 22:04:39.739108+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383214</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383214</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </assignee>
+        </task>
+        <task>
+          <id>258573</id>
+          <name>3-10-22-Schnable-Sorghum_310-203-11-2-SC_500_2022-03-11_14-40-14.670_5207700</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:45:06.816929+01:00</created>
+          <updated>2022-05-12 20:45:20.947188+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383215</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383215</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258574</id>
+          <name>3-10-22-Schnable-Sorghum_310-204-16-1-P850029_2022-03-11_14-42-08.383_5207800</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:46:19.245472+01:00</created>
+          <updated>2022-05-12 20:46:35.130684+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383216</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383216</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258575</id>
+          <name>3-10-22-Schnable-Sorghum_310-205-16-2-P850029_2022-03-11_14-44-09.928_5207900</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:47:46.766692+01:00</created>
+          <updated>2022-05-12 20:48:02.569494+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383217</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383217</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258576</id>
+          <name>3-10-22-Schnable-Sorghum_310-206-17-6-AS_4601_Pawaga_2022-03-11_14-46-07.851_5208000</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:48:39.331047+01:00</created>
+          <updated>2022-05-12 20:48:54.155653+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383218</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383218</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258578</id>
+          <name>3-10-22-Schnable-Sorghum_310-207-17-7-AS_4601_Pawaga_2022-03-11_14-49-30.984_5208100</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:49:10.635271+01:00</created>
+          <updated>2022-05-12 20:49:26.493750+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383219</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383219</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258581</id>
+          <name>3-10-22-Schnable-Sorghum_310-208-17-8-AS_4601_Pawaga_2022-03-11_14-51-06.617_5208200</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:50:17.716257+01:00</created>
+          <updated>2022-05-12 20:50:33.305300+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383221</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383221</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258582</id>
+          <name>3-10-22-Schnable-Sorghum_310-211-22-2-R_LINE_AR2002_2022-03-11_14-59-49.733_5208500</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:51:22.496117+01:00</created>
+          <updated>2022-05-12 20:51:39.182386+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383222</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383222</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258583</id>
+          <name>3-10-22-Schnable-Sorghum_310-212-23-1-SC_1439_2022-03-11_15-01-44.995_5208600</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:51:59.733235+01:00</created>
+          <updated>2022-05-12 20:52:17.330569+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383223</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383223</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258584</id>
+          <name>3-10-22-Schnable-Sorghum_310-213-23-2-SC_1439_2022-03-11_15-04-00.664_5208700</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:52:35.661925+01:00</created>
+          <updated>2022-05-12 20:52:53.351982+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383224</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383224</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258585</id>
+          <name>3-10-22-Schnable-Sorghum_310-214-29-1-Red_Amber_2022-03-11_15-05-53.607_5208800</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:53:08.377679+01:00</created>
+          <updated>2022-05-12 20:53:23.733471+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383225</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383225</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258586</id>
+          <name>3-10-22-Schnable-Sorghum_310-215-30-1-9E_2022-03-11_15-08-08.448_5208900</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:53:38.725721+01:00</created>
+          <updated>2022-05-12 20:53:55.244518+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383226</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383226</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258587</id>
+          <name>3-10-22-Schnable-Sorghum_310-216-30-2-9E_2022-03-11_15-10-17.297_5209000</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:54:08.977624+01:00</created>
+          <updated>2022-05-12 20:54:24.737455+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383227</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383227</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258589</id>
+          <name>3-10-22-Schnable-Sorghum_310-217-42-1-BTx623_2022-03-11_15-12-11.064_5209100</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:54:42.551065+01:00</created>
+          <updated>2022-05-12 20:54:59.134818+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383229</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383229</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258590</id>
+          <name>3-10-22-Schnable-Sorghum_310-218-42-2-BTx623_2022-03-11_15-15-03.620_5209200</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:55:18.592879+01:00</created>
+          <updated>2022-05-12 20:55:35.031228+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383230</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383230</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258592</id>
+          <name>3-10-22-Schnable-Sorghum_310-219-42-3-BTx623_2022-03-11_15-17-51.394_5209300</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:55:50.205260+01:00</created>
+          <updated>2022-05-12 20:56:07.069196+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383231</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383231</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258593</id>
+          <name>3-10-22-Schnable-Sorghum_310-220-42-4-BTx623_2022-03-11_15-20-53.810_5209400</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:56:19.361845+01:00</created>
+          <updated>2022-05-12 20:56:36.133013+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383232</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383232</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258594</id>
+          <name>3-10-22-Schnable-Sorghum_310-221-42-5-BTx623_2022-03-11_15-36-54.627_5209500</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:56:50.711145+01:00</created>
+          <updated>2022-05-12 20:57:07.269520+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383235</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383235</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258595</id>
+          <name>3-10-22-Schnable-Sorghum_310-222-42-6-BTx623_2022-03-11_15-38-50.024_5209600</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:57:23.079772+01:00</created>
+          <updated>2022-05-12 20:57:38.975914+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383236</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383236</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258596</id>
+          <name>3-10-22-Schnable-Sorghum_310-223-42-7-BTx623_2022-03-11_15-41-11.553_5209700</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:57:53.625140+01:00</created>
+          <updated>2022-05-12 20:58:12.423326+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383237</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383237</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+        <task>
+          <id>258597</id>
+          <name>3-10-22-Schnable-Sorghum_310-224-42-8-BTx623_2022-03-11_15-43-19.315_5209800</name>
+          <size>10</size>
+          <mode>annotation</mode>
+          <overlap>0</overlap>
+          <bugtracker></bugtracker>
+          <created>2022-05-12 20:58:37.930548+01:00</created>
+          <updated>2022-05-12 20:58:53.117013+01:00</updated>
+          <subset>Validation</subset>
+          <start_frame>0</start_frame>
+          <stop_frame>9</stop_frame>
+          <frame_filter></frame_filter>
+          <segments>
+            <segment>
+              <id>383238</id>
+              <start>0</start>
+              <stop>9</stop>
+              <url>https://cvat.org/?id=383238</url>
+            </segment>
+          </segments>
+          <owner>
+            <username>mgaillard</username>
+            <email>mgaillar@purdue.edu</email>
+          </owner>
+          <assignee></assignee>
+        </task>
+      </tasks>
+      <labels>
+        <label>
+          <name>Leaf tip</name>
+          <color>#ff007c</color>
+          <attributes>
+          </attributes>
+        </label>
+        <label>
+          <name>Leaf junction</name>
+          <color>#3d3df5</color>
+          <attributes>
+          </attributes>
+        </label>
+      </labels>
+      <subsets>Validation</subsets>
+      <owner>
+        <username>mgaillard</username>
+        <email>mgaillar@purdue.edu</email>
+      </owner>
+      <assignee></assignee>
+    </project>
+    <dumped>2022-05-12 22:15:35.635180+01:00</dumped>
+  </meta>
+  <image id="9" name="top_0_90_0.jpg" subset="Validation" task_id="258559" width="6576" height="4384">
+    <points label="Leaf tip" occluded="0" source="manual" points="2957.35,2694.71" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2929.20,2384.14" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3280.81,3252.28" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3535.11,2411.56" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3943.73,2140.34" z_order="0">
+    </points>
+  </image>
+  <image id="8" name="0_72_0.jpg" subset="Validation" task_id="258559" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="2564.80,4105.20" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1886.20,4729.20" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2006.70,5452.33" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2592.63,5371.69" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2957.44,5186.58" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2343.37,5463.34" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2352.65,5099.12" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2402.39,4629.52" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2400.39,4038.43" z_order="0">
+    </points>
+  </image>
+  <image id="7" name="0_36_0.jpg" subset="Validation" task_id="258559" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="3086.06,4085.38" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2105.75,4754.10" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2492.32,5461.19" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2542.10,5339.78" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2614.94,5111.54" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2412.24,4041.20" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2385.85,4615.42" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2330.78,5466.24" z_order="0">
+    </points>
+  </image>
+  <image id="6" name="0_324_0.jpg" subset="Validation" task_id="258559" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="1746.97,5131.36" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2241.65,5306.07" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2965.62,5317.51" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2645.58,4731.98" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3079.46,3999.02" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2265.44,5452.65" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2272.52,5100.57" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2261.44,4604.96" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2312.14,4033.29" z_order="0">
+    </points>
+  </image>
+  <image id="5" name="0_288_0.jpg" subset="Validation" task_id="258559" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="2813.65,5243.97" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2742.37,4686.86" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2618.05,3976.15" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2238.83,5476.33" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2233.06,5104.62" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2196.64,4612.93" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2224.97,4044.34" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1524.84,5249.93" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2106.15,5330.51" z_order="0">
+    </points>
+  </image>
+  <image id="4" name="0_252_0.jpg" subset="Validation" task_id="258559" width="4384" height="6576">
+    <points label="Leaf junction" occluded="0" source="manual" points="2230.96,5494.15" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2215.73,5176.86" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2219.94,5106.88" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2167.21,4624.28" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2164.30,4051.03" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2006.13,5357.96" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1560.63,5323.55" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2492.99,5188.52" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2665.30,4655.74" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2065.79,3974.43" z_order="0">
+    </points>
+  </image>
+  <image id="3" name="0_216_0.jpg" subset="Validation" task_id="258559" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="2006.70,5390.65" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1902.29,5388.22" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2137.82,5193.97" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2151.57,4047.95" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2183.93,4636.08" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2226.27,5066.36" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2231.98,5183.79" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2247.60,5480.29" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1571.73,4010.82" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2450.49,4634.76" z_order="0">
+    </points>
+  </image>
+  <image id="2" name="0_144_0.jpg" subset="Validation" task_id="258559" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="1389.66,4089.26" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1617.13,5318.41" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1944.60,4662.03" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2886.67,5326.92" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2339.83,5426.45" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2314.98,5491.10" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2311.87,4642.52" z_order="0">
+    </points>
+  </image>
+  <image id="1" name="0_108_0.jpg" subset="Validation" task_id="258559" width="4384" height="6576">
+    <points label="Leaf junction" occluded="0" source="manual" points="2336.37,5469.24" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2340.08,5121.89" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2375.50,4637.95" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2340.52,4058.32" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1705.10,5392.84" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1831.44,4685.33" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3078.07,5264.24" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2510.77,5395.85" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1861.07,4115.96" z_order="0">
+    </points>
+  </image>
+  <image id="0" name="0_0_0.jpg" subset="Validation" task_id="258559" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="2840.89,5424.28" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2420.74,5311.32" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2122.15,5110.02" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2405.18,4757.69" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3272.24,4039.71" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2299.85,5456.41" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2292.51,5159.51" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2312.70,5098.41" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2328.53,4612.40" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2376.50,4035.16" z_order="0">
+    </points>
+  </image>
+  <image id="19" name="top_0_90_0_1.jpg" subset="Validation" task_id="258571" width="6576" height="4384">
+    <points label="Leaf tip" occluded="0" source="manual" points="4670.51,1638.76" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2704.38,3288.75" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="4524.01,1668.71" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2034.38,2595.44" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2270.72,2880.34" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="4456.51,2039.72" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="4443.95,2405.01" z_order="0">
+    </points>
+  </image>
+  <image id="18" name="0_72_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="3483.63,4834.00" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2442.16,5198.53" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1984.27,4737.02" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2041.66,4972.05" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1345.52,4379.10" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1101.76,3837.14" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3144.15,3172.98" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3256.28,3825.30" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3200.51,4135.68" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2391.42,5148.28" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3163.51,5021.31" z_order="0">
+    </points>
+  </image>
+  <image id="17" name="0_36_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="2991.51,4711.96" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2423.16,5134.14" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2135.80,4431.60" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1717.13,3861.62" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2686.34,3176.86" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2669.83,4953.21" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2769.48,4977.69" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2883.12,4720.70" z_order="0">
+    </points>
+  </image>
+  <image id="16" name="0_324_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="3488.30,4303.44" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3514.60,4527.03" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2301.43,4926.86" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2248.58,5075.61" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2324.81,5116.94" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2253.66,5165.73" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2245.53,4839.79" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2317.69,5037.32" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3224.20,4810.30" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2249.59,4978.03" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2244.85,4445.06" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2289.57,4715.78" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1530.91,4968.77" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1619.54,4704.10" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1090.21,4173.56" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1036.79,3851.83" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1581.90,3199.88" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3329.46,3819.84" z_order="0">
+    </points>
+  </image>
+  <image id="15" name="0_288_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
+    <points label="Leaf junction" occluded="0" source="manual" points="2177.39,4847.91" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2183.02,4439.71" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2213.93,4732.68" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2231.49,4945.57" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2175.99,4993.34" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2246.95,5048.85" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2246.25,5130.35" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2176.69,5081.87" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2178.10,5175.31" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1236.78,5113.45" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1130.44,4790.11" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="841.98,4251.06" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="754.57,3901.41" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1264.47,3187.54" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3552.78,3777.43" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3415.84,4188.27" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3141.24,4448.16" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2971.45,4708.12" z_order="0">
+    </points>
+  </image>
+  <image id="14" name="0_252_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="2444.17,4690.79" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2508.57,4419.12" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2157.24,4454.73" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2134.26,4845.03" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2137.07,4985.54" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2138.47,5101.47" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1011.12,4929.82" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1319.74,5238.15" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2132.85,5190.70" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1150.22,4326.31" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3053.02,4189.10" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3294.92,3750.97" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1314.00,3157.97" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1041.57,3944.68" z_order="0">
+    </points>
+  </image>
+  <image id="13" name="0_216_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="1992.97,4413.50" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2145.25,5213.18" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2138.16,4994.65" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2152.33,4854.02" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2178.63,4459.45" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1833.57,5346.82" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1329.74,5066.38" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1792.30,3161.47" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2729.07,3738.39" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1797.65,4378.37" z_order="0">
+    </points>
+  </image>
+  <image id="12" name="0_144_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="3709.16,3920.00" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3076.13,3152.31" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1402.83,3770.37" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1198.86,4228.07" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1003.40,4574.07" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1312.50,4873.34" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2313.08,5126.10" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2246.33,5166.49" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2278.53,4761.92" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2323.18,4444.97" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2317.17,4894.24" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2271.50,4983.24" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2317.76,5023.63" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2315.42,5220.94" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2258.04,5082.77" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3145.53,5274.18" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3079.77,5059.70" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3647.97,4283.64" z_order="0">
+    </points>
+  </image>
+  <image id="11" name="0_108_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
+    <points label="Leaf junction" occluded="0" source="manual" points="2381.72,4451.64" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2328.47,5156.19" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2398.15,5130.43" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2334.33,5070.12" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2398.73,5029.72" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2341.35,4953.61" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2393.46,4876.33" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2354.23,4747.52" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2398.15,5208.88" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3361.09,5131.36" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3549.90,4839.40" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3652.16,4194.93" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3798.18,3850.04" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3309.79,3167.80" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1018.70,3788.36" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="995.39,4323.03" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1212.46,4655.20" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1516.95,4952.40" z_order="0">
+    </points>
+  </image>
+  <image id="10" name="0_0_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="2613.08,3873.80" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3015.58,4425.47" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3514.56,4594.23" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3175.84,4902.60" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2381.37,5119.78" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2348.66,4722.56" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2366.57,4915.72" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2378.25,5030.21" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2084.64,4932.83" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2090.29,3182.27" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1709.33,3840.35" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1708.21,4124.51" z_order="0">
+    </points>
+  </image>
+  <image id="29" name="top_0_90_0_2.jpg" subset="Validation" task_id="258573" width="6576" height="4384">
+  </image>
+  <image id="28" name="0_72_0_2.jpg" subset="Validation" task_id="258573" width="4384" height="6576">
+  </image>
+  <image id="27" name="0_36_0_2.jpg" subset="Validation" task_id="258573" width="4384" height="6576">
+  </image>
+  <image id="26" name="0_324_0_2.jpg" subset="Validation" task_id="258573" width="4384" height="6576">
+  </image>
+  <image id="25" name="0_288_0_2.jpg" subset="Validation" task_id="258573" width="4384" height="6576">
+  </image>
+  <image id="24" name="0_252_0_2.jpg" subset="Validation" task_id="258573" width="4384" height="6576">
+  </image>
+  <image id="23" name="0_216_0_2.jpg" subset="Validation" task_id="258573" width="4384" height="6576">
+  </image>
+  <image id="22" name="0_144_0_2.jpg" subset="Validation" task_id="258573" width="4384" height="6576">
+  </image>
+  <image id="21" name="0_108_0_2.jpg" subset="Validation" task_id="258573" width="4384" height="6576">
+  </image>
+  <image id="20" name="0_0_0_2.jpg" subset="Validation" task_id="258573" width="4384" height="6576">
+  </image>
+  <image id="39" name="top_0_90_0_3.jpg" subset="Validation" task_id="258574" width="6576" height="4384">
+  </image>
+  <image id="38" name="0_72_0_3.jpg" subset="Validation" task_id="258574" width="4384" height="6576">
+  </image>
+  <image id="37" name="0_36_0_3.jpg" subset="Validation" task_id="258574" width="4384" height="6576">
+  </image>
+  <image id="36" name="0_324_0_3.jpg" subset="Validation" task_id="258574" width="4384" height="6576">
+  </image>
+  <image id="35" name="0_288_0_3.jpg" subset="Validation" task_id="258574" width="4384" height="6576">
+  </image>
+  <image id="34" name="0_252_0_3.jpg" subset="Validation" task_id="258574" width="4384" height="6576">
+  </image>
+  <image id="33" name="0_216_0_3.jpg" subset="Validation" task_id="258574" width="4384" height="6576">
+  </image>
+  <image id="32" name="0_144_0_3.jpg" subset="Validation" task_id="258574" width="4384" height="6576">
+  </image>
+  <image id="31" name="0_108_0_3.jpg" subset="Validation" task_id="258574" width="4384" height="6576">
+  </image>
+  <image id="30" name="0_0_0_3.jpg" subset="Validation" task_id="258574" width="4384" height="6576">
+  </image>
+  <image id="49" name="top_0_90_0_4.jpg" subset="Validation" task_id="258575" width="6576" height="4384">
+  </image>
+  <image id="48" name="0_72_0_4.jpg" subset="Validation" task_id="258575" width="4384" height="6576">
+  </image>
+  <image id="47" name="0_36_0_4.jpg" subset="Validation" task_id="258575" width="4384" height="6576">
+  </image>
+  <image id="46" name="0_324_0_4.jpg" subset="Validation" task_id="258575" width="4384" height="6576">
+  </image>
+  <image id="45" name="0_288_0_4.jpg" subset="Validation" task_id="258575" width="4384" height="6576">
+  </image>
+  <image id="44" name="0_252_0_4.jpg" subset="Validation" task_id="258575" width="4384" height="6576">
+  </image>
+  <image id="43" name="0_216_0_4.jpg" subset="Validation" task_id="258575" width="4384" height="6576">
+  </image>
+  <image id="42" name="0_144_0_4.jpg" subset="Validation" task_id="258575" width="4384" height="6576">
+  </image>
+  <image id="41" name="0_108_0_4.jpg" subset="Validation" task_id="258575" width="4384" height="6576">
+  </image>
+  <image id="40" name="0_0_0_4.jpg" subset="Validation" task_id="258575" width="4384" height="6576">
+  </image>
+  <image id="59" name="top_0_90_0_5.jpg" subset="Validation" task_id="258576" width="6576" height="4384">
+  </image>
+  <image id="58" name="0_72_0_5.jpg" subset="Validation" task_id="258576" width="4384" height="6576">
+  </image>
+  <image id="57" name="0_36_0_5.jpg" subset="Validation" task_id="258576" width="4384" height="6576">
+  </image>
+  <image id="56" name="0_324_0_5.jpg" subset="Validation" task_id="258576" width="4384" height="6576">
+  </image>
+  <image id="55" name="0_288_0_5.jpg" subset="Validation" task_id="258576" width="4384" height="6576">
+  </image>
+  <image id="54" name="0_252_0_5.jpg" subset="Validation" task_id="258576" width="4384" height="6576">
+  </image>
+  <image id="53" name="0_216_0_5.jpg" subset="Validation" task_id="258576" width="4384" height="6576">
+  </image>
+  <image id="52" name="0_144_0_5.jpg" subset="Validation" task_id="258576" width="4384" height="6576">
+  </image>
+  <image id="51" name="0_108_0_5.jpg" subset="Validation" task_id="258576" width="4384" height="6576">
+  </image>
+  <image id="50" name="0_0_0_5.jpg" subset="Validation" task_id="258576" width="4384" height="6576">
+  </image>
+  <image id="69" name="top_0_90_0_6.jpg" subset="Validation" task_id="258578" width="6576" height="4384">
+  </image>
+  <image id="68" name="0_72_0_6.jpg" subset="Validation" task_id="258578" width="4384" height="6576">
+  </image>
+  <image id="67" name="0_36_0_6.jpg" subset="Validation" task_id="258578" width="4384" height="6576">
+  </image>
+  <image id="66" name="0_324_0_6.jpg" subset="Validation" task_id="258578" width="4384" height="6576">
+  </image>
+  <image id="65" name="0_288_0_6.jpg" subset="Validation" task_id="258578" width="4384" height="6576">
+  </image>
+  <image id="64" name="0_252_0_6.jpg" subset="Validation" task_id="258578" width="4384" height="6576">
+  </image>
+  <image id="63" name="0_216_0_6.jpg" subset="Validation" task_id="258578" width="4384" height="6576">
+  </image>
+  <image id="62" name="0_144_0_6.jpg" subset="Validation" task_id="258578" width="4384" height="6576">
+  </image>
+  <image id="61" name="0_108_0_6.jpg" subset="Validation" task_id="258578" width="4384" height="6576">
+  </image>
+  <image id="60" name="0_0_0_6.jpg" subset="Validation" task_id="258578" width="4384" height="6576">
+  </image>
+  <image id="79" name="top_0_90_0_7.jpg" subset="Validation" task_id="258581" width="6576" height="4384">
+  </image>
+  <image id="78" name="0_72_0_7.jpg" subset="Validation" task_id="258581" width="4384" height="6576">
+  </image>
+  <image id="77" name="0_36_0_7.jpg" subset="Validation" task_id="258581" width="4384" height="6576">
+  </image>
+  <image id="76" name="0_324_0_7.jpg" subset="Validation" task_id="258581" width="4384" height="6576">
+  </image>
+  <image id="75" name="0_288_0_7.jpg" subset="Validation" task_id="258581" width="4384" height="6576">
+  </image>
+  <image id="74" name="0_252_0_7.jpg" subset="Validation" task_id="258581" width="4384" height="6576">
+  </image>
+  <image id="73" name="0_216_0_7.jpg" subset="Validation" task_id="258581" width="4384" height="6576">
+  </image>
+  <image id="72" name="0_144_0_7.jpg" subset="Validation" task_id="258581" width="4384" height="6576">
+  </image>
+  <image id="71" name="0_108_0_7.jpg" subset="Validation" task_id="258581" width="4384" height="6576">
+  </image>
+  <image id="70" name="0_0_0_7.jpg" subset="Validation" task_id="258581" width="4384" height="6576">
+  </image>
+  <image id="89" name="top_0_90_0_8.jpg" subset="Validation" task_id="258582" width="6576" height="4384">
+  </image>
+  <image id="88" name="0_72_0_8.jpg" subset="Validation" task_id="258582" width="4384" height="6576">
+  </image>
+  <image id="87" name="0_36_0_8.jpg" subset="Validation" task_id="258582" width="4384" height="6576">
+  </image>
+  <image id="86" name="0_324_0_8.jpg" subset="Validation" task_id="258582" width="4384" height="6576">
+  </image>
+  <image id="85" name="0_288_0_8.jpg" subset="Validation" task_id="258582" width="4384" height="6576">
+  </image>
+  <image id="84" name="0_252_0_8.jpg" subset="Validation" task_id="258582" width="4384" height="6576">
+  </image>
+  <image id="83" name="0_216_0_8.jpg" subset="Validation" task_id="258582" width="4384" height="6576">
+  </image>
+  <image id="82" name="0_144_0_8.jpg" subset="Validation" task_id="258582" width="4384" height="6576">
+  </image>
+  <image id="81" name="0_108_0_8.jpg" subset="Validation" task_id="258582" width="4384" height="6576">
+  </image>
+  <image id="80" name="0_0_0_8.jpg" subset="Validation" task_id="258582" width="4384" height="6576">
+  </image>
+  <image id="99" name="top_0_90_0_9.jpg" subset="Validation" task_id="258583" width="6576" height="4384">
+  </image>
+  <image id="98" name="0_72_0_9.jpg" subset="Validation" task_id="258583" width="4384" height="6576">
+  </image>
+  <image id="97" name="0_36_0_9.jpg" subset="Validation" task_id="258583" width="4384" height="6576">
+  </image>
+  <image id="96" name="0_324_0_9.jpg" subset="Validation" task_id="258583" width="4384" height="6576">
+  </image>
+  <image id="95" name="0_288_0_9.jpg" subset="Validation" task_id="258583" width="4384" height="6576">
+  </image>
+  <image id="94" name="0_252_0_9.jpg" subset="Validation" task_id="258583" width="4384" height="6576">
+  </image>
+  <image id="93" name="0_216_0_9.jpg" subset="Validation" task_id="258583" width="4384" height="6576">
+  </image>
+  <image id="92" name="0_144_0_9.jpg" subset="Validation" task_id="258583" width="4384" height="6576">
+  </image>
+  <image id="91" name="0_108_0_9.jpg" subset="Validation" task_id="258583" width="4384" height="6576">
+  </image>
+  <image id="90" name="0_0_0_9.jpg" subset="Validation" task_id="258583" width="4384" height="6576">
+  </image>
+  <image id="109" name="top_0_90_0_10.jpg" subset="Validation" task_id="258584" width="6576" height="4384">
+  </image>
+  <image id="108" name="0_72_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
+  </image>
+  <image id="107" name="0_36_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
+  </image>
+  <image id="106" name="0_324_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
+  </image>
+  <image id="105" name="0_288_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
+  </image>
+  <image id="104" name="0_252_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
+  </image>
+  <image id="103" name="0_216_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
+  </image>
+  <image id="102" name="0_144_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
+  </image>
+  <image id="101" name="0_108_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
+  </image>
+  <image id="100" name="0_0_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
+  </image>
+  <image id="119" name="top_0_90_0_11.jpg" subset="Validation" task_id="258585" width="6576" height="4384">
+  </image>
+  <image id="118" name="0_72_0_11.jpg" subset="Validation" task_id="258585" width="4384" height="6576">
+  </image>
+  <image id="117" name="0_36_0_11.jpg" subset="Validation" task_id="258585" width="4384" height="6576">
+  </image>
+  <image id="116" name="0_324_0_11.jpg" subset="Validation" task_id="258585" width="4384" height="6576">
+  </image>
+  <image id="115" name="0_288_0_11.jpg" subset="Validation" task_id="258585" width="4384" height="6576">
+  </image>
+  <image id="114" name="0_252_0_11.jpg" subset="Validation" task_id="258585" width="4384" height="6576">
+  </image>
+  <image id="113" name="0_216_0_11.jpg" subset="Validation" task_id="258585" width="4384" height="6576">
+  </image>
+  <image id="112" name="0_144_0_11.jpg" subset="Validation" task_id="258585" width="4384" height="6576">
+  </image>
+  <image id="111" name="0_108_0_11.jpg" subset="Validation" task_id="258585" width="4384" height="6576">
+  </image>
+  <image id="110" name="0_0_0_11.jpg" subset="Validation" task_id="258585" width="4384" height="6576">
+  </image>
+  <image id="129" name="top_0_90_0_12.jpg" subset="Validation" task_id="258586" width="6576" height="4384">
+  </image>
+  <image id="128" name="0_72_0_12.jpg" subset="Validation" task_id="258586" width="4384" height="6576">
+  </image>
+  <image id="127" name="0_36_0_12.jpg" subset="Validation" task_id="258586" width="4384" height="6576">
+  </image>
+  <image id="126" name="0_324_0_12.jpg" subset="Validation" task_id="258586" width="4384" height="6576">
+  </image>
+  <image id="125" name="0_288_0_12.jpg" subset="Validation" task_id="258586" width="4384" height="6576">
+  </image>
+  <image id="124" name="0_252_0_12.jpg" subset="Validation" task_id="258586" width="4384" height="6576">
+  </image>
+  <image id="123" name="0_216_0_12.jpg" subset="Validation" task_id="258586" width="4384" height="6576">
+  </image>
+  <image id="122" name="0_144_0_12.jpg" subset="Validation" task_id="258586" width="4384" height="6576">
+  </image>
+  <image id="121" name="0_108_0_12.jpg" subset="Validation" task_id="258586" width="4384" height="6576">
+  </image>
+  <image id="120" name="0_0_0_12.jpg" subset="Validation" task_id="258586" width="4384" height="6576">
+  </image>
+  <image id="139" name="top_0_90_0_13.jpg" subset="Validation" task_id="258587" width="6576" height="4384">
+  </image>
+  <image id="138" name="0_72_0_13.jpg" subset="Validation" task_id="258587" width="4384" height="6576">
+  </image>
+  <image id="137" name="0_36_0_13.jpg" subset="Validation" task_id="258587" width="4384" height="6576">
+  </image>
+  <image id="136" name="0_324_0_13.jpg" subset="Validation" task_id="258587" width="4384" height="6576">
+  </image>
+  <image id="135" name="0_288_0_13.jpg" subset="Validation" task_id="258587" width="4384" height="6576">
+  </image>
+  <image id="134" name="0_252_0_13.jpg" subset="Validation" task_id="258587" width="4384" height="6576">
+  </image>
+  <image id="133" name="0_216_0_13.jpg" subset="Validation" task_id="258587" width="4384" height="6576">
+  </image>
+  <image id="132" name="0_144_0_13.jpg" subset="Validation" task_id="258587" width="4384" height="6576">
+  </image>
+  <image id="131" name="0_108_0_13.jpg" subset="Validation" task_id="258587" width="4384" height="6576">
+  </image>
+  <image id="130" name="0_0_0_13.jpg" subset="Validation" task_id="258587" width="4384" height="6576">
+  </image>
+  <image id="149" name="top_0_90_0_14.jpg" subset="Validation" task_id="258589" width="6576" height="4384">
+  </image>
+  <image id="148" name="0_72_0_14.jpg" subset="Validation" task_id="258589" width="4384" height="6576">
+  </image>
+  <image id="147" name="0_36_0_14.jpg" subset="Validation" task_id="258589" width="4384" height="6576">
+  </image>
+  <image id="146" name="0_324_0_14.jpg" subset="Validation" task_id="258589" width="4384" height="6576">
+  </image>
+  <image id="145" name="0_288_0_14.jpg" subset="Validation" task_id="258589" width="4384" height="6576">
+  </image>
+  <image id="144" name="0_252_0_14.jpg" subset="Validation" task_id="258589" width="4384" height="6576">
+  </image>
+  <image id="143" name="0_216_0_14.jpg" subset="Validation" task_id="258589" width="4384" height="6576">
+  </image>
+  <image id="142" name="0_144_0_14.jpg" subset="Validation" task_id="258589" width="4384" height="6576">
+  </image>
+  <image id="141" name="0_108_0_14.jpg" subset="Validation" task_id="258589" width="4384" height="6576">
+  </image>
+  <image id="140" name="0_0_0_14.jpg" subset="Validation" task_id="258589" width="4384" height="6576">
+  </image>
+  <image id="159" name="top_0_90_0_15.jpg" subset="Validation" task_id="258590" width="6576" height="4384">
+  </image>
+  <image id="158" name="0_72_0_15.jpg" subset="Validation" task_id="258590" width="4384" height="6576">
+  </image>
+  <image id="157" name="0_36_0_15.jpg" subset="Validation" task_id="258590" width="4384" height="6576">
+  </image>
+  <image id="156" name="0_324_0_15.jpg" subset="Validation" task_id="258590" width="4384" height="6576">
+  </image>
+  <image id="155" name="0_288_0_15.jpg" subset="Validation" task_id="258590" width="4384" height="6576">
+  </image>
+  <image id="154" name="0_252_0_15.jpg" subset="Validation" task_id="258590" width="4384" height="6576">
+  </image>
+  <image id="153" name="0_216_0_15.jpg" subset="Validation" task_id="258590" width="4384" height="6576">
+  </image>
+  <image id="152" name="0_144_0_15.jpg" subset="Validation" task_id="258590" width="4384" height="6576">
+  </image>
+  <image id="151" name="0_108_0_15.jpg" subset="Validation" task_id="258590" width="4384" height="6576">
+  </image>
+  <image id="150" name="0_0_0_15.jpg" subset="Validation" task_id="258590" width="4384" height="6576">
+  </image>
+  <image id="169" name="top_0_90_0_16.jpg" subset="Validation" task_id="258592" width="6576" height="4384">
+  </image>
+  <image id="168" name="0_72_0_16.jpg" subset="Validation" task_id="258592" width="4384" height="6576">
+  </image>
+  <image id="167" name="0_36_0_16.jpg" subset="Validation" task_id="258592" width="4384" height="6576">
+  </image>
+  <image id="166" name="0_324_0_16.jpg" subset="Validation" task_id="258592" width="4384" height="6576">
+  </image>
+  <image id="165" name="0_288_0_16.jpg" subset="Validation" task_id="258592" width="4384" height="6576">
+  </image>
+  <image id="164" name="0_252_0_16.jpg" subset="Validation" task_id="258592" width="4384" height="6576">
+  </image>
+  <image id="163" name="0_216_0_16.jpg" subset="Validation" task_id="258592" width="4384" height="6576">
+  </image>
+  <image id="162" name="0_144_0_16.jpg" subset="Validation" task_id="258592" width="4384" height="6576">
+  </image>
+  <image id="161" name="0_108_0_16.jpg" subset="Validation" task_id="258592" width="4384" height="6576">
+  </image>
+  <image id="160" name="0_0_0_16.jpg" subset="Validation" task_id="258592" width="4384" height="6576">
+  </image>
+  <image id="179" name="top_0_90_0_17.jpg" subset="Validation" task_id="258593" width="6576" height="4384">
+  </image>
+  <image id="178" name="0_72_0_17.jpg" subset="Validation" task_id="258593" width="4384" height="6576">
+  </image>
+  <image id="177" name="0_36_0_17.jpg" subset="Validation" task_id="258593" width="4384" height="6576">
+  </image>
+  <image id="176" name="0_324_0_17.jpg" subset="Validation" task_id="258593" width="4384" height="6576">
+  </image>
+  <image id="175" name="0_288_0_17.jpg" subset="Validation" task_id="258593" width="4384" height="6576">
+  </image>
+  <image id="174" name="0_252_0_17.jpg" subset="Validation" task_id="258593" width="4384" height="6576">
+  </image>
+  <image id="173" name="0_216_0_17.jpg" subset="Validation" task_id="258593" width="4384" height="6576">
+  </image>
+  <image id="172" name="0_144_0_17.jpg" subset="Validation" task_id="258593" width="4384" height="6576">
+  </image>
+  <image id="171" name="0_108_0_17.jpg" subset="Validation" task_id="258593" width="4384" height="6576">
+  </image>
+  <image id="170" name="0_0_0_17.jpg" subset="Validation" task_id="258593" width="4384" height="6576">
+  </image>
+  <image id="189" name="top_0_90_0_18.jpg" subset="Validation" task_id="258594" width="6576" height="4384">
+  </image>
+  <image id="188" name="0_72_0_18.jpg" subset="Validation" task_id="258594" width="4384" height="6576">
+  </image>
+  <image id="187" name="0_36_0_18.jpg" subset="Validation" task_id="258594" width="4384" height="6576">
+  </image>
+  <image id="186" name="0_324_0_18.jpg" subset="Validation" task_id="258594" width="4384" height="6576">
+  </image>
+  <image id="185" name="0_288_0_18.jpg" subset="Validation" task_id="258594" width="4384" height="6576">
+  </image>
+  <image id="184" name="0_252_0_18.jpg" subset="Validation" task_id="258594" width="4384" height="6576">
+  </image>
+  <image id="183" name="0_216_0_18.jpg" subset="Validation" task_id="258594" width="4384" height="6576">
+  </image>
+  <image id="182" name="0_144_0_18.jpg" subset="Validation" task_id="258594" width="4384" height="6576">
+  </image>
+  <image id="181" name="0_108_0_18.jpg" subset="Validation" task_id="258594" width="4384" height="6576">
+  </image>
+  <image id="180" name="0_0_0_18.jpg" subset="Validation" task_id="258594" width="4384" height="6576">
+  </image>
+  <image id="199" name="top_0_90_0_19.jpg" subset="Validation" task_id="258595" width="6576" height="4384">
+  </image>
+  <image id="198" name="0_72_0_19.jpg" subset="Validation" task_id="258595" width="4384" height="6576">
+  </image>
+  <image id="197" name="0_36_0_19.jpg" subset="Validation" task_id="258595" width="4384" height="6576">
+  </image>
+  <image id="196" name="0_324_0_19.jpg" subset="Validation" task_id="258595" width="4384" height="6576">
+  </image>
+  <image id="195" name="0_288_0_19.jpg" subset="Validation" task_id="258595" width="4384" height="6576">
+  </image>
+  <image id="194" name="0_252_0_19.jpg" subset="Validation" task_id="258595" width="4384" height="6576">
+  </image>
+  <image id="193" name="0_216_0_19.jpg" subset="Validation" task_id="258595" width="4384" height="6576">
+  </image>
+  <image id="192" name="0_144_0_19.jpg" subset="Validation" task_id="258595" width="4384" height="6576">
+  </image>
+  <image id="191" name="0_108_0_19.jpg" subset="Validation" task_id="258595" width="4384" height="6576">
+  </image>
+  <image id="190" name="0_0_0_19.jpg" subset="Validation" task_id="258595" width="4384" height="6576">
+  </image>
+  <image id="209" name="top_0_90_0_20.jpg" subset="Validation" task_id="258596" width="6576" height="4384">
+  </image>
+  <image id="208" name="0_72_0_20.jpg" subset="Validation" task_id="258596" width="4384" height="6576">
+  </image>
+  <image id="207" name="0_36_0_20.jpg" subset="Validation" task_id="258596" width="4384" height="6576">
+  </image>
+  <image id="206" name="0_324_0_20.jpg" subset="Validation" task_id="258596" width="4384" height="6576">
+  </image>
+  <image id="205" name="0_288_0_20.jpg" subset="Validation" task_id="258596" width="4384" height="6576">
+  </image>
+  <image id="204" name="0_252_0_20.jpg" subset="Validation" task_id="258596" width="4384" height="6576">
+  </image>
+  <image id="203" name="0_216_0_20.jpg" subset="Validation" task_id="258596" width="4384" height="6576">
+  </image>
+  <image id="202" name="0_144_0_20.jpg" subset="Validation" task_id="258596" width="4384" height="6576">
+  </image>
+  <image id="201" name="0_108_0_20.jpg" subset="Validation" task_id="258596" width="4384" height="6576">
+  </image>
+  <image id="200" name="0_0_0_20.jpg" subset="Validation" task_id="258596" width="4384" height="6576">
+  </image>
+  <image id="219" name="top_0_90_0_21.jpg" subset="Validation" task_id="258597" width="6576" height="4384">
+  </image>
+  <image id="218" name="0_72_0_21.jpg" subset="Validation" task_id="258597" width="4384" height="6576">
+  </image>
+  <image id="217" name="0_36_0_21.jpg" subset="Validation" task_id="258597" width="4384" height="6576">
+  </image>
+  <image id="216" name="0_324_0_21.jpg" subset="Validation" task_id="258597" width="4384" height="6576">
+  </image>
+  <image id="215" name="0_288_0_21.jpg" subset="Validation" task_id="258597" width="4384" height="6576">
+  </image>
+  <image id="214" name="0_252_0_21.jpg" subset="Validation" task_id="258597" width="4384" height="6576">
+  </image>
+  <image id="213" name="0_216_0_21.jpg" subset="Validation" task_id="258597" width="4384" height="6576">
+  </image>
+  <image id="212" name="0_144_0_21.jpg" subset="Validation" task_id="258597" width="4384" height="6576">
+  </image>
+  <image id="211" name="0_108_0_21.jpg" subset="Validation" task_id="258597" width="4384" height="6576">
+  </image>
+  <image id="210" name="0_0_0_21.jpg" subset="Validation" task_id="258597" width="4384" height="6576">
+  </image>
+</annotations>
