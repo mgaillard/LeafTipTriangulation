@@ -17,3 +17,5 @@ The file `ground_truth.csv` contains the ground-truth number of leaves measured 
 ## Special plants
 In this section, descriptions of plants with problems that may affect the leaf triangulation:
 - `3-10-22-Schnable-Sorghum_310-204-16-1-P850029_2022-03-11_14-42-08.383_5207800` touches the sides of the imaging chamber
+- `3-10-22-Schnable-Sorghum_310-205-16-2-P850029_2022-03-11_14-44-09.928_5207900` touches the sides of the imaging chamber
+- `3-10-22-Schnable-Sorghum_310-206-17-6-AS_4601_Pawaga_2022-03-11_14-46-07.851_5208000` many leaf tips are close to each other, and occluded by the pot
