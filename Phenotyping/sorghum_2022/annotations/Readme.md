@@ -22,6 +22,7 @@ Use the script `compare_to_ground_truth.py` to compute the measures:
 ```bash
 $ python compare_to_ground_truth.py --input results.csv --truth ground_truth.csv
 ```
+Make sure the encoding is right if the script cannot read one of the CSV files.
 
 ## Special plants
 In this section, descriptions of plants with problems that may affect the leaf triangulation:

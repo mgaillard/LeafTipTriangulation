@@ -86,7 +86,8 @@ def compare_to_ground_truth(input_path: Path, truth_path: Path):
     print(truths)
 
     # TODO: Histogram of the absolute difference in leaf counted
-    # TODO: Linear regression between result and ground-truth (generate the scatter plot)
+    # TODO: Linear regression between result and ground-truth
+    #       generate the scatter plot, X axis is the human observation, Y axis is the prediction (Figure 5 paper Chenyong)
 
 
 def add_logging_arguments(parser):
