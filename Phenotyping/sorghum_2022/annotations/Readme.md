@@ -13,6 +13,15 @@ The file `annotations.csv` can later be processed for 3D triangulation.
 
 ## Ground-truth
 The file `ground_truth.csv` contains the ground-truth number of leaves measured by humans on the real plants.
+To compare the results to the ground-truth, launch the triangulation program, and save the result in a CSV file.
+```PowerShell
+cd LeafTipTriangulation/Phenotyping
+../build/bin/Release/LeafTipTriangulation.exe leaf_counting > results.csv
+```
+Use the script `compare_to_ground_truth.py` to compute the measures:
+```bash
+$ python compare_to_ground_truth.py --input results.csv --truth ground_truth.csv
+```
 
 ## Special plants
 In this section, descriptions of plants with problems that may affect the leaf triangulation:
