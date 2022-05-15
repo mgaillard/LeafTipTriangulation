@@ -31,7 +31,7 @@ def read_csv(csv_path: Path):
             if len(row) == 2:
                 result_lines.append({
                     'name': row[0],
-                    'result': row[1]
+                    'result': int(row[1])
                 })
 
     return result_lines
@@ -40,6 +40,7 @@ def read_csv(csv_path: Path):
 def merge_results_with_ground_truth(result_lines, truth_lines):
     """
     Merge the lines of results with the lines from ground-truth
+    If the ground-truth is -1, it means this example is discarded from the dataset because images are not valid
     Example:
     [
         {'name': '3-10-22-Schnable-Sorghum_310-201', 'result': 4, 'truth': 5},
@@ -49,7 +50,7 @@ def merge_results_with_ground_truth(result_lines, truth_lines):
 
     for result in result_lines:
         for truth in truth_lines:
-            if result['name'] == truth['name']:
+            if result['name'] == truth['name'] and truth['result'] > 0:
                 merged_result_lines.append({
                     'name': result['name'],
                     'result': result['result'],
@@ -67,8 +68,8 @@ def vectors_results_truth(merged_result_lines):
     y = []
 
     for result in merged_result_lines:
-        x.append(int(result['result']))
-        y.append(int(result['truth']))
+        x.append(result['result'])
+        y.append(result['truth'])
 
     return x, y
 
@@ -140,7 +141,7 @@ def generate_scatter_plot(results, truths, output: Path):
             verticalalignment='top')
 
     # Plot the regression line
-    ax.plot(line_x, line_y, '-r', label='y={:.2f}*x+{:.2f}'.format(line_a, line_b))
+    ax.plot(line_x, line_y, '-r', label='y={:.2f}*x+({:.2f})'.format(line_a, line_b))
     ax.legend(loc='lower right')
 
     # Scatter plot
