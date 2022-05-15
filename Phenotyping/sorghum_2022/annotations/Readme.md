@@ -7,7 +7,7 @@ The export format is `CVAT for Images 1.1`.
 Annotations are exported in the XML file: `annotations.xml`.
 To convert the annotations in XML format to CSV format, use the Python script `convert_cvat_to_csv.py`.
 ```bash
-$ python convert_cvat_to_csv.py --input annotations.xml > annotations.csv
+$ python scripts/convert_cvat_to_csv.py --input annotations.xml > annotations.csv
 ```
 The file `annotations.csv` can later be processed for 3D triangulation.
 
@@ -20,7 +20,7 @@ cd LeafTipTriangulation/Phenotyping
 ```
 Use the script `compare_to_ground_truth.py` to compute the measures:
 ```bash
-$ python compare_to_ground_truth.py --input results.csv --truth ground_truth.csv
+$ python scripts/compare_to_ground_truth.py --input results.csv --truth ground_truth.csv
 ```
 Make sure the encoding is right if the script cannot read one of the CSV files.
 

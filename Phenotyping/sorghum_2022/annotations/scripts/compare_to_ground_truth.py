@@ -8,10 +8,11 @@ import logging
 import sys
 import argparse
 import logging
-import re
-from _operator import truth
 from pathlib import Path
 import csv
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import stats
 
 
 def read_csv(csv_path: Path):
@@ -66,10 +67,93 @@ def vectors_results_truth(merged_result_lines):
     y = []
 
     for result in merged_result_lines:
-        x.append(result['result'])
-        y.append(result['truth'])
+        x.append(int(result['result']))
+        y.append(int(result['truth']))
 
     return x, y
+
+
+def generate_scatter_plot(results, truths):
+    """
+    Generate a scatter plot with a fitting line
+    results = [4, 6, 5]
+    truths = [3, 6, 4]
+    """
+    # Convert to Numpy
+    original_x = np.array(truths)
+    original_y = np.array(results)
+    # Compute the number of occurrence of the pairs (observation, prediction)
+    # Each object in the array histogram is like {'x': 2, 'y': 3, 'n': 1}
+    histogram = []
+    for i in range(len(original_x)):
+        found = False
+        for j in range(len(histogram)):
+            if histogram[j]['x'] == original_x[i] and histogram[j]['y'] == original_y[i]:
+                histogram[j]['n'] = histogram[j]['n'] + 1
+                found = True
+                break
+        if not found:
+            histogram.append({
+                'x': original_x[i],
+                'y': original_y[i],
+                'n': 1
+            })
+
+    # Size multiplier for size of markers
+    size_multiplier = 32.0
+
+    # Convert to Numpy format
+    x = np.zeros(len(histogram))
+    y = np.zeros(len(histogram))
+    n = np.zeros(len(histogram))
+    for i in range(len(histogram)):
+        x[i] = histogram[i]['x']
+        y[i] = histogram[i]['y']
+        n[i] = size_multiplier * histogram[i]['n']
+
+    # Bounds for the axis of the plot
+    lower_bound = min(np.min(x), np.min(y))
+    higher_bound = max(np.max(x), np.max(y))
+
+    # Linear regression
+    res = stats.linregress(original_x, original_y)
+    line_a = res.slope
+    line_b = res.intercept
+    r_sq = res.rvalue ** 2
+    line_x = np.linspace(lower_bound, higher_bound, 10)
+    line_y = line_a * line_x + line_b
+
+    # RMSE computation
+    rmse = np.sqrt(np.mean((original_y - original_x) ** 2))
+
+    # Agreement in percentage
+    agreement = int(100.0 * np.count_nonzero(original_x == original_y) / len(original_x))
+
+    # Plot
+    fig, ax = plt.subplots(figsize=(4, 4), dpi=216)
+
+    # Text box in upper left in axes coords, with info about regression
+    ax.text(0.05, 0.95,
+            'R^2: {:.3f}\nRMSE: {:.3f}\nAgreement: {:d} %'.format(r_sq, rmse, agreement),
+            transform=ax.transAxes,
+            fontsize=12,
+            verticalalignment='top')
+
+    # Plot the regression line
+    ax.plot(line_x, line_y, '-r', label='y={:.2f}*x+{:.2f}'.format(line_a, line_b))
+    ax.legend(loc='lower right')
+
+    # Scatter plot
+    ax.scatter(x, y, s=n)
+
+    ax.set(xlim=(lower_bound - 0.5, higher_bound + 0.5),
+           xticks=np.arange(lower_bound, higher_bound + 1),
+           xlabel='Human observation',
+           ylim=(lower_bound - 0.5, higher_bound + 0.5),
+           yticks=np.arange(lower_bound, higher_bound + 1),
+           ylabel='Prediction')
+
+    plt.show()
 
 
 def compare_to_ground_truth(input_path: Path, truth_path: Path):
@@ -85,9 +169,9 @@ def compare_to_ground_truth(input_path: Path, truth_path: Path):
     print(results)
     print(truths)
 
+    # Linear regression between result and ground-truth
+    generate_scatter_plot(results, truths)
     # TODO: Histogram of the absolute difference in leaf counted
-    # TODO: Linear regression between result and ground-truth
-    #       generate the scatter plot, X axis is the human observation, Y axis is the prediction (Figure 5 paper Chenyong)
 
 
 def add_logging_arguments(parser):
