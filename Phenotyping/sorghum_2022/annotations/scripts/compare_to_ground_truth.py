@@ -156,6 +156,31 @@ def generate_scatter_plot(results, truths):
     plt.show()
 
 
+def generate_histogram(results, truths):
+    """
+    Generate a histogram of differences between observations and predictions
+    results = [4, 6, 5]
+    truths = [3, 6, 4]
+    """
+    # Convert to Numpy
+    x = np.array(truths)
+    y = np.array(results)
+    # Difference between human observations and predictions
+    diff = x - y
+    # Maximum absolute value of the difference, to infer the number of bins
+    n_bins = np.max(np.abs(x - y))
+
+    # Plot
+    fig, ax = plt.subplots(figsize=(4, 4), dpi=216)
+
+    ax.hist(diff, bins=np.arange(-n_bins, n_bins + 1), rwidth=0.95)
+
+    ax.set_xlabel('Human observation - Predictions')
+    ax.set_ylabel('Count')
+
+    plt.show()
+
+
 def compare_to_ground_truth(input_path: Path, truth_path: Path):
     result_lines = read_csv(input_path)
     truth_lines = read_csv(truth_path)
@@ -171,7 +196,8 @@ def compare_to_ground_truth(input_path: Path, truth_path: Path):
 
     # Linear regression between result and ground-truth
     generate_scatter_plot(results, truths)
-    # TODO: Histogram of the absolute difference in leaf counted
+    # Histogram of the absolute difference in leaf counted
+    generate_histogram(results, truths)
 
 
 def add_logging_arguments(parser):
