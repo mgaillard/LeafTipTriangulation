@@ -73,7 +73,7 @@ def vectors_results_truth(merged_result_lines):
     return x, y
 
 
-def generate_scatter_plot(results, truths):
+def generate_scatter_plot(results, truths, output: Path):
     """
     Generate a scatter plot with a fitting line
     results = [4, 6, 5]
@@ -154,9 +154,10 @@ def generate_scatter_plot(results, truths):
            ylabel='Prediction')
 
     plt.show()
+    plt.savefig(str(output), bbox_inches='tight')
 
 
-def generate_histogram(results, truths):
+def generate_histogram(results, truths, output: Path):
     """
     Generate a histogram of differences between observations and predictions
     results = [4, 6, 5]
@@ -168,36 +169,34 @@ def generate_histogram(results, truths):
     # Difference between human observations and predictions
     diff = x - y
     # Maximum absolute value of the difference, to infer the number of bins
-    n_bins = np.max(np.abs(x - y))
+    n_bins = max(1, np.max(np.abs(x - y)))
 
     # Plot
     fig, ax = plt.subplots(figsize=(4, 4), dpi=216)
 
-    ax.hist(diff, bins=np.arange(-n_bins, n_bins + 1), rwidth=0.95)
+    ax.hist(diff, bins=np.arange(-n_bins, n_bins + 1), rwidth=0.95, align='left')
 
     ax.set_xlabel('Human observation - Predictions')
     ax.set_ylabel('Count')
 
     plt.show()
+    plt.savefig(str(output), bbox_inches='tight')
 
 
-def compare_to_ground_truth(input_path: Path, truth_path: Path):
+def compare_to_ground_truth(input_path: Path, truth_path: Path, output_path: Path):
     result_lines = read_csv(input_path)
     truth_lines = read_csv(truth_path)
     results_with_truth = merge_results_with_ground_truth(result_lines, truth_lines)
 
     for result in results_with_truth:
-        print('{}\t{}\t{}'.format(result['name'], result['result'], result['truth']))
+        logging.info('{}\t{}\t{}'.format(result['name'], result['result'], result['truth']))
 
     results, truths = vectors_results_truth(results_with_truth)
 
-    print(results)
-    print(truths)
-
     # Linear regression between result and ground-truth
-    generate_scatter_plot(results, truths)
+    generate_scatter_plot(results, truths, output_path.joinpath('scatter.png'))
     # Histogram of the absolute difference in leaf counted
-    generate_histogram(results, truths)
+    generate_histogram(results, truths, output_path.joinpath('histogram.png'))
 
 
 def add_logging_arguments(parser):
@@ -240,26 +239,29 @@ def main() -> int:
     parser.add_argument('--input', type=str, help='Path to the result CSV file (required)', default='')
     # Argument for the ground-truth CSV file
     parser.add_argument('--truth', type=str, help='Path to the ground-truth CSV file (required)', default='')
+    # Argument for the output folder
+    parser.add_argument('--output', type=str, help='Path to the output folder (required)', default='')
 
     args = parser.parse_args()
 
     init_logging(args.log, args.log_file)
 
     # Check arguments exist
-    if not args.input or not args.truth:
+    if not args.input or not args.truth or not args.output:
         parser.print_help(sys.stderr)
         return 1
 
     input_path = Path(args.input)
     truth_path = Path(args.truth)
+    output_path = Path(args.output)
 
     # Check arguments are valid
-    if not input_path.exists() or not truth_path.exists():
-        logging.error('The input file {} or the ground-truth file {} does not exist'.format(input_path, truth_path))
+    if not input_path.exists() or not truth_path.exists() or not output_path.exists():
+        logging.error('One of these paths does not exist.'.format(input_path, truth_path, output_path))
         return 1
 
     # Execute the command
-    compare_to_ground_truth(input_path, truth_path)
+    compare_to_ground_truth(input_path, truth_path, output_path)
 
     return 0
 
