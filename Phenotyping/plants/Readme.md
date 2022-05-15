@@ -1,4 +1,4 @@
-This folder contains examples of plants from the Sorghum 2018 dataset.
+This folder contains examples of plants from the Sorghum 2018 and Sorghum 2022 datasets.
 
 Side views are files named:
  - `0_0_0.png`

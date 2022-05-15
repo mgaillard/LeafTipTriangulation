@@ -548,13 +548,14 @@ void runCrocodileMeasurement()
 
 int main(int argc, char *argv[])
 {
-	if (argc != 2)
+	if (argc < 2)
 	{
 		std::cout << "Give the benchmark to execute as an argument." << std::endl;
 		return 1;
 	}
 
 	const std::string command = argv[1];
+	const std::string argument = argv[2];
 
 	if (command == "runtime_points")
 	{
@@ -593,7 +594,7 @@ int main(int argc, char *argv[])
 	else if (command == "leaf_counting")
 	{
 		// Example with counting leaves for a set of manually annotated plants
-		runLeafCounting("sorghum_2018");
+		runLeafCounting(argument);
 	}
 	else if (command == "measure_crocodile")
 	{
