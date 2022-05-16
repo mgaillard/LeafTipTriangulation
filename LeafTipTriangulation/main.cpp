@@ -554,9 +554,17 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	// The command to execute
 	const std::string command = argv[1];
-	const std::string argument = argv[2];
+	
+	// For some of the commands, there is an argument
+	std::string argument;
+	if (argc >= 3)
+	{
+		argument = argv[2];
+	}
 
+	// Execute the command
 	if (command == "runtime_points")
 	{
 		// Runtime (single core) vs number of points with 3 cameras
