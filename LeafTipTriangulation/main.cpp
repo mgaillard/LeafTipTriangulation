@@ -437,7 +437,7 @@ void runPlantPhenotyping()
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 
-void runLeafCounting(const std::string& folder)
+void runLeafCounting(const std::string& folder, const std::string& output)
 {
 	// Convert the output of the calibration script to a CSV file that can be read by readAndApplyTranslationsFromCsv()
 	// Use the following line (and replace the name of files)
@@ -464,10 +464,7 @@ void runLeafCounting(const std::string& folder)
 		numberLeafTips[i].second = static_cast<int>(triangulatedPoints3D.size());
 	}
 
-	for (const auto& [plantName, number] : numberLeafTips)
-	{
-		std::cout << plantName << "\t" << number << std::endl;
-	}
+	exportNumberLeavesToCsv(output, numberLeafTips);
 }
 
 void runCrocodileMeasurement()
@@ -550,18 +547,18 @@ int main(int argc, char *argv[])
 {
 	if (argc < 2)
 	{
-		std::cout << "Give the benchmark to execute as an argument." << std::endl;
+		std::cerr << "Give the benchmark to execute as an argument." << std::endl;
 		return 1;
 	}
 
 	// The command to execute
 	const std::string command = argv[1];
-	
-	// For some of the commands, there is an argument
-	std::string argument;
-	if (argc >= 3)
+
+	// Add any remaining argument to an array
+	std::vector<std::string> args;
+	for (int i = 2; i < argc; i++)
 	{
-		argument = argv[2];
+		args.push_back(argv[i]);
 	}
 
 	// Execute the command
@@ -601,8 +598,14 @@ int main(int argc, char *argv[])
 	}
 	else if (command == "leaf_counting")
 	{
+		if (args.size() < 2)
+		{
+			std::cerr << "Missing arguments for leaf counting" << std::endl;
+			return 1;
+		}
+
 		// Example with counting leaves for a set of manually annotated plants
-		runLeafCounting(argument);
+		runLeafCounting(args[0], args[1]);
 	}
 	else if (command == "measure_crocodile")
 	{

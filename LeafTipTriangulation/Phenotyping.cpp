@@ -505,3 +505,22 @@ bool drawPointsInImage(const std::string& filename,
 
 	return cv::imwrite(filename, image);
 }
+
+bool exportNumberLeavesToCsv(const std::string& filename, const std::vector<std::pair<std::string, int>>& numberLeafTips)
+{
+	std::ofstream file(filename, std::ofstream::out);
+
+	if (!file.is_open())
+	{
+		return false;
+	}
+
+	for (const auto& [plantName, number] : numberLeafTips)
+	{
+		file << plantName << "\t" << number << "\n";
+	}
+
+	file.close();
+
+	return true;
+}

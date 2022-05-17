@@ -197,3 +197,11 @@ std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const 
 bool drawPointsInImage(const std::string& filename,
 					   const std::string& backgroundImage,
                        const std::vector<glm::vec2>& points);
+
+/**
+ * \brief Save the number of leaves per plant in a CSV file
+ * \param filename The path to the CSV file
+ * \param numberLeafTips A list of name of plants with the number of leaves
+ * \return True if the list was saved successfully
+ */
+bool exportNumberLeavesToCsv(const std::string& filename, const std::vector<std::pair<std::string, int>>& numberLeafTips);
