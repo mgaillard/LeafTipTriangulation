@@ -32,3 +32,7 @@ In this section, descriptions of plants with problems that may affect the leaf t
 - `3-10-22-Schnable-Sorghum_310-211-22-2-R_LINE_AR2002_2022-03-11_14-59-49.733_5208500` has many meaf touching the ground with self occlusion, leaf tips move a lot between shots and some are not visible
 - `3-10-22-Schnable-Sorghum_310-212-23-1-SC_1439_2022-03-11_15-01-44.995_5208600` has leaves touching the floor of the machine
 - `3-10-22-Schnable-Sorghum_310-213-23-2-SC_1439_2022-03-11_15-04-00.664_5208700` has two panicles 
+- `3-10-22-Schnable-Sorghum_310-219-42-3-BTx623_2022-03-11_15-17-51.394_5209300` is the perfect example of a plant where there is no view from which all leaf tips are visible
+- `3-10-22-Schnable-Sorghum_310-221-42-5-BTx623_2022-03-11_15-36-54.627_5209500` has many leaves touching the ground with self occlusion
+- `3-10-22-Schnable-Sorghum_310-222-42-6-BTx623_2022-03-11_15-38-50.024_5209600` has leaves touching the floor
+- `3-10-22-Schnable-Sorghum_310-224-42-8-BTx623_2022-03-11_15-43-19.315_5209800` has many leaves touching the ground with self occlusion, some leaves have broken tips
