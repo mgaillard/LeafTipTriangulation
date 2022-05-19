@@ -104,7 +104,7 @@ def read_xml_images(document):
                         image_junction_points.append({'x': point_x, 'y': point_y})
 
         # If image has no point, discard it
-        if len(image_tip_points) == 0 or len(image_junction_points) == 0:
+        if len(image_tip_points) == 0 and len(image_junction_points) == 0:
             continue
 
         images.append({
