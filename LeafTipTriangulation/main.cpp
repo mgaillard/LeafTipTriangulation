@@ -437,7 +437,10 @@ void runPlantPhenotyping()
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 
-void runLeafCounting(const std::string& folder, const std::string& output)
+void runLeafCounting(
+	const std::string& folder,
+	const std::string& outputFileNumberLeaves,
+	const std::string& outputFileAnnotationsPerView)
 {
 	// Convert the output of the calibration script to a CSV file that can be read by readAndApplyTranslationsFromCsv()
 	// Use the following line (and replace the name of files)
@@ -464,7 +467,8 @@ void runLeafCounting(const std::string& folder, const std::string& output)
 		numberLeafTips[i].second = static_cast<int>(triangulatedPoints3D.size());
 	}
 
-	exportNumberLeavesToCsv(output, numberLeafTips);
+	exportPlantStatsToCsv(outputFileAnnotationsPerView, setup, plants);
+	exportNumberLeavesToCsv(outputFileNumberLeaves, numberLeafTips);
 }
 
 void runCrocodileMeasurement()
@@ -558,7 +562,7 @@ int main(int argc, char *argv[])
 	std::vector<std::string> args;
 	for (int i = 2; i < argc; i++)
 	{
-		args.push_back(argv[i]);
+		args.emplace_back(argv[i]);
 	}
 
 	// Execute the command
@@ -598,14 +602,14 @@ int main(int argc, char *argv[])
 	}
 	else if (command == "leaf_counting")
 	{
-		if (args.size() < 2)
+		if (args.size() < 3)
 		{
 			std::cerr << "Missing arguments for leaf counting" << std::endl;
 			return 1;
 		}
 
 		// Example with counting leaves for a set of manually annotated plants
-		runLeafCounting(args[0], args[1]);
+		runLeafCounting(args[0], args[1], args[2]);
 	}
 	else if (command == "measure_crocodile")
 	{

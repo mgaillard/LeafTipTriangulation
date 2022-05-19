@@ -506,6 +506,45 @@ bool drawPointsInImage(const std::string& filename,
 	return cv::imwrite(filename, image);
 }
 
+bool exportPlantStatsToCsv(
+	const std::string& filename,
+	const PhenotypingSetup& setup,
+	const std::vector<PlantLeafTips>& plants)
+{
+	std::ofstream file(filename, std::ofstream::out);
+
+	if (!file.is_open())
+	{
+		return false;
+	}
+
+	const auto& views = setup.views();
+
+	// Header
+	for (const auto& view : views)
+	{
+		file << "\t" << view;
+	}
+	file << "\n";
+
+	// Plants
+	for (const auto& plant : plants)
+	{
+		file << plant.plantName();
+
+		for (const auto& view : views)
+		{
+			file << "\t" << plant.pointsFromView(view).size();
+		}
+
+		file << "\n";
+	}
+
+	file.close();
+
+	return true;
+}
+
 bool exportNumberLeavesToCsv(const std::string& filename, const std::vector<std::pair<std::string, int>>& numberLeafTips)
 {
 	std::ofstream file(filename, std::ofstream::out);

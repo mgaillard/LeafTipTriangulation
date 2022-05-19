@@ -199,9 +199,21 @@ bool drawPointsInImage(const std::string& filename,
                        const std::vector<glm::vec2>& points);
 
 /**
+ * \brief Export a table of the statistics of loaded plants
+ * \param filename The path to the CSV file
+ * \param setup The phenotyping setup (for the list of views)
+ * \param plants The list of plants
+ * \return True if the list was saved successfully
+ */
+bool exportPlantStatsToCsv(const std::string& filename,
+	                       const PhenotypingSetup& setup,
+	                       const std::vector<PlantLeafTips>& plants);
+
+/**
  * \brief Save the number of leaves per plant in a CSV file
  * \param filename The path to the CSV file
  * \param numberLeafTips A list of name of plants with the number of leaves
  * \return True if the list was saved successfully
  */
-bool exportNumberLeavesToCsv(const std::string& filename, const std::vector<std::pair<std::string, int>>& numberLeafTips);
+bool exportNumberLeavesToCsv(const std::string& filename,
+	                         const std::vector<std::pair<std::string, int>>& numberLeafTips);
