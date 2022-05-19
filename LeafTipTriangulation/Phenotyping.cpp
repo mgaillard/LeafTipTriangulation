@@ -67,6 +67,33 @@ std::vector<Camera> PhenotypingSetup::camerasFromViews(const std::vector<std::st
 	return cameras;
 }
 
+bool PhenotypingSetup::removeView(const std::string& viewName)
+{
+	bool success = false;
+
+	auto itViews = m_views.begin();
+	auto itCameras = m_cameras.begin();
+
+	while (itViews != m_views.end() && itCameras != m_cameras.end())
+	{
+		if (*itViews == viewName)
+		{
+			// Erase from both vectors
+			itViews = m_views.erase(itViews);
+			itCameras = m_cameras.erase(itCameras);
+
+			success = true;
+		}
+		else
+		{
+			++itViews;
+			++itCameras;
+		}
+	}
+
+	return success;
+}
+
 PlantLeafTips::PlantLeafTips(std::string plantName) : m_plantName(std::move(plantName))
 {
 	

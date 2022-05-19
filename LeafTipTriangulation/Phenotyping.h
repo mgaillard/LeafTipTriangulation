@@ -33,6 +33,13 @@ public:
 	 */
 	std::vector<Camera> camerasFromViews(const std::vector<std::string>& viewNames) const;
 
+	/**
+	 * \brief Remove a view from the phenotyping setup
+	 * \param viewName The name of the view to remove
+	 * \return True if the view was found and removed
+	 */
+	bool removeView(const std::string& viewName);
+
 private:
 	double m_imageWidth;
 	double m_imageHeight;

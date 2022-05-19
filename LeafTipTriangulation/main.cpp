@@ -357,9 +357,9 @@ void testCorrespondenceWithThreshold(float noiseStd)
 	}
 }
 
-void runPlantPhenotyping()
+void runPlantPhenotyping(const std::string& folder)
 {
-	const auto setup = loadPhenotypingSetup("cameras/");
+	auto setup = loadPhenotypingSetup(folder + "/cameras/");
 
 	// X axis is from left to right
 	// Y axis is from bottom to top
@@ -427,6 +427,34 @@ void runPlantPhenotyping()
 			{944, 628}
 		}
 	};
+
+	// List of annotated views
+	const std::vector<std::string> availableViews = {
+		"SV_0",
+		"SV_72",
+		"SV_144",
+		"SV_216",
+		"SV_288",
+		"TV_90"
+	};
+
+	// List of all views available in the camera setup
+	auto views = setup.views();
+
+	for (const auto& v : availableViews)
+	{
+		// Remove views that are available
+		views.erase(std::remove_if(views.begin(),
+		                           views.end(),
+		                           [&v](const auto& x) { return x == v; }),
+		            views.end());
+	}
+
+	// Now remove unavailable views from the camera setup
+	for (const auto& v : views)
+	{
+		setup.removeView(v);
+	}
 
 	// Compute rays in 3D from camera matrices and 2D points
 	const auto rays = computeRays(setup.cameras(), points2D);
@@ -597,8 +625,15 @@ int main(int argc, char *argv[])
 	}
 	else if (command == "plant_phenotyping")
 	{
+		if (args.empty())
+		{
+			std::cerr << "Missing arguments for plant phenotyping." << std::endl;
+			std::cerr << "Argument 1: Path to the folder for the 2018 phenotyping setup." << std::endl;
+			return 1;
+		}
+
 		// Example with a plant in a phenotyping facility
-		runPlantPhenotyping();
+		runPlantPhenotyping(args[0]);
 	}
 	else if (command == "leaf_counting")
 	{
