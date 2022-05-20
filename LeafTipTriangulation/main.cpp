@@ -6,6 +6,7 @@
 #include <utils/warnoff.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <spdlog/spdlog.h>
 #include <utils/warnon.h>
 
 #include "Camera.h"
@@ -506,9 +507,11 @@ void runPlantPhenotyping(const std::string& folder, const std::string& plantName
 
 	if (plants.empty())
 	{
-		std::cerr << "Could not find the plant: " << plantName << std::endl;
+		spdlog::error("Could not find the plant: {}", plantName);
 		return;
 	}
+
+	spdlog::info("Triangulating leaves of plant {}", plantName);
 	
 	const auto viewNames = plants.front().getAllViews();
 	const auto points = plants.front().pointsFromViews(viewNames);
@@ -517,6 +520,7 @@ void runPlantPhenotyping(const std::string& folder, const std::string& plantName
 	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays);
 
 	// Export the scene
+	spdlog::debug("Found {} leaves", triangulatedPoints3D.size());
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 
@@ -526,6 +530,8 @@ void runLeafCounting(
 	const std::string& outputFileAnnotationsPerView)
 {
 	const auto [setup, plants] = loadPhenotypingSetupAndLeafTips(folder);
+
+	spdlog::info("Triangulating leaves for {} plants in the folder {}", plants.size(), folder);
 
 	std::vector<std::pair<std::string, int>> numberLeafTips(plants.size());
 
@@ -537,7 +543,9 @@ void runLeafCounting(
 		numberLeafTips[i].second = static_cast<int>(triangulatedPoints3D.size());
 	}
 
+	spdlog::debug("Saving plant annotation statistics in {}", outputFileAnnotationsPerView);
 	exportPlantStatsToCsv(outputFileAnnotationsPerView, setup, plants);
+	spdlog::debug("Saving number of leaves in {}", outputFileNumberLeaves);
 	exportNumberLeavesToCsv(outputFileNumberLeaves, numberLeafTips);
 }
 
@@ -614,14 +622,16 @@ void runCrocodileMeasurement()
 	                                                    tvecs,
 	                                                    points2D);
 
-	std::cout << "Length: " << pointsDistance << " m" << std::endl;
+	spdlog::info("Length: {} m", pointsDistance);
 }
 
 int main(int argc, char *argv[])
 {
+	spdlog::set_level(spdlog::level::trace);
+
 	if (argc < 2)
 	{
-		std::cerr << "Give the benchmark to execute as an argument." << std::endl;
+		spdlog::error("Give the command to execute as an argument.");
 		return 1;
 	}
 
@@ -669,8 +679,8 @@ int main(int argc, char *argv[])
 	{
 		if (args.empty())
 		{
-			std::cerr << "Missing arguments for plant phenotyping." << std::endl;
-			std::cerr << "Argument 1: Path to the folder for the 2018 phenotyping setup." << std::endl;
+			spdlog::error("Missing arguments for plant phenotyping.");
+			spdlog::error("Argument 1: Path to the folder for the 2018 phenotyping setup.");
 			return 1;
 		}
 
@@ -681,9 +691,9 @@ int main(int argc, char *argv[])
 	{
 		if (args.size() < 2)
 		{
-			std::cerr << "Missing arguments for plant phenotyping" << std::endl;
-			std::cerr << "Argument 1: Path to the folder for the phenotyping setup." << std::endl;
-			std::cerr << "Argument 2: Name of the plant to inspect." << std::endl;
+			spdlog::error("Missing arguments for plant phenotyping");
+			spdlog::error("Argument 1: Path to the folder for the phenotyping setup.");
+			spdlog::error("Argument 2: Name of the plant to inspect.");
 			return 1;
 		}
 
@@ -694,7 +704,10 @@ int main(int argc, char *argv[])
 	{
 		if (args.size() < 3)
 		{
-			std::cerr << "Missing arguments for leaf counting" << std::endl;
+			spdlog::error("Missing arguments for leaf counting");
+			spdlog::error("Argument 1: Path to the folder for the phenotyping setup.");
+			spdlog::error("Argument 2: Output CSV file for the number of leaves.");
+			spdlog::error("Argument 3: Output CSV file for statistics about plants.");
 			return 1;
 		}
 
