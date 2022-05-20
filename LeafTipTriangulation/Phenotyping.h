@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <random>
 
 #include <utils/warnoff.h>
 #include <glm/glm.hpp>
@@ -110,12 +111,43 @@ public:
 	 */
 	void apply90DegreesCounterClockwiseRotationToView(const std::string& viewName, double imageWidth, double imageHeight);
 
-
 	/**
 	 * \brief Flip the coordinates of points on the Y axis
 	 * \param imageHeight Resolution of the image on the Y axis
 	 */
 	void flipYAxis(double imageHeight);
+
+	/**
+	 * \brief Randomly discard leaf tips in the plant
+	 * \tparam RandomGenerator A std random generator initialized with a seed
+	 * \param generator A random generator
+	 * \param probability A probability to discard a leaf tip
+	 */
+	template<class RandomGenerator>
+	void discardLeafTipsRandomly(RandomGenerator& generator, double probability)
+	{
+		std::uniform_real_distribution<double> dist(0.0, 1.0);
+
+		for (auto& [viewName, points] : m_points)
+		{
+			for (auto itPoint = points.begin(); itPoint != points.end();)
+			{
+				// Generate a random number between 0 and 1
+				const auto randomNumber = dist(generator);
+				// If the random number is higher than the probability, we keep
+				if (randomNumber > probability)
+				{
+					// Keep the point
+					++itPoint;
+				}
+				else
+				{
+					// Discard the point
+					itPoint = points.erase(itPoint);
+				}
+			}
+		}
+	}
 
 	/**
 	 * \brief Return a list of points from a view
@@ -215,6 +247,14 @@ void keepOnlyPlantsWithMultipleViews(std::vector<PlantLeafTips>& plants);
  * \param plants The list of plants to filter
  */
 void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::vector<PlantLeafTips>& plants);
+
+/**
+ * \brief Discard some annotated leaf tips randomly
+ * \param seed Initialization value for the random generator
+ * \param probability Probability to discard a point
+ * \param plants The list of plants to process
+ */
+void discardLeafTipsRandomly(unsigned int seed, double probability, std::vector<PlantLeafTips>& plants);
 
 /**
  * \brief Find the 3D position of leaf tips in a plant

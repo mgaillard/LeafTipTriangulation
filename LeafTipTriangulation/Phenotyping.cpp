@@ -560,6 +560,16 @@ void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::
 	plants.erase(endIt, plants.end());
 }
 
+void discardLeafTipsRandomly(unsigned seed, double probability, std::vector<PlantLeafTips>& plants)
+{
+	std::default_random_engine generator(seed);
+
+	for (auto& plant : plants)
+	{
+		plant.discardLeafTipsRandomly(generator, probability);
+	}
+}
+
 std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const PlantLeafTips& plantLeafTips)
 {
 	// Get the list of views from which the plant was annotated, order does matter
