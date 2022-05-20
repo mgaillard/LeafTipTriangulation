@@ -526,6 +526,7 @@ void runPlantPhenotyping(const std::string& folder, const std::string& plantName
 
 void runLeafCounting(
 	const std::string& folder,
+	unsigned int seed,
 	double probabilityDiscard,
 	const std::string& outputFileNumberLeaves,
 	const std::string& outputFileAnnotationsPerView)
@@ -536,8 +537,8 @@ void runLeafCounting(
 	
 	if (probabilityDiscard > 0.0)
 	{
-		spdlog::debug("Discarding points with probability {:.2f} %", 100.0 * probabilityDiscard);
-		discardLeafTipsRandomly(14117, probabilityDiscard, plants);
+		spdlog::debug("Discarding points with probability {:.2f} % (seed = {:d})", 100.0 * probabilityDiscard, seed);
+		discardLeafTipsRandomly(seed, probabilityDiscard, plants);
 	}
 
 	std::vector<std::pair<std::string, int>> numberLeafTips(plants.size());
@@ -709,21 +710,23 @@ int main(int argc, char *argv[])
 	}
 	else if (command == "leaf_counting")
 	{
-		if (args.size() < 4)
+		if (args.size() < 5)
 		{
 			spdlog::error("Missing arguments for leaf counting");
 			spdlog::error("Argument 1: Path to the folder for the phenotyping setup.");
-			spdlog::error("Argument 2: Percentage of points to discard between 0.0 and 1.0.");
-			spdlog::error("Argument 3: Output CSV file for the number of leaves.");
-			spdlog::error("Argument 4: Output CSV file for statistics about plants.");
+			spdlog::error("Argument 2: Random seed (unsigned integer).");
+			spdlog::error("Argument 3: Percentage of points to discard between 0.0 and 1.0.");
+			spdlog::error("Argument 4: Output CSV file for the number of leaves.");
+			spdlog::error("Argument 5: Output CSV file for statistics about plants.");
 			return 1;
 		}
 
 		// Counting leaves for a set of manually annotated plants
 		runLeafCounting(args[0],
-		                std::stod(args[1]),
-		                args[2],
-		                args[3]);
+						std::stoul(args[1]),
+		                std::stod(args[2]),
+		                args[3],
+		                args[4]);
 	}
 	else if (command == "measure_crocodile")
 	{
