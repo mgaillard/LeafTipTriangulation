@@ -357,7 +357,7 @@ void testCorrespondenceWithThreshold(float noiseStd)
 	}
 }
 
-void runPlantPhenotyping(const std::string& folder)
+void runPlantPhenotypingExample(const std::string& folder)
 {
 	auto setup = loadPhenotypingSetup(folder + "/cameras/");
 
@@ -465,25 +465,67 @@ void runPlantPhenotyping(const std::string& folder)
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 
-void runLeafCounting(
-	const std::string& folder,
-	const std::string& outputFileNumberLeaves,
-	const std::string& outputFileAnnotationsPerView)
+std::tuple<PhenotypingSetup, std::vector<PlantLeafTips>> loadPhenotypingSetupAndLeafTips(const std::string& folder)
 {
 	// Convert the output of the calibration script to a CSV file that can be read by readAndApplyTranslationsFromCsv()
 	// Use the following line (and replace the name of files)
 	// convertCalibrationOutputToCsv(folder + "calibration_output.txt", folder + "calibration.csv");
 
-	const auto setup = loadPhenotypingSetup(folder + "/cameras/");
+	auto setup = loadPhenotypingSetup(folder + "/cameras/");
 	auto plants = readLeafTipsFromCSV(folder + "/leaf_tips.csv");
 	keepOnlyPlantsWithMultipleViews(plants);
 	// Apply the transformation from the image-based calibration
 	readAndApplyTranslationsFromCsv(folder + "/calibration.csv", plants);
-	// Only for top views there is a 90 degrees clockwise rotation
-	// TODO: apply the exact rotation from the SorghumReconstruction app (89.33f clockwise) with 2018 data set
-	apply90DegreesRotationToViews("TV_90", setup, plants);
+	const auto rotationDirection = loadTopViewRotationDirection(folder + "/tv_90_rotation.txt");
+	// Only for top views there is a 90 degrees rotation
+	// For the 2018 data set, the rotation is clockwise
+	// For the 2022 data set, the rotation is counterclockwise
+	apply90DegreesRotationToViews("TV_90", setup, rotationDirection, plants);
 	// Flip Y axis because our camera model origin is on the bottom left
 	flipYAxisOnAllPlants(setup, plants);
+
+	return { setup, plants };
+}
+
+void runPlantPhenotyping(const std::string& folder, const std::string& plantName)
+{
+	auto [setup, plants] = loadPhenotypingSetupAndLeafTips(folder);
+
+	// Select only the plant whose name is plantName
+	for (auto itPlant = plants.begin(); itPlant != plants.end();)
+	{
+		if (itPlant->plantName() != plantName)
+		{
+			itPlant = plants.erase(itPlant);
+		}
+		else
+		{
+			++itPlant;
+		}
+	}
+
+	if (plants.empty())
+	{
+		std::cerr << "Could not find the plant: " << plantName << std::endl;
+		return;
+	}
+	
+	const auto viewNames = plants.front().getAllViews();
+	const auto points = plants.front().pointsFromViews(viewNames);
+	const auto cameras = setup.camerasFromViews(viewNames);
+	const auto rays = computeRays(cameras, points);
+	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays);
+
+	// Export the scene
+	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
+}
+
+void runLeafCounting(
+	const std::string& folder,
+	const std::string& outputFileNumberLeaves,
+	const std::string& outputFileAnnotationsPerView)
+{
+	const auto [setup, plants] = loadPhenotypingSetupAndLeafTips(folder);
 
 	std::vector<std::pair<std::string, int>> numberLeafTips(plants.size());
 
@@ -623,7 +665,7 @@ int main(int argc, char *argv[])
 		testCorrespondenceWithThreshold(0.5f);
 		testCorrespondenceWithThreshold(2.0f);
 	}
-	else if (command == "plant_phenotyping")
+	else if (command == "plant_phenotyping_example")
 	{
 		if (args.empty())
 		{
@@ -633,7 +675,20 @@ int main(int argc, char *argv[])
 		}
 
 		// Example with a plant in a phenotyping facility
-		runPlantPhenotyping(args[0]);
+		runPlantPhenotypingExample(args[0]);
+	}
+	else if (command == "plant_phenotyping")
+	{
+		if (args.size() < 2)
+		{
+			std::cerr << "Missing arguments for plant phenotyping" << std::endl;
+			std::cerr << "Argument 1: Path to the folder for the phenotyping setup." << std::endl;
+			std::cerr << "Argument 2: Name of the plant to inspect." << std::endl;
+			return 1;
+		}
+
+		// Triangulating leaf tips for a set of manually annotated plants
+		runPlantPhenotyping(args[0], args[1]);
 	}
 	else if (command == "leaf_counting")
 	{
@@ -643,7 +698,7 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 
-		// Example with counting leaves for a set of manually annotated plants
+		// Counting leaves for a set of manually annotated plants
 		runLeafCounting(args[0], args[1], args[2]);
 	}
 	else if (command == "measure_crocodile")

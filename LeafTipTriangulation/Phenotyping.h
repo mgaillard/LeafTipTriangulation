@@ -91,11 +91,25 @@ public:
 	/**
 	 * \brief Apply a 90 degrees clockwise rotation to all points from a view
 	 *        The center of the rotation is the center of the image, therefore we need the resolution
+	 *		  The image starts with resolution (width, height)
+	 *		  After the rotation the resolution is still (width, height)
 	 * \param viewName The name of the view
 	 * \param imageWidth Resolution of the image on the X axis
 	 * \param imageHeight Resolution of the image on the Y axis
 	 */
-	void apply90DegreesRotationToView(const std::string& viewName, double imageWidth, double imageHeight);
+	void apply90DegreesClockwiseRotationToView(const std::string& viewName, double imageWidth, double imageHeight);
+
+	/**
+	 * \brief Apply a 90 degrees counterclockwise rotation to all points from a view
+	 *        The center of the rotation is the center of the image, therefore we need the resolution
+	 *		  The image starts with resolution (height, width)
+	 *		  After the rotation the resolution is still (width, height)
+	 * \param viewName The name of the view
+	 * \param imageWidth Resolution of the image on the X axis
+	 * \param imageHeight Resolution of the image on the Y axis
+	 */
+	void apply90DegreesCounterClockwiseRotationToView(const std::string& viewName, double imageWidth, double imageHeight);
+
 
 	/**
 	 * \brief Flip the coordinates of points on the Y axis
@@ -127,6 +141,20 @@ private:
 
 };
 
+enum class RotationDirection
+{
+	Unknown,
+	Clockwise,
+	Counterclockwise
+};
+
+/**
+ * \brief Load the rotation direction for the top view
+ * \param rotationFile Path to the file containing the rotation direction
+ * \return The rotation 
+ */
+RotationDirection loadTopViewRotationDirection(const std::string& rotationFile);
+
 /**
  * \brief Load a phenotyping setup
  * \param cameraFolder Path to the folder containing the camera calibration files
@@ -152,11 +180,13 @@ void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantLeafTi
  * \brief Apply a 90 degrees clockwise rotation to points in a view for a list of plants
  * \param viewName The name of the view
  * \param setup The phenotyping setup used to image the plants
+ * \param rotationDirection The direction of the rotation
  * \param plants The list of plants to modify
  */
 void apply90DegreesRotationToViews(const std::string& viewName,
-	                               const PhenotypingSetup& setup,
-	                               std::vector<PlantLeafTips>& plants);
+                                   const PhenotypingSetup& setup,
+                                   const RotationDirection& rotationDirection,
+                                   std::vector<PlantLeafTips>& plants);
 
 /**
  * \brief Convert the output of the calibration script to a CSV file

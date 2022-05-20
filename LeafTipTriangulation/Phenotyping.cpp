@@ -154,7 +154,10 @@ void PlantLeafTips::applyTranslationToView(const std::string& viewName, const gl
 	}
 }
 
-void PlantLeafTips::apply90DegreesRotationToView(const std::string& viewName, double imageWidth, double imageHeight)
+void PlantLeafTips::apply90DegreesClockwiseRotationToView(
+	const std::string& viewName,
+	double imageWidth,
+	double imageHeight)
 {
 	if (m_points.count(viewName) > 0)
 	{
@@ -169,7 +172,37 @@ void PlantLeafTips::apply90DegreesRotationToView(const std::string& viewName, do
 			// y' = x
 			std::swap(point.x, point.y);
 			point.x = -point.x;
+
+			// Translate the points back to the center of rotation
+			// We apply the opposite transformation
+			//  - width/2 is added to the X axis
+			//  - height/2 is added to the Y axis
+			// We do this because the image is rotated, but the canvas stays the same
+			point.x += static_cast<float>(imageWidth) / 2.f;
+			point.y += static_cast<float>(imageHeight) / 2.f;
+		}
+	}
+}
+
+void PlantLeafTips::apply90DegreesCounterClockwiseRotationToView(
+	const std::string& viewName,
+	double imageWidth,
+	double imageHeight)
+{
+	if (m_points.count(viewName) > 0)
+	{
+		for (auto& point : m_points[viewName])
+		{
+			// Inverse translate the points from the center of rotation
+			point.x -= static_cast<float>(imageHeight) / 2.f;
+			point.y -= static_cast<float>(imageWidth) / 2.f;
 			
+			// Apply the following transformation (rotation 90 deg counter-clockwise)
+			// x' = y
+			// y' = -x
+			std::swap(point.x, point.y);
+			point.y = -point.y;
+
 			// Translate the points back to the center of rotation
 			// We apply the opposite transformation
 			//  - width/2 is added to the X axis
@@ -213,6 +246,32 @@ std::vector<std::vector<glm::vec2>> PlantLeafTips::pointsFromViews(const std::ve
 	}
 
 	return points;
+}
+
+RotationDirection loadTopViewRotationDirection(const std::string& rotationFile)
+{
+	auto direction = RotationDirection::Unknown;
+
+	std::ifstream file(rotationFile);
+
+	if (file.is_open())
+	{
+		std::string directionString;
+		file >> directionString;
+
+		if (directionString == "CW")
+		{
+			direction = RotationDirection::Clockwise;
+		}
+		else if (directionString == "CCW")
+		{
+			direction = RotationDirection::Counterclockwise;
+		}
+
+		file.close();
+	}
+
+	return direction;
 }
 
 PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder)
@@ -345,12 +404,20 @@ void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantLeafTi
 }
 
 void apply90DegreesRotationToViews(const std::string& viewName,
-	                               const PhenotypingSetup& setup,
-	                               std::vector<PlantLeafTips>& plants)
+                                   const PhenotypingSetup& setup,
+                                   const RotationDirection& rotationDirection,
+                                   std::vector<PlantLeafTips>& plants)
 {
 	for (auto& plant : plants)
 	{
-		plant.apply90DegreesRotationToView(viewName, setup.imageWidth(), setup.imageHeight());
+		if (rotationDirection == RotationDirection::Clockwise)
+		{
+			plant.apply90DegreesClockwiseRotationToView(viewName, setup.imageWidth(), setup.imageHeight());
+		}
+		else if (rotationDirection == RotationDirection::Counterclockwise)
+		{
+			plant.apply90DegreesCounterClockwiseRotationToView(viewName, setup.imageWidth(), setup.imageHeight());
+		}
 	}
 }
 
