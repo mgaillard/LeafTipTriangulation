@@ -1,16 +1,19 @@
 #!/bin/bash
 
+LeafTipTriangulationCmd="./build/bin/Release/LeafTipTriangulation.exe"
+phenotype="tips"
+
 mkdir -p results
 
 # Processing the sorghum 2018 dataset
 mkdir -p results/sorghum_2018
-./build/bin/Release/LeafTipTriangulation.exe leaf_counting Phenotyping/sorghum_2018 0 0.0 results/sorghum_2018/results.csv results/sorghum_2018/nb_annotations.csv
+$LeafTipTriangulationCmd leaf_counting Phenotyping/sorghum_2018 $phenotype 0 0.0 results/sorghum_2018/results.csv results/sorghum_2018/nb_annotations.csv
 python3 Phenotyping/scripts/compare_to_ground_truth.py --command graphs --input results/sorghum_2018/results.csv --truth Phenotyping/sorghum_2018/annotations/ground_truth.csv --output results/sorghum_2018
 
 # Processing the sorghum 2022 dataset
 mkdir -p results/sorghum_2022
 python3 Phenotyping/scripts/convert_cvat_to_csv.py --input Phenotyping/sorghum_2022/annotations/annotations.xml > Phenotyping/sorghum_2022/leaf_tips.csv
-./build/bin/Release/LeafTipTriangulation.exe leaf_counting Phenotyping/sorghum_2022 0 0.0 results/sorghum_2022/results.csv results/sorghum_2022/nb_annotations.csv
+$LeafTipTriangulationCmd leaf_counting Phenotyping/sorghum_2022 $phenotype 0 0.0 results/sorghum_2022/results.csv results/sorghum_2022/nb_annotations.csv
 python3 Phenotyping/scripts/compare_to_ground_truth.py --command graphs --input results/sorghum_2022/results.csv --truth Phenotyping/sorghum_2022/annotations/ground_truth.csv --output results/sorghum_2022
 
 # Merge the results of the two datasets and compare to observations
@@ -35,7 +38,7 @@ do
     do    
         resultCsvFile="$directory/results_${s}_${p}.csv"
         annotationCsvFile="$directory/nb_annotations_${s}_${p}.csv"
-        ./build/bin/Release/LeafTipTriangulation.exe leaf_counting Phenotyping/sorghum_2022 $s $probability $resultCsvFile $annotationCsvFile
+        $LeafTipTriangulationCmd leaf_counting Phenotyping/sorghum_2022 $phenotype $s $probability $resultCsvFile $annotationCsvFile
         python3 Phenotyping/scripts/compare_to_ground_truth.py --command values --input $resultCsvFile --truth Phenotyping/sorghum_2022/annotations/ground_truth.csv --output results/sorghum_2022 >> $resultProbabilityFile
         rm $resultCsvFile
         rm $annotationCsvFile

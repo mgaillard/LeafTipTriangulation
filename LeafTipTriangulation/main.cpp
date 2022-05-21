@@ -466,14 +466,15 @@ void runPlantPhenotypingExample(const std::string& folder)
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 
-std::tuple<PhenotypingSetup, std::vector<PlantPhenotypePoints>> loadPhenotypingSetupAndLeafTips(const std::string& folder)
+std::tuple<PhenotypingSetup, std::vector<PlantPhenotypePoints>>
+loadPhenotypingSetupAndPhenotypePoints(const std::string& folder, PlantPhenotypePointType type)
 {
 	// Convert the output of the calibration script to a CSV file that can be read by readAndApplyTranslationsFromCsv()
 	// Use the following line (and replace the name of files)
 	// convertCalibrationOutputToCsv(folder + "calibration_output.txt", folder + "calibration.csv");
 
 	auto setup = loadPhenotypingSetup(folder + "/cameras/");
-	auto plants = readLeafTipsFromCSV(folder + "/leaf_tips.csv");
+	auto plants = readPhenotypePointsFromCsv(folder + "/leaf_tips.csv", type);
 	keepOnlyPlantsWithMultipleViews(plants);
 	// Apply the transformation from the image-based calibration
 	readAndApplyTranslationsFromCsv(folder + "/calibration.csv", plants);
@@ -490,7 +491,7 @@ std::tuple<PhenotypingSetup, std::vector<PlantPhenotypePoints>> loadPhenotypingS
 
 void runPlantPhenotyping(const std::string& folder, const std::string& plantName)
 {
-	auto [setup, plants] = loadPhenotypingSetupAndLeafTips(folder);
+	auto [setup, plants] = loadPhenotypingSetupAndPhenotypePoints(folder, PlantPhenotypePointType::LeafTip);
 
 	// Select only the plant whose name is plantName
 	for (auto itPlant = plants.begin(); itPlant != plants.end();)
@@ -526,12 +527,25 @@ void runPlantPhenotyping(const std::string& folder, const std::string& plantName
 
 void runLeafCounting(
 	const std::string& folder,
+	const std::string& phenotype,
 	unsigned int seed,
 	double probabilityDiscard,
 	const std::string& outputFileNumberLeaves,
 	const std::string& outputFileAnnotationsPerView)
 {
-	auto [setup, plants] = loadPhenotypingSetupAndLeafTips(folder);
+	// By default, triangulate leaf tips
+	PlantPhenotypePointType type = PlantPhenotypePointType::LeafTip;
+
+	if (phenotype == "tips")
+	{
+		type = PlantPhenotypePointType::LeafTip;
+	}
+	else if (phenotype == "junctions")
+	{
+		type = PlantPhenotypePointType::LeafJunction;
+	}
+
+	auto [setup, plants] = loadPhenotypingSetupAndPhenotypePoints(folder, type);
 
 	spdlog::info("Triangulating leaves for {} plants in the folder {}", plants.size(), folder);
 	
@@ -710,23 +724,25 @@ int main(int argc, char *argv[])
 	}
 	else if (command == "leaf_counting")
 	{
-		if (args.size() < 5)
+		if (args.size() < 6)
 		{
 			spdlog::error("Missing arguments for leaf counting");
 			spdlog::error("Argument 1: Path to the folder for the phenotyping setup.");
-			spdlog::error("Argument 2: Random seed (unsigned integer).");
-			spdlog::error("Argument 3: Percentage of points to discard between 0.0 and 1.0.");
-			spdlog::error("Argument 4: Output CSV file for the number of leaves.");
-			spdlog::error("Argument 5: Output CSV file for statistics about plants.");
+			spdlog::error("Argument 2: Phenotype to triangulate and count (tips, junctions).");
+			spdlog::error("Argument 3: Random seed (unsigned integer).");
+			spdlog::error("Argument 4: Percentage of points to discard between 0.0 and 1.0.");
+			spdlog::error("Argument 5: Output CSV file for the number of leaves.");
+			spdlog::error("Argument 6: Output CSV file for statistics about plants.");
 			return 1;
 		}
 
 		// Counting leaves for a set of manually annotated plants
 		runLeafCounting(args[0],
-						std::stoul(args[1]),
-		                std::stod(args[2]),
-		                args[3],
-		                args[4]);
+						args[1],
+						std::stoul(args[2]),
+		                std::stod(args[3]),
+		                args[4],
+		                args[5]);
 	}
 	else if (command == "measure_crocodile")
 	{

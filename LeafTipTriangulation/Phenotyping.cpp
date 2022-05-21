@@ -317,7 +317,7 @@ PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder)
 	};
 }
 
-std::vector<PlantPhenotypePoints> readLeafTipsFromCSV(const std::string& filename)
+std::vector<PlantPhenotypePoints> readPhenotypePointsFromCsv(const std::string& filename, PlantPhenotypePointType type)
 {
 	// Regex to match the name of the plant
 	const std::string matchPlantName = R"((.+)_Vis_(\w{2}_\d+)\.(?:png|jpg))";
@@ -347,11 +347,14 @@ std::vector<PlantPhenotypePoints> readLeafTipsFromCSV(const std::string& filenam
 			std::smatch matchesInLine;
 			if (std::regex_match(line, matchesInLine, matchLeafTipLine) && matchesInLine.size() == 5)
 			{
-				const std::string plantName = matchesInLine[1];
-				const std::string plantView = matchesInLine[2];
+				const std::string& plantName = matchesInLine[1];
+				const std::string& plantView = matchesInLine[2];
+				const std::string& leafTipPoints = matchesInLine[3];
+				const std::string& junctionPoints = matchesInLine[4];
 				std::vector<glm::vec2> points;
 
-				std::string pointsString = matchesInLine[3];
+				// Based on which phenotype we want to read, read leaf tips or junctions
+				std::string pointsString = (type == PlantPhenotypePointType::LeafTip) ? leafTipPoints : junctionPoints;
 				std::smatch matchesInPoints;
 				while (std::regex_search(pointsString, matchesInPoints, matchPoint) && matchesInPoints.size() == 3)
 				{

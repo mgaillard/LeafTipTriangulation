@@ -175,6 +175,12 @@ private:
 
 };
 
+enum class PlantPhenotypePointType
+{
+	LeafTip,
+	LeafJunction
+};
+
 enum class RotationDirection
 {
 	Unknown,
@@ -199,9 +205,10 @@ PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder);
 /**
  * \brief Read leaf tips data from a CSV file
  * \param filename Path to the CSV file
+ * \param type Type of phenotype to read from the CSV file
  * \return A list of plants with their leaf tips
  */
-std::vector<PlantPhenotypePoints> readLeafTipsFromCSV(const std::string& filename);
+std::vector<PlantPhenotypePoints> readPhenotypePointsFromCsv(const std::string& filename, PlantPhenotypePointType type);
 
 /**
  * \brief Flip the Y axis coordinates of a list of plants according to a phenotyping setup
