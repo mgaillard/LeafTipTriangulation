@@ -538,7 +538,7 @@ void runLeafCounting(
 	if (probabilityDiscard > 0.0)
 	{
 		spdlog::debug("Discarding points with probability {:.2f} % (seed = {:d})", 100.0 * probabilityDiscard, seed);
-		discardLeafTipsRandomly(seed, probabilityDiscard, plants);
+		discardPointsRandomly(seed, probabilityDiscard, plants);
 	}
 
 	std::vector<std::pair<std::string, int>> numberLeafTips(plants.size());

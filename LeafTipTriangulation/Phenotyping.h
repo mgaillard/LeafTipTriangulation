@@ -124,7 +124,7 @@ public:
 	 * \param probability A probability to discard a leaf tip
 	 */
 	template<class RandomGenerator>
-	void discardLeafTipsRandomly(RandomGenerator& generator, double probability)
+	void discardPointsRandomly(RandomGenerator& generator, double probability)
 	{
 		std::uniform_real_distribution<double> dist(0.0, 1.0);
 
@@ -249,12 +249,12 @@ void keepOnlyPlantsWithMultipleViews(std::vector<PlantLeafTips>& plants);
 void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::vector<PlantLeafTips>& plants);
 
 /**
- * \brief Discard some annotated leaf tips randomly
+ * \brief Discard some annotated points randomly in the plant
  * \param seed Initialization value for the random generator
  * \param probability Probability to discard a point
  * \param plants The list of plants to process
  */
-void discardLeafTipsRandomly(unsigned int seed, double probability, std::vector<PlantLeafTips>& plants);
+void discardPointsRandomly(unsigned int seed, double probability, std::vector<PlantLeafTips>& plants);
 
 /**
  * \brief Find the 3D position of leaf tips in a plant
