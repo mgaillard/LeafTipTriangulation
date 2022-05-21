@@ -74,6 +74,31 @@ def vectors_results_truth(merged_result_lines):
     return x, y
 
 
+def compute_stats(x, y):
+    """
+    Compute statistics about results
+    Args:
+        x: Truth vector
+        y: Result vector
+
+    Returns: Linear regression, rmse, agreement
+
+    """
+    # Linear regression
+    res = stats.linregress(x, y)
+    line_a = res.slope
+    line_b = res.intercept
+    r_sq = res.rvalue ** 2
+
+    # RMSE computation
+    rmse = np.sqrt(np.mean((y - x) ** 2))
+
+    # Agreement in percentage
+    agreement = int(100.0 * np.count_nonzero(x == y) / len(x))
+
+    return line_a, line_b, r_sq, rmse, agreement
+
+
 def generate_scatter_plot(results, truths, output: Path):
     """
     Generate a scatter plot with a fitting line
@@ -116,19 +141,10 @@ def generate_scatter_plot(results, truths, output: Path):
     lower_bound = min(np.min(x), np.min(y))
     higher_bound = max(np.max(x), np.max(y))
 
-    # Linear regression
-    res = stats.linregress(original_x, original_y)
-    line_a = res.slope
-    line_b = res.intercept
-    r_sq = res.rvalue ** 2
+    # RMSE computation, Agreement in percentage, Linear regression
+    line_a, line_b, r_sq, rmse, agreement = compute_stats(original_x, original_y)
     line_x = np.linspace(lower_bound, higher_bound, 10)
     line_y = line_a * line_x + line_b
-
-    # RMSE computation
-    rmse = np.sqrt(np.mean((original_y - original_x) ** 2))
-
-    # Agreement in percentage
-    agreement = int(100.0 * np.count_nonzero(original_x == original_y) / len(original_x))
 
     # Plot
     fig, ax = plt.subplots(figsize=(4, 4), dpi=216)
@@ -184,20 +200,28 @@ def generate_histogram(results, truths, output: Path):
     plt.savefig(str(output), bbox_inches='tight')
 
 
-def compare_to_ground_truth(input_path: Path, truth_path: Path, output_path: Path):
+def compare_to_ground_truth_graphs(input_path: Path, truth_path: Path, output_path: Path):
     result_lines = read_csv(input_path)
     truth_lines = read_csv(truth_path)
     results_with_truth = merge_results_with_ground_truth(result_lines, truth_lines)
-
-    for result in results_with_truth:
-        logging.info('{}\t{}\t{}'.format(result['name'], result['result'], result['truth']))
-
     results, truths = vectors_results_truth(results_with_truth)
 
     # Linear regression between result and ground-truth
     generate_scatter_plot(results, truths, output_path.joinpath('scatter.png'))
     # Histogram of the absolute difference in leaf counted
     generate_histogram(results, truths, output_path.joinpath('histogram.png'))
+
+
+def compare_to_ground_truth_values(input_path: Path, truth_path: Path):
+    result_lines = read_csv(input_path)
+    truth_lines = read_csv(truth_path)
+    results_with_truth = merge_results_with_ground_truth(result_lines, truth_lines)
+    results, truths = vectors_results_truth(results_with_truth)
+
+    x = np.array(truths)
+    y = np.array(results)
+    line_a, line_b, r_sq, rmse, agreement = compute_stats(x, y)
+    print('{}\t{}\t{}'.format(r_sq, rmse, agreement))
 
 
 def add_logging_arguments(parser):
@@ -237,6 +261,9 @@ def main() -> int:
     # Arguments for logging
     add_logging_arguments(parser)
     # Argument for the input CSV file
+    parser.add_argument('--command', type=str, help='Command to execute, either',
+                        default='values', choices=['graphs', 'values'])
+    # Argument for the input CSV file
     parser.add_argument('--input', type=str, help='Path to the result CSV file (required)', default='')
     # Argument for the ground-truth CSV file
     parser.add_argument('--truth', type=str, help='Path to the ground-truth CSV file (required)', default='')
@@ -248,7 +275,7 @@ def main() -> int:
     init_logging(args.log, args.log_file)
 
     # Check arguments exist
-    if not args.input or not args.truth or not args.output:
+    if not args.command or not args.input or not args.truth or not args.output:
         parser.print_help(sys.stderr)
         return 1
 
@@ -262,7 +289,10 @@ def main() -> int:
         return 1
 
     # Execute the command
-    compare_to_ground_truth(input_path, truth_path, output_path)
+    if args.command == 'graphs':
+        compare_to_ground_truth_graphs(input_path, truth_path, output_path)
+    else:
+        compare_to_ground_truth_values(input_path, truth_path)
 
     return 0
 

@@ -1,0 +1,12 @@
+#!/usr/bin/gnuplot
+reset
+set terminal pdf
+
+set xlabel 'Percentage of points discarded'
+set ylabel 'Agreement (%)'
+
+set yrange [0:100]
+
+set key bottom right
+
+plot filename using 1:4 with linespoints notitle
