@@ -32,7 +32,7 @@ public:
 	 *        If one of the views is not available, it will not be added to the output list of cameras
 	 * \return A subset of cameras from a list of view names
 	 */
-	std::vector<Camera> camerasFromViews(const std::vector<std::string>& viewNames) const;
+	[[nodiscard]] std::vector<Camera> camerasFromViews(const std::vector<std::string>& viewNames) const;
 
 	/**
 	 * \brief Remove a view from the phenotyping setup
@@ -50,30 +50,30 @@ private:
 	std::vector<Camera> m_cameras;
 };
 
-class PlantLeafTips
+class PlantPhenotypePoints
 {
 public:
-	PlantLeafTips() = default;
-	explicit PlantLeafTips(std::string plantName);
+	PlantPhenotypePoints() = default;
+	explicit PlantPhenotypePoints(std::string plantName);
 
 	/**
 	 * \brief Return the name of the plant
 	 * \return The name of the plant
 	 */
-	const std::string& plantName() const;
+	[[nodiscard]] const std::string& plantName() const;
 
 	/**
 	 * \brief Return the list of all views that have points
 	 * \return The list of all views that have points
 	 */
-	std::vector<std::string> getAllViews() const;
+	[[nodiscard]] std::vector<std::string> getAllViews() const;
 
 	/**
 	 * \brief Check if the plant has all views in a list
 	 * \param viewNames A list of view names
 	 * \return True if the plant has all views, false otherwise
 	 */
-	bool hasAllViews(const std::vector<std::string>& viewNames) const;
+	[[nodiscard]] bool hasAllViews(const std::vector<std::string>& viewNames) const;
 
 	/**
 	 * \brief Add 2D points seen from a view
@@ -109,7 +109,9 @@ public:
 	 * \param imageWidth Resolution of the image on the X axis
 	 * \param imageHeight Resolution of the image on the Y axis
 	 */
-	void apply90DegreesCounterClockwiseRotationToView(const std::string& viewName, double imageWidth, double imageHeight);
+	void apply90DegreesCounterClockwiseRotationToView(const std::string& viewName,
+	                                                  double imageWidth,
+	                                                  double imageHeight);
 
 	/**
 	 * \brief Flip the coordinates of points on the Y axis
@@ -161,7 +163,7 @@ public:
 	 * \param viewNames The list of views where points are required, for example: {SV_0, SV_36, SV_72}
 	 * \return A list of lists of 2D points
 	 */
-	std::vector<std::vector<glm::vec2>> pointsFromViews(const std::vector<std::string>& viewNames) const;
+	[[nodiscard]] std::vector<std::vector<glm::vec2>> pointsFromViews(const std::vector<std::string>& viewNames) const;
 
 private:
 
@@ -199,14 +201,14 @@ PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder);
  * \param filename Path to the CSV file
  * \return A list of plants with their leaf tips
  */
-std::vector<PlantLeafTips> readLeafTipsFromCSV(const std::string& filename);
+std::vector<PlantPhenotypePoints> readLeafTipsFromCSV(const std::string& filename);
 
 /**
  * \brief Flip the Y axis coordinates of a list of plants according to a phenotyping setup
  * \param setup The phenotyping setup used to image the plants
  * \param plants The list of plants to modify
  */
-void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantLeafTips>& plants);
+void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantPhenotypePoints>& plants);
 
 /**
  * \brief Apply a 90 degrees clockwise rotation to points in a view for a list of plants
@@ -218,7 +220,7 @@ void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantLeafTi
 void apply90DegreesRotationToViews(const std::string& viewName,
                                    const PhenotypingSetup& setup,
                                    const RotationDirection& rotationDirection,
-                                   std::vector<PlantLeafTips>& plants);
+                                   std::vector<PlantPhenotypePoints>& plants);
 
 /**
  * \brief Convert the output of the calibration script to a CSV file
@@ -233,20 +235,20 @@ void convertCalibrationOutputToCsv(const std::string& inputFilename, const std::
  * \param filename Path to the CSV file
  * \param plants List of plants on which to apply the transformations
  */
-void readAndApplyTranslationsFromCsv(const std::string& filename, std::vector<PlantLeafTips>& plants);
+void readAndApplyTranslationsFromCsv(const std::string& filename, std::vector<PlantPhenotypePoints>& plants);
 
 /**
  * \brief Only keep plants in the list with at least two views (required for 3D triangulation)
  * \param plants The list of plants to filter
  */
-void keepOnlyPlantsWithMultipleViews(std::vector<PlantLeafTips>& plants);
+void keepOnlyPlantsWithMultipleViews(std::vector<PlantPhenotypePoints>& plants);
 
 /**
  * \brief Only keep plants in the list with all views
  * \param viewNames A list of name of views
  * \param plants The list of plants to filter
  */
-void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::vector<PlantLeafTips>& plants);
+void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::vector<PlantPhenotypePoints>& plants);
 
 /**
  * \brief Discard some annotated points randomly in the plant
@@ -254,7 +256,7 @@ void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::
  * \param probability Probability to discard a point
  * \param plants The list of plants to process
  */
-void discardPointsRandomly(unsigned int seed, double probability, std::vector<PlantLeafTips>& plants);
+void discardPointsRandomly(unsigned int seed, double probability, std::vector<PlantPhenotypePoints>& plants);
 
 /**
  * \brief Find the 3D position of leaf tips in a plant
@@ -262,7 +264,7 @@ void discardPointsRandomly(unsigned int seed, double probability, std::vector<Pl
  * \param plantLeafTips The leaf tips of the plant
  * \return A list of 3D points that correspond to the leaf tips
  */
-std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const PlantLeafTips& plantLeafTips);
+std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const PlantPhenotypePoints& plantLeafTips);
 
 /**
  * \brief Draw a list of points in 2D image
@@ -284,7 +286,7 @@ bool drawPointsInImage(const std::string& filename,
  */
 bool exportPlantStatsToCsv(const std::string& filename,
 	                       const PhenotypingSetup& setup,
-	                       const std::vector<PlantLeafTips>& plants);
+	                       const std::vector<PlantPhenotypePoints>& plants);
 
 /**
  * \brief Save the number of leaves per plant in a CSV file

@@ -466,7 +466,7 @@ void runPlantPhenotypingExample(const std::string& folder)
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 
-std::tuple<PhenotypingSetup, std::vector<PlantLeafTips>> loadPhenotypingSetupAndLeafTips(const std::string& folder)
+std::tuple<PhenotypingSetup, std::vector<PlantPhenotypePoints>> loadPhenotypingSetupAndLeafTips(const std::string& folder)
 {
 	// Convert the output of the calibration script to a CSV file that can be read by readAndApplyTranslationsFromCsv()
 	// Use the following line (and replace the name of files)

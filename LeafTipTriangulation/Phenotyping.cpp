@@ -94,17 +94,17 @@ bool PhenotypingSetup::removeView(const std::string& viewName)
 	return success;
 }
 
-PlantLeafTips::PlantLeafTips(std::string plantName) : m_plantName(std::move(plantName))
+PlantPhenotypePoints::PlantPhenotypePoints(std::string plantName) : m_plantName(std::move(plantName))
 {
 	
 }
 
-const std::string& PlantLeafTips::plantName() const
+const std::string& PlantPhenotypePoints::plantName() const
 {
 	return m_plantName;
 }
 
-std::vector<std::string> PlantLeafTips::getAllViews() const
+std::vector<std::string> PlantPhenotypePoints::getAllViews() const
 {
 	std::vector<std::string> viewNames;
 
@@ -116,7 +116,7 @@ std::vector<std::string> PlantLeafTips::getAllViews() const
 	return viewNames;
 }
 
-bool PlantLeafTips::hasAllViews(const std::vector<std::string>& viewNames) const
+bool PlantPhenotypePoints::hasAllViews(const std::vector<std::string>& viewNames) const
 {
 	for (const auto& viewName : viewNames)
 	{
@@ -129,7 +129,7 @@ bool PlantLeafTips::hasAllViews(const std::vector<std::string>& viewNames) const
 	return true;
 }
 
-void PlantLeafTips::addPointsFromView(const std::string& viewName, const std::vector<glm::vec2>& points)
+void PlantPhenotypePoints::addPointsFromView(const std::string& viewName, const std::vector<glm::vec2>& points)
 {
 	if (m_points.count(viewName) > 0)
 	{
@@ -143,7 +143,7 @@ void PlantLeafTips::addPointsFromView(const std::string& viewName, const std::ve
 	}	
 }
 
-void PlantLeafTips::applyTranslationToView(const std::string& viewName, const glm::vec2& translation)
+void PlantPhenotypePoints::applyTranslationToView(const std::string& viewName, const glm::vec2& translation)
 {
 	if (m_points.count(viewName) > 0)
 	{
@@ -154,7 +154,7 @@ void PlantLeafTips::applyTranslationToView(const std::string& viewName, const gl
 	}
 }
 
-void PlantLeafTips::apply90DegreesClockwiseRotationToView(
+void PlantPhenotypePoints::apply90DegreesClockwiseRotationToView(
 	const std::string& viewName,
 	double imageWidth,
 	double imageHeight)
@@ -184,7 +184,7 @@ void PlantLeafTips::apply90DegreesClockwiseRotationToView(
 	}
 }
 
-void PlantLeafTips::apply90DegreesCounterClockwiseRotationToView(
+void PlantPhenotypePoints::apply90DegreesCounterClockwiseRotationToView(
 	const std::string& viewName,
 	double imageWidth,
 	double imageHeight)
@@ -214,7 +214,7 @@ void PlantLeafTips::apply90DegreesCounterClockwiseRotationToView(
 	}
 }
 
-void PlantLeafTips::flipYAxis(double imageHeight)
+void PlantPhenotypePoints::flipYAxis(double imageHeight)
 {
 	for (auto& points : m_points)
 	{
@@ -225,7 +225,7 @@ void PlantLeafTips::flipYAxis(double imageHeight)
 	}
 }
 
-std::vector<glm::vec2> PlantLeafTips::pointsFromView(const std::string& viewName) const
+std::vector<glm::vec2> PlantPhenotypePoints::pointsFromView(const std::string& viewName) const
 {
 	if (m_points.count(viewName) > 0)
 	{
@@ -236,7 +236,7 @@ std::vector<glm::vec2> PlantLeafTips::pointsFromView(const std::string& viewName
 	return {};
 }
 
-std::vector<std::vector<glm::vec2>> PlantLeafTips::pointsFromViews(const std::vector<std::string>& viewNames) const
+std::vector<std::vector<glm::vec2>> PlantPhenotypePoints::pointsFromViews(const std::vector<std::string>& viewNames) const
 {
 	std::vector<std::vector<glm::vec2>> points;
 
@@ -317,7 +317,7 @@ PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder)
 	};
 }
 
-std::vector<PlantLeafTips> readLeafTipsFromCSV(const std::string& filename)
+std::vector<PlantPhenotypePoints> readLeafTipsFromCSV(const std::string& filename)
 {
 	// Regex to match the name of the plant
 	const std::string matchPlantName = R"((.+)_Vis_(\w{2}_\d+)\.(?:png|jpg))";
@@ -334,7 +334,7 @@ std::vector<PlantLeafTips> readLeafTipsFromCSV(const std::string& filename)
 	const std::regex matchPoint(R"(\[(\d+),\s(\d+)\])");
 
 	// Plants indexed by name
-	std::unordered_map<std::string, PlantLeafTips> plants;
+	std::unordered_map<std::string, PlantPhenotypePoints> plants;
 
 	std::ifstream file(filename);
 
@@ -372,7 +372,7 @@ std::vector<PlantLeafTips> readLeafTipsFromCSV(const std::string& filename)
 					if (itPlant == plants.end())
 					{
 						// The plant does not already exist, we add it
-						std::tie(itPlant, std::ignore) = plants.emplace(plantName, PlantLeafTips(plantName));
+						std::tie(itPlant, std::ignore) = plants.emplace(plantName, PlantPhenotypePoints(plantName));
 					}
 
 					// The plant already exists, we only add the points from the view
@@ -385,7 +385,7 @@ std::vector<PlantLeafTips> readLeafTipsFromCSV(const std::string& filename)
 	}
 
 	// Convert the map of plants to a list of plants
-	std::vector<PlantLeafTips> plantList(plants.size());
+	std::vector<PlantPhenotypePoints> plantList(plants.size());
 	std::transform(plants.begin(), plants.end(), plantList.begin(),
 		[](auto pair)
 		{
@@ -395,7 +395,7 @@ std::vector<PlantLeafTips> readLeafTipsFromCSV(const std::string& filename)
 	return plantList;
 }
 
-void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantLeafTips>& plants)
+void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantPhenotypePoints>& plants)
 {
 	for (auto& plant : plants)
 	{
@@ -406,7 +406,7 @@ void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantLeafTi
 void apply90DegreesRotationToViews(const std::string& viewName,
                                    const PhenotypingSetup& setup,
                                    const RotationDirection& rotationDirection,
-                                   std::vector<PlantLeafTips>& plants)
+                                   std::vector<PlantPhenotypePoints>& plants)
 {
 	for (auto& plant : plants)
 	{
@@ -482,7 +482,7 @@ void convertCalibrationOutputToCsv(const std::string& inputFilename, const std::
 	outputFile.close();
 }
 
-void readAndApplyTranslationsFromCsv(const std::string& filename, std::vector<PlantLeafTips>& plants)
+void readAndApplyTranslationsFromCsv(const std::string& filename, std::vector<PlantPhenotypePoints>& plants)
 {
 	// Regex to match the name of the plant
 	const std::string matchPlantName = R"((.+)_Vis_(\w{2}_\d+)\.(?:png|jpg))";
@@ -515,7 +515,7 @@ void readAndApplyTranslationsFromCsv(const std::string& filename, std::vector<Pl
 
 				// Find the plant whose name is plantName in the list
 				auto plantIt = std::find_if(plants.begin(), plants.end(),
-					[&plantName](const PlantLeafTips& plant)
+					[&plantName](const PlantPhenotypePoints& plant)
 					{
 						return plant.plantName() == plantName;
 					});
@@ -532,12 +532,12 @@ void readAndApplyTranslationsFromCsv(const std::string& filename, std::vector<Pl
 	}
 }
 
-void keepOnlyPlantsWithMultipleViews(std::vector<PlantLeafTips>& plants)
+void keepOnlyPlantsWithMultipleViews(std::vector<PlantPhenotypePoints>& plants)
 {
 	// Send plants without all views at the end of the list
 	const auto endIt = std::remove_if(plants.begin(),
 	                                  plants.end(),
-	                                  [](const PlantLeafTips& p) -> bool
+	                                  [](const PlantPhenotypePoints& p) -> bool
 	                                  {
 		                                  return p.getAllViews().size() <= 1;
 	                                  });
@@ -546,12 +546,12 @@ void keepOnlyPlantsWithMultipleViews(std::vector<PlantLeafTips>& plants)
 	plants.erase(endIt, plants.end());
 }
 
-void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::vector<PlantLeafTips>& plants)
+void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::vector<PlantPhenotypePoints>& plants)
 {
 	// Send plants without all views at the end of the list
 	const auto endIt = std::remove_if(plants.begin(),
 	                                  plants.end(),
-	                                  [&viewNames](const PlantLeafTips& p) -> bool
+	                                  [&viewNames](const PlantPhenotypePoints& p) -> bool
 	                                  {
 		                                  return !p.hasAllViews(viewNames);
 	                                  });
@@ -560,7 +560,7 @@ void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::
 	plants.erase(endIt, plants.end());
 }
 
-void discardPointsRandomly(unsigned seed, double probability, std::vector<PlantLeafTips>& plants)
+void discardPointsRandomly(unsigned int seed, double probability, std::vector<PlantPhenotypePoints>& plants)
 {
 	std::default_random_engine generator(seed);
 
@@ -570,7 +570,7 @@ void discardPointsRandomly(unsigned seed, double probability, std::vector<PlantL
 	}
 }
 
-std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const PlantLeafTips& plantLeafTips)
+std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const PlantPhenotypePoints& plantLeafTips)
 {
 	// Get the list of views from which the plant was annotated, order does matter
 	const auto viewNames = plantLeafTips.getAllViews();
@@ -613,7 +613,7 @@ bool drawPointsInImage(const std::string& filename,
 bool exportPlantStatsToCsv(
 	const std::string& filename,
 	const PhenotypingSetup& setup,
-	const std::vector<PlantLeafTips>& plants)
+	const std::vector<PlantPhenotypePoints>& plants)
 {
 	std::ofstream file(filename, std::ofstream::out);
 
