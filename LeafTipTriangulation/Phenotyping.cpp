@@ -291,6 +291,59 @@ PlantPhenotypePointType readPhenotypingPointTypeFromString(const std::string& ph
 	return type;
 }
 
+std::string translateViewNameToFilename(const std::string& viewName, const std::string& extension)
+{
+	std::string filename;
+
+	if (viewName == "SV_0")
+	{
+		filename = "0_0_0";
+	}
+	else if (viewName == "SV_36")
+	{
+		filename = "0_36_0";
+	}
+	else if (viewName == "SV_72")
+	{
+		filename = "0_72_0";
+	}
+	else if (viewName == "SV_108")
+	{
+		filename = "0_108_0";
+	}
+	else if (viewName == "SV_144")
+	{
+		filename = "0_144_0";
+	}
+	else if (viewName == "SV_216")
+	{
+		filename = "0_216_0";
+	}
+	else if (viewName == "SV_252")
+	{
+		filename = "0_252_0";
+	}
+	else if (viewName == "SV_288")
+	{
+		filename = "0_288_0";
+	}
+	else if (viewName == "SV_324")
+	{
+		filename = "0_324_0";
+	}
+	else if (viewName == "TV_90")
+	{
+		filename = "top_0_90_0";
+	}
+	else
+	{
+		// By default the view name is "default", which will most likely not exist and trigger an error.
+		filename = "default";
+	}
+
+	return filename + '.' + extension;
+}
+
 PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder)
 {
 	const std::array<std::pair<std::string, std::string>, 10> viewCameraNames = {{
@@ -618,13 +671,17 @@ bool drawPointsInImage(const std::string& filename,
 		return false;
 	}
 
+	// The radius of points is 0.5% of the largest dimension of the image
+	const auto radius = std::max(image.rows, image.cols) / 200;
+	const auto thickness = radius / 2;
+
 	for (const auto& point : points)
 	{
 		cv::circle(image,
 		           cv::Point2f(point.x, static_cast<float>(image.rows) - point.y),
-		           5,
+		           radius,
 		           cv::Scalar(255, 0, 0),
-		           2);
+		           thickness);
 	}
 
 	return cv::imwrite(filename, image);

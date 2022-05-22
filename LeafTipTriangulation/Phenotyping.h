@@ -204,6 +204,14 @@ RotationDirection loadTopViewRotationDirection(const std::string& rotationFile);
 PlantPhenotypePointType readPhenotypingPointTypeFromString(const std::string& phenotype);
 
 /**
+ * \brief Translate a view name like "SV_0" to a filename like "0_0_0.png"
+ * \param viewName The view name. For example: "SV_0", "SV_72", "TV_90"
+ * \param extension Extension for the filename (jpg, png) 
+ * \return The filename corresponding to the view name
+ */
+std::string translateViewNameToFilename(const std::string& viewName, const std::string& extension);
+
+/**
  * \brief Load a phenotyping setup
  * \param cameraFolder Path to the folder containing the camera calibration files
  * \return A phenotyping setup

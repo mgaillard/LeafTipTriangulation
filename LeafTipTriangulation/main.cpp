@@ -1,4 +1,5 @@
 #include <chrono>
+#include <filesystem>
 #include <iostream>
 #include <tuple>
 #include <vector>
@@ -15,6 +16,8 @@
 #include "RayMatching.h"
 #include "Reconstruction.h"
 #include "SyntheticData.h"
+
+namespace fs = std::filesystem;
 
 struct Parameters
 {
@@ -561,6 +564,77 @@ void runLeafCounting(
 	exportNumberLeavesToCsv(outputFileNumberLeaves, numberLeafTips);
 }
 
+void runExportAnnotations(
+	const std::string& annotationFolderStr,
+	const std::string& phenotype,
+	const std::string& imageFolderStr,
+	const std::string& outputFolderStr)
+{
+	const fs::path annotationFolder(annotationFolderStr);
+	const fs::path imageFolder(imageFolderStr);
+	const fs::path outputFolder(outputFolderStr);
+
+	if (!fs::exists(annotationFolder) || !fs::is_directory(annotationFolder))
+	{
+		spdlog::error("The annotation folder {} does not exist.", annotationFolderStr);
+		return;
+	}
+
+	if (!fs::exists(imageFolder) || !fs::is_directory(imageFolder))
+	{
+		spdlog::error("The image folder {} does not exist.", imageFolderStr);
+		return;
+	}
+
+	if (!fs::exists(outputFolder) || !fs::is_directory(outputFolder))
+	{
+		spdlog::error("The output folder {} does not exist.", outputFolderStr);
+		return;
+	}
+
+	const auto type = readPhenotypingPointTypeFromString(phenotype);
+	auto [setup, plants] = loadPhenotypingSetupAndPhenotypePoints(annotationFolderStr, type);
+
+	spdlog::info("Exporting annotations for {} plants in the folder {}", plants.size(), annotationFolderStr);
+
+	for (const auto& plant : plants)
+	{
+		spdlog::debug("Exporting annotations for plant {}", plant.plantName());
+
+		const auto plantFolder = imageFolder / plant.plantName();
+		const auto outputPlantFolder = outputFolder / plant.plantName();
+
+		// If the folder with original images of the plant does not exist, raise warning and move on
+		if (!fs::exists(plantFolder))
+		{
+			spdlog::warn("Could not open the plant folder for {}.", plant.plantName());
+			continue;
+		}
+
+		// If the output folder does not exist, create it
+		fs::create_directory(outputPlantFolder);
+
+		const auto viewNames = plant.getAllViews();
+		#pragma omp parallel for 
+		for (int i = 0; i < static_cast<int>(viewNames.size()); i++)
+		{
+			const auto& viewName = viewNames[i];
+			const auto filename = translateViewNameToFilename(viewName, "png");
+			const auto viewFile = plantFolder / filename;
+			const auto outputViewFile = outputPlantFolder / filename;
+
+			if (!fs::exists(viewFile))
+			{
+				spdlog::warn("Could not open the view file {} for plant {}.", filename, plant.plantName());
+				continue;
+			}
+
+			const auto points = plant.pointsFromView(viewName);
+			drawPointsInImage(outputViewFile.string(), viewFile.string(), points);
+		}
+	}
+}
+
 void runCrocodileMeasurement()
 {
 	// X axis is from left to right
@@ -734,6 +808,21 @@ int main(int argc, char *argv[])
 		                std::stod(args[3]),
 		                args[4],
 		                args[5]);
+	}
+	else if (command == "export_annotations")
+	{
+		if (args.size() < 4)
+		{
+			spdlog::error("Missing arguments for leaf counting");
+			spdlog::error("Argument 1: Path to the folder for the phenotyping setup.");
+			spdlog::error("Argument 2: Phenotype to triangulate and count (tips, junctions).");
+			spdlog::error("Argument 3: Path to the folder with images.");
+			spdlog::error("Argument 4: Path to the output folder.");
+
+			return 1;
+		}
+
+		runExportAnnotations(args[0], args[1], args[2], args[3]);
 	}
 	else if (command == "measure_crocodile")
 	{
