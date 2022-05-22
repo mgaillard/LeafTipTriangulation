@@ -274,6 +274,23 @@ RotationDirection loadTopViewRotationDirection(const std::string& rotationFile)
 	return direction;
 }
 
+PlantPhenotypePointType readPhenotypingPointTypeFromString(const std::string& phenotype)
+{
+	// By default, triangulate leaf tips
+	auto type = PlantPhenotypePointType::LeafTip;
+
+	if (phenotype == "tips")
+	{
+		type = PlantPhenotypePointType::LeafTip;
+	}
+	else if (phenotype == "junctions")
+	{
+		type = PlantPhenotypePointType::LeafJunction;
+	}
+
+	return type;
+}
+
 PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder)
 {
 	const std::array<std::pair<std::string, std::string>, 10> viewCameraNames = {{

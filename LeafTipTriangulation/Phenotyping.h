@@ -196,6 +196,14 @@ enum class RotationDirection
 RotationDirection loadTopViewRotationDirection(const std::string& rotationFile);
 
 /**
+ * \brief Read the type of phenotype from a string
+ *        By default, return PlantPhenotypePointType::LeafTip
+ * \param phenotype The string of the phenotype ("tips", "junctions")
+ * \return The corresponding value in the enum class PlantPhenotypePointType
+ */
+PlantPhenotypePointType readPhenotypingPointTypeFromString(const std::string& phenotype);
+
+/**
  * \brief Load a phenotyping setup
  * \param cameraFolder Path to the folder containing the camera calibration files
  * \return A phenotyping setup

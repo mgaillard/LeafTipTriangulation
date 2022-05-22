@@ -489,9 +489,10 @@ loadPhenotypingSetupAndPhenotypePoints(const std::string& folder, PlantPhenotype
 	return { setup, plants };
 }
 
-void runPlantPhenotyping(const std::string& folder, const std::string& plantName)
+void runPlantPhenotyping(const std::string& folder, const std::string& phenotype, const std::string& plantName)
 {
-	auto [setup, plants] = loadPhenotypingSetupAndPhenotypePoints(folder, PlantPhenotypePointType::LeafTip);
+	const auto type = readPhenotypingPointTypeFromString(phenotype);
+	auto [setup, plants] = loadPhenotypingSetupAndPhenotypePoints(folder, type);
 
 	// Select only the plant whose name is plantName
 	for (auto itPlant = plants.begin(); itPlant != plants.end();)
@@ -533,18 +534,7 @@ void runLeafCounting(
 	const std::string& outputFileNumberLeaves,
 	const std::string& outputFileAnnotationsPerView)
 {
-	// By default, triangulate leaf tips
-	PlantPhenotypePointType type = PlantPhenotypePointType::LeafTip;
-
-	if (phenotype == "tips")
-	{
-		type = PlantPhenotypePointType::LeafTip;
-	}
-	else if (phenotype == "junctions")
-	{
-		type = PlantPhenotypePointType::LeafJunction;
-	}
-
+	const auto type = readPhenotypingPointTypeFromString(phenotype);
 	auto [setup, plants] = loadPhenotypingSetupAndPhenotypePoints(folder, type);
 
 	spdlog::info("Triangulating leaves for {} plants in the folder {}", plants.size(), folder);
@@ -711,16 +701,17 @@ int main(int argc, char *argv[])
 	}
 	else if (command == "plant_phenotyping")
 	{
-		if (args.size() < 2)
+		if (args.size() < 3)
 		{
 			spdlog::error("Missing arguments for plant phenotyping");
 			spdlog::error("Argument 1: Path to the folder for the phenotyping setup.");
-			spdlog::error("Argument 2: Name of the plant to inspect.");
+			spdlog::error("Argument 2: Phenotype to triangulate and count (tips, junctions).");
+			spdlog::error("Argument 3: Name of the plant to inspect.");
 			return 1;
 		}
 
 		// Triangulating leaf tips for a set of manually annotated plants
-		runPlantPhenotyping(args[0], args[1]);
+		runPlantPhenotyping(args[0], args[1], args[2]);
 	}
 	else if (command == "leaf_counting")
 	{
