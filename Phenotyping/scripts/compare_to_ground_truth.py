@@ -106,6 +106,7 @@ def generate_scatter_plot(results, truths, output: Path):
     truths = [3, 6, 4]
     """
     # Convert to Numpy
+    number_results = len(results)
     original_x = np.array(truths)
     original_y = np.array(results)
     # Compute the number of occurrence of the pairs (observation, prediction)
@@ -151,7 +152,7 @@ def generate_scatter_plot(results, truths, output: Path):
 
     # Text box in upper left in axes coords, with info about regression
     ax.text(0.05, 0.95,
-            'R^2: {:.3f}\nRMSE: {:.3f}\nAgreement: {:d} %'.format(r_sq, rmse, agreement),
+            'R^2: {:.3f}\nRMSE: {:.3f}\nAgreement: {:d} %\nN: {:d}'.format(r_sq, rmse, agreement, number_results),
             transform=ax.transAxes,
             fontsize=12,
             verticalalignment='top')
@@ -191,7 +192,7 @@ def generate_histogram(results, truths, output: Path):
     # Plot
     fig, ax = plt.subplots(figsize=(4, 4), dpi=216)
 
-    ax.hist(diff, bins=np.arange(-n_bins, n_bins + 1), rwidth=0.95, align='left')
+    ax.hist(diff, bins=np.arange(-n_bins, n_bins + 2), rwidth=0.95, align='left')
 
     ax.set_xlabel('Human observation - Predictions')
     ax.set_ylabel('Count')
