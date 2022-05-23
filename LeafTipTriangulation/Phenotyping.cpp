@@ -240,6 +240,7 @@ std::vector<std::vector<glm::vec2>> PlantPhenotypePoints::pointsFromViews(const 
 {
 	std::vector<std::vector<glm::vec2>> points;
 
+	points.reserve(viewNames.size());
 	for (const auto& viewName : viewNames)
 	{
 		points.push_back(pointsFromView(viewName));
