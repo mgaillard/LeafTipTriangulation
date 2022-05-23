@@ -593,7 +593,11 @@ void runExportAnnotations(
 	}
 
 	const auto type = readPhenotypingPointTypeFromString(phenotype);
-	auto [setup, plants] = loadPhenotypingSetupAndPhenotypePoints(annotationFolderStr, type);
+	// Note that annotations are not calibrated to reflect exactly what was clicked by the annotators
+	const auto setup = loadPhenotypingSetup(annotationFolderStr + "/cameras/");
+	auto plants = readPhenotypePointsFromCsv(annotationFolderStr + "/leaf_tips.csv", type);
+	// Flip Y axis because our camera model origin is on the bottom left
+	flipYAxisOnAllPlants(setup, plants);
 
 	spdlog::info("Exporting annotations for {} plants in the folder {}", plants.size(), annotationFolderStr);
 
@@ -601,14 +605,37 @@ void runExportAnnotations(
 	{
 		spdlog::debug("Exporting annotations for plant {}", plant.plantName());
 
-		const auto plantFolder = imageFolder / plant.plantName();
 		const auto outputPlantFolder = outputFolder / plant.plantName();
+		auto plantFolder = imageFolder / plant.plantName();
 
 		// If the folder with original images of the plant does not exist, raise warning and move on
 		if (!fs::exists(plantFolder))
 		{
-			spdlog::warn("Could not open the plant folder for {}.", plant.plantName());
-			continue;
+			spdlog::warn("Could not open the plant folder for {}. Trying to find matches...", plant.plantName());
+
+			// Try to look for similar directory names
+			bool alternativeFound = false;
+			for (const auto& entry : fs::directory_iterator(imageFolder))
+			{
+				if (entry.is_directory())
+				{
+					// If the name of the directory contains the name of the current plant, we try to use it
+					const auto directoryName = entry.path().filename().string();
+					if (directoryName.find(plant.plantName()) != std::string::npos)
+					{
+						spdlog::warn("Using plant folder {} instead", directoryName);
+						plantFolder = entry.path();
+						alternativeFound = true;
+						break;
+					}
+				}
+			}
+
+			if (!alternativeFound)
+			{
+				spdlog::warn("Could not find any alternative folder, skipping plant.");
+				continue;
+			}
 		}
 
 		// If the output folder does not exist, create it
