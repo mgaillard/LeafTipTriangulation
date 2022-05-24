@@ -644,7 +644,8 @@ void discardPointsRandomly(unsigned int seed, double probability, std::vector<Pl
 	}
 }
 
-std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const PlantPhenotypePoints& plantLeafTips)
+std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>>
+triangulateLeafTips(const PhenotypingSetup& setup, const PlantPhenotypePoints& plantLeafTips)
 {
 	// Get the list of views from which the plant was annotated, order does matter
 	const auto viewNames = plantLeafTips.getAllViews();
@@ -655,9 +656,7 @@ std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const 
 	// Un-project annotated 2D points and get 3D rays
 	const auto rays = computeRays(cameras, points);
 	// Triangulate the 3D points
-	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays);
-
-	return triangulatedPoints3D;
+	return matchRaysAndTriangulate(cameras, points, rays);
 }
 
 bool drawPointsInImage(const std::string& filename,
@@ -683,6 +682,61 @@ bool drawPointsInImage(const std::string& filename,
 		           radius,
 		           cv::Scalar(255, 0, 0),
 		           thickness);
+	}
+
+	return cv::imwrite(filename, image);
+}
+
+bool drawPointsInImageWithMatches(
+	const std::string& filename,
+	const std::string& backgroundImage,
+	const std::vector<glm::vec2>& annotationPoints,
+	const std::vector<glm::vec2>& projectionPoints,
+	const std::vector<int>& projectionMatches)
+{
+	auto image = cv::imread(backgroundImage);
+
+	// Could not open the background image
+	if (image.data == nullptr)
+	{
+		return false;
+	}
+
+	// The radius of points is 0.5% of the largest dimension of the image
+	const auto radius = std::max(image.rows, image.cols) / 200;
+	const auto thickness = radius / 2;
+
+	for (const auto& point : annotationPoints)
+	{
+		cv::circle(image,
+		           cv::Point2f(point.x, static_cast<float>(image.rows) - point.y),
+		           radius,
+		           cv::Scalar(0, 0, 255),
+		           thickness);
+	}
+
+	for (const auto& point : projectionPoints)
+	{
+		cv::circle(image,
+		           cv::Point2f(point.x, static_cast<float>(image.rows) - point.y),
+		           radius,
+		           cv::Scalar(255, 0, 0),
+		           thickness);
+	}
+
+	// Display matches with lines between points
+	for (unsigned int i = 0; i < projectionMatches.size(); i++)
+	{
+		// Draw a line between projection i and annotation match[i]
+		const auto indexMatch = projectionMatches[i];
+
+		if (indexMatch >= 0 && indexMatch < annotationPoints.size())
+		{
+			cv::Point2f pt1(projectionPoints[i].x, static_cast<float>(image.rows) - projectionPoints[i].y);
+			cv::Point2f pt2(annotationPoints[indexMatch].x, static_cast<float>(image.rows) - annotationPoints[indexMatch].y);
+
+			cv::line(image, pt1, pt2, cv::Scalar(255, 0, 0), thickness);
+		}
 	}
 
 	return cv::imwrite(filename, image);

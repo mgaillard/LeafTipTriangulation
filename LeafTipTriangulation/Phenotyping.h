@@ -285,13 +285,14 @@ void discardPointsRandomly(unsigned int seed, double probability, std::vector<Pl
  * \brief Find the 3D position of leaf tips in a plant
  * \param setup The phenotyping setup used to image the plant
  * \param plantLeafTips The leaf tips of the plant
- * \return A list of 3D points that correspond to the leaf tips
+ * \return A list of 3D points that correspond to the leaf tips and the correspondences
  */
-std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const PlantPhenotypePoints& plantLeafTips);
+std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>>
+triangulateLeafTips(const PhenotypingSetup& setup, const PlantPhenotypePoints& plantLeafTips);
 
 /**
  * \brief Draw a list of points in 2D image
- * \param filename The filename of the image
+ * \param filename The filename where the resulting image is saved
  * \param backgroundImage Image to load as background
  * \param points A list of 2D points to draw in the image
  * \return True if the image was successfully saved, false otherwise
@@ -299,6 +300,22 @@ std::vector<glm::vec3> triangulateLeafTips(const PhenotypingSetup& setup, const 
 bool drawPointsInImage(const std::string& filename,
 					   const std::string& backgroundImage,
                        const std::vector<glm::vec2>& points);
+
+/**
+ * \brief Draw a list of points with their matches in a 2D image
+ * \param filename The filename where the resulting image is saved
+ * \param backgroundImage Image to load as background
+ * \param annotationPoints A list of 2D points to draw in the image, corresponding to annotations
+ * \param projectionPoints A list of 2D points to draw in the image, corresponding to projected 3D points
+ * \param projectionMatches For each point in the projectionPoints list, index of the match in the annotationPoints
+ *                          If there is no match, the index is -1
+ * \return True if the image was successfully saved, false otherwise
+ */
+bool drawPointsInImageWithMatches(const std::string& filename,
+                                  const std::string& backgroundImage,
+                                  const std::vector<glm::vec2>& annotationPoints,
+                                  const std::vector<glm::vec2>& projectionPoints,
+	                              const std::vector<int>& projectionMatches);
 
 /**
  * \brief Export a table of the statistics of loaded plants
