@@ -109,10 +109,10 @@ public:
 	void applyTranslationToView(const std::string& viewName, const glm::vec2& translation);
 	
 	/**
-	 * \brief Apply a 90 degrees counterclockwise rotation to all points from a view
+	 * \brief Apply a 90 degrees rotation to all points from a view
 	 *        The center of the rotation is the center of the image, therefore we need the resolution
 	 *		  The image starts with resolution (height, width)
-	 *		  After the rotation the resolution is still (width, height)
+	 *		  After the rotation the resolution can be changed
 	 * \param viewName The name of the view
 	 * \param rotationDirection The rotation direction for the points and the images
 	 * \param imageWidth Resolution of the image on the X axis
@@ -184,6 +184,18 @@ private:
 	std::unordered_map<std::string, std::vector<glm::vec2>> m_points;
 
 };
+
+/**
+ * \brief Apply a 90 degrees rotation to a list of points
+ * \param rotationDirection The rotation direction for the points and the images
+ * \param imageWidth Resolution of the image on the X axis
+ * \param imageHeight Resolution of the image on the Y axis
+ * \param points A list of 2D points to rotate
+ */
+void apply90DegreesRotationToPoints(const RotationDirection& rotationDirection,
+                                    double imageWidth,
+                                    double imageHeight,
+                                    std::vector<glm::vec2>& points);
 
 /**
  * \brief Load the rotation direction for the top view

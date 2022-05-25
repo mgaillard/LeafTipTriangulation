@@ -162,53 +162,7 @@ void PlantPhenotypePoints::apply90DegreesRotationToView(
 {
 	if (m_points.count(viewName) > 0)
 	{
-		for (auto& point : m_points[viewName])
-		{
-			if (rotationDirection == RotationDirection::CounterclockwiseWithCanvas
-				|| rotationDirection == RotationDirection::ClockwiseWithCanvas)
-			{
-				// Inverse translate the points from the center of rotation
-				point.x -= static_cast<float>(imageHeight) / 2.f;
-				point.y -= static_cast<float>(imageWidth) / 2.f;
-			}
-			else if (rotationDirection == RotationDirection::CounterclockwiseWithoutCanvas
-				|| rotationDirection == RotationDirection::ClockwiseWithoutCanvas)
-			{
-				// Inverse translate the points from the center of rotation
-				point.x -= static_cast<float>(imageWidth) / 2.f;
-				point.y -= static_cast<float>(imageHeight) / 2.f;
-			}
-
-			if (rotationDirection == RotationDirection::CounterclockwiseWithCanvas
-				|| rotationDirection == RotationDirection::CounterclockwiseWithoutCanvas)
-			{
-				// Apply the following transformation (rotation 90 deg counter-clockwise)
-				// x' = y
-				// y' = -x
-				std::swap(point.x, point.y);
-				point.y = -point.y;
-			}
-			else if (rotationDirection == RotationDirection::ClockwiseWithCanvas
-				|| rotationDirection == RotationDirection::ClockwiseWithoutCanvas)
-			{
-				// Apply the following transformation (rotation 90 deg clockwise)
-				// x' = -y
-				// y' = x
-				std::swap(point.x, point.y);
-				point.x = -point.x;
-			}
-
-			if (rotationDirection != RotationDirection::Unknown)
-			{
-				// Translate the points back to the center of rotation
-				// We apply the opposite transformation
-				//  - width/2 is added to the X axis
-				//  - height/2 is added to the Y axis
-				// We do this because the image is rotated, but the canvas stays the same
-				point.x += static_cast<float>(imageWidth) / 2.f;
-				point.y += static_cast<float>(imageHeight) / 2.f;
-			}
-		}
+		apply90DegreesRotationToPoints(rotationDirection, imageWidth, imageHeight, m_points[viewName]);
 	}
 }
 
@@ -245,6 +199,61 @@ std::vector<std::vector<glm::vec2>> PlantPhenotypePoints::pointsFromViews(const 
 	}
 
 	return points;
+}
+
+void apply90DegreesRotationToPoints(
+	const RotationDirection& rotationDirection,
+	double imageWidth,
+	double imageHeight,
+	std::vector<glm::vec2>& points)
+{
+	for (auto& point : points)
+	{
+		if (rotationDirection == RotationDirection::CounterclockwiseWithCanvas
+			|| rotationDirection == RotationDirection::ClockwiseWithCanvas)
+		{
+			// Inverse translate the points from the center of rotation
+			point.x -= static_cast<float>(imageHeight) / 2.f;
+			point.y -= static_cast<float>(imageWidth) / 2.f;
+		}
+		else if (rotationDirection == RotationDirection::CounterclockwiseWithoutCanvas
+			|| rotationDirection == RotationDirection::ClockwiseWithoutCanvas)
+		{
+			// Inverse translate the points from the center of rotation
+			point.x -= static_cast<float>(imageWidth) / 2.f;
+			point.y -= static_cast<float>(imageHeight) / 2.f;
+		}
+
+		if (rotationDirection == RotationDirection::CounterclockwiseWithCanvas
+			|| rotationDirection == RotationDirection::CounterclockwiseWithoutCanvas)
+		{
+			// Apply the following transformation (rotation 90 deg counter-clockwise)
+			// x' = y
+			// y' = -x
+			std::swap(point.x, point.y);
+			point.y = -point.y;
+		}
+		else if (rotationDirection == RotationDirection::ClockwiseWithCanvas
+			|| rotationDirection == RotationDirection::ClockwiseWithoutCanvas)
+		{
+			// Apply the following transformation (rotation 90 deg clockwise)
+			// x' = -y
+			// y' = x
+			std::swap(point.x, point.y);
+			point.x = -point.x;
+		}
+
+		if (rotationDirection != RotationDirection::Unknown)
+		{
+			// Translate the points back to the center of rotation
+			// We apply the opposite transformation
+			//  - width/2 is added to the X axis
+			//  - height/2 is added to the Y axis
+			// We do this because the image is rotated, but the canvas stays the same
+			point.x += static_cast<float>(imageWidth) / 2.f;
+			point.y += static_cast<float>(imageHeight) / 2.f;
+		}
+	}
 }
 
 RotationDirection loadTopViewRotationDirection(const std::string& rotationFile)
