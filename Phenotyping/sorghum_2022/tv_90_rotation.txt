@@ -1,1 +1,1 @@
-CCW
+CounterclockwiseWithCanvas

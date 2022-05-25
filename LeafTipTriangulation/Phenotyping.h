@@ -11,6 +11,25 @@
 
 #include "Camera.h"
 
+enum class PlantPhenotypePointType
+{
+	LeafTip,
+	LeafJunction
+};
+
+enum class RotationDirection
+{
+	Unknown,
+	// Rotate the points in the image, and the image
+	ClockwiseWithCanvas,
+	// Rotate the points in the image, but not the image
+	ClockwiseWithoutCanvas,
+	// Rotate the points in the image, and the image
+	CounterclockwiseWithCanvas,
+	// Rotate the points in the image, but not the image
+	CounterclockwiseWithoutCanvas
+};
+
 class PhenotypingSetup
 {
 public:
@@ -88,30 +107,21 @@ public:
 	 * \param translation The 2D translation to apply
 	 */
 	void applyTranslationToView(const std::string& viewName, const glm::vec2& translation);
-
-	/**
-	 * \brief Apply a 90 degrees clockwise rotation to all points from a view
-	 *        The center of the rotation is the center of the image, therefore we need the resolution
-	 *		  The image starts with resolution (width, height)
-	 *		  After the rotation the resolution is still (width, height)
-	 * \param viewName The name of the view
-	 * \param imageWidth Resolution of the image on the X axis
-	 * \param imageHeight Resolution of the image on the Y axis
-	 */
-	void apply90DegreesClockwiseRotationToView(const std::string& viewName, double imageWidth, double imageHeight);
-
+	
 	/**
 	 * \brief Apply a 90 degrees counterclockwise rotation to all points from a view
 	 *        The center of the rotation is the center of the image, therefore we need the resolution
 	 *		  The image starts with resolution (height, width)
 	 *		  After the rotation the resolution is still (width, height)
 	 * \param viewName The name of the view
+	 * \param rotationDirection The rotation direction for the points and the images
 	 * \param imageWidth Resolution of the image on the X axis
 	 * \param imageHeight Resolution of the image on the Y axis
 	 */
-	void apply90DegreesCounterClockwiseRotationToView(const std::string& viewName,
-	                                                  double imageWidth,
-	                                                  double imageHeight);
+	void apply90DegreesRotationToView(const std::string& viewName,
+	                                  const RotationDirection& rotationDirection,
+	                                  double imageWidth,
+	                                  double imageHeight);
 
 	/**
 	 * \brief Flip the coordinates of points on the Y axis
@@ -173,19 +183,6 @@ private:
 	// Views can be named: SV_0, SV_36, SV_72, ..., TV_90
 	std::unordered_map<std::string, std::vector<glm::vec2>> m_points;
 
-};
-
-enum class PlantPhenotypePointType
-{
-	LeafTip,
-	LeafJunction
-};
-
-enum class RotationDirection
-{
-	Unknown,
-	Clockwise,
-	Counterclockwise
 };
 
 /**
