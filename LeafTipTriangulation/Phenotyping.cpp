@@ -645,18 +645,71 @@ void discardPointsRandomly(unsigned int seed, double probability, std::vector<Pl
 }
 
 std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>>
-triangulateLeafTips(const PhenotypingSetup& setup, const PlantPhenotypePoints& plantLeafTips)
+triangulatePhenotypePoints(const PhenotypingSetup& setup, const PlantPhenotypePoints& plantPoints)
 {
 	// Get the list of views from which the plant was annotated, order does matter
-	const auto viewNames = plantLeafTips.getAllViews();
+	const auto viewNames = plantPoints.getAllViews();
 	// Get the 2D points in the same order as the views
-	const auto points = plantLeafTips.pointsFromViews(viewNames);
+	const auto points = plantPoints.pointsFromViews(viewNames);
 	// Get the cameras in the same order as the views
 	const auto cameras = setup.camerasFromViews(viewNames);
 	// Un-project annotated 2D points and get 3D rays
 	const auto rays = computeRays(cameras, points);
 	// Triangulate the 3D points
 	return matchRaysAndTriangulate(cameras, points, rays);
+}
+
+std::tuple<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<int>>>
+projectPhenotypePointsAndRetainMatches(
+	const PhenotypingSetup& setup,
+	const PlantPhenotypePoints& plantPoints,
+	const std::vector<glm::vec3>& triangulatedPoints3D,
+	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
+{
+	std::vector<std::vector<glm::vec2>> triangulatedPoints;
+	std::vector<std::vector<int>> triangulatedPointsMatches;
+
+	// Re-project 3D triangulated points on views
+	const auto viewNames = plantPoints.getAllViews();
+	const auto cameras = setup.camerasFromViews(viewNames);
+	for (int c = 0; c < static_cast<int>(cameras.size()); c++)
+	{
+		const auto& camera = cameras[c];
+		// Project 3D triangulated points 
+		std::vector<glm::vec2> viewTriangulatedPoints;
+		viewTriangulatedPoints.reserve(triangulatedPoints3D.size());
+		for (const auto& point : triangulatedPoints3D)
+		{
+			const auto point2D = camera.project(point);
+			// point2D is a vec3 but adding to the vector of glm::vec2 removes the Z coordinate
+			viewTriangulatedPoints.emplace_back(point2D);
+		}
+		// Add the projected points to the list of all projected points
+		triangulatedPoints.emplace_back(std::move(viewTriangulatedPoints));
+
+		// List matches between points
+		std::vector<int> viewTriangulatedPointsMatches;
+		viewTriangulatedPointsMatches.reserve(setsOfRays.size());
+		for (const auto& setOfRays : setsOfRays)
+		{
+			// Look for the annotated point in the current view that corresponds to the current triangulated point
+			int annotatedPointIndex = -1;
+			// setOfRays is a list of (cameraIndex, pointIndex) for a triangulated point
+			for (const auto& [cameraIndex, pointIndex] : setOfRays)
+			{
+				if (cameraIndex == c)
+				{
+					annotatedPointIndex = pointIndex;
+					break;
+				}
+			}
+			viewTriangulatedPointsMatches.push_back(annotatedPointIndex);
+		}
+		// Add the projected points to the list of all projected points
+		triangulatedPointsMatches.emplace_back(std::move(viewTriangulatedPointsMatches));
+	}
+
+	return { triangulatedPoints, triangulatedPointsMatches };
 }
 
 bool drawPointsInImage(const std::string& filename,

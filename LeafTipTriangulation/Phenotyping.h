@@ -282,13 +282,27 @@ void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::
 void discardPointsRandomly(unsigned int seed, double probability, std::vector<PlantPhenotypePoints>& plants);
 
 /**
- * \brief Find the 3D position of leaf tips in a plant
+ * \brief Find the 3D position of phenotype points in a plant
  * \param setup The phenotyping setup used to image the plant
- * \param plantLeafTips The leaf tips of the plant
- * \return A list of 3D points that correspond to the leaf tips and the correspondences
+ * \param plantPoints The phenotype points of the plant
+ * \return A list of 3D points that correspond to the phenotype points and the correspondences
  */
 std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>>
-triangulateLeafTips(const PhenotypingSetup& setup, const PlantPhenotypePoints& plantLeafTips);
+triangulatePhenotypePoints(const PhenotypingSetup& setup, const PlantPhenotypePoints& plantPoints);
+
+/**
+ * \brief Find the 3D position of phenotype points in a plant and retain matches between 3D points and 2D points
+ * \param setup The phenotyping setup used to image the plant
+ * \param plantPoints The phenotype points of the plant
+ * \param triangulatedPoints3D A list of 3D points triangulated that correspond to 2D points in the plant
+ * \param setsOfRays A list of correspondences that correspond to 2D points in the plant
+ * \return A list of 3D points that correspond to the phenotype points and the correspondences
+ */
+std::tuple<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<int>>>
+projectPhenotypePointsAndRetainMatches(const PhenotypingSetup& setup,
+                                       const PlantPhenotypePoints& plantPoints,
+                                       const std::vector<glm::vec3>& triangulatedPoints3D,
+                                       const std::vector<std::vector<std::pair<int, int>>>& setsOfRays);
 
 /**
  * \brief Draw a list of points in 2D image

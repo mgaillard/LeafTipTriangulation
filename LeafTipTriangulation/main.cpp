@@ -553,7 +553,7 @@ void runLeafCounting(
 	#pragma omp parallel for
 	for (int i = 0; i < static_cast<int>(plants.size()); i++)
 	{
-		const auto [triangulatedPoints3D, setsOfRays] = triangulateLeafTips(setup, plants[i]);
+		const auto [triangulatedPoints3D, setsOfRays] = triangulatePhenotypePoints(setup, plants[i]);
 		numberLeafTips[i].first = plants[i].plantName();
 		numberLeafTips[i].second = static_cast<int>(triangulatedPoints3D.size());
 	}
@@ -594,7 +594,7 @@ void runExportAnnotations(
 
 	const auto type = readPhenotypingPointTypeFromString(phenotype);
 	// Load list of plants for running the triangulation
-	auto [setup, plants_calibrated] = loadPhenotypingSetupAndPhenotypePoints(annotationFolderStr, type);
+	const auto [setup, plants_calibrated] = loadPhenotypingSetupAndPhenotypePoints(annotationFolderStr, type);
 	// Load again the list of plants without calibration
 	// Note that annotations are not calibrated to reflect exactly what was clicked by the annotators
 	auto plants = readPhenotypePointsFromCsv(annotationFolderStr + "/leaf_tips.csv", type);
@@ -607,51 +607,19 @@ void runExportAnnotations(
 	#pragma omp parallel for
 	for (int i = 0; i < static_cast<int>(plants_calibrated.size()); i++)
 	{
-		const auto [triangulatedPoints3D, setsOfRays] = triangulateLeafTips(setup, plants_calibrated[i]);
+		// Triangulate points of the plant
+		const auto [triangulatedPoints3D, setsOfRays] = triangulatePhenotypePoints(setup, plants_calibrated[i]);
+		// Re-project points of the plant on views, and retain correspondences with 2D to draw matches in views
+		auto [plantPoints, plantMatches] = projectPhenotypePointsAndRetainMatches(setup,
+			                                                                      plants_calibrated[i],
+			                                                                      triangulatedPoints3D,
+			                                                                      setsOfRays);
 
-		// TODO: extract function in Phenotyping.h
-		// Re-project points on views
-		const auto viewNames = plants_calibrated[i].getAllViews();
-		const auto cameras = setup.camerasFromViews(viewNames);
-		for (int c = 0; c < static_cast<int>(cameras.size()); c++)
-		{
-			const auto& camera = cameras[c];
-			// Project 3D triangulated points 
-			std::vector<glm::vec2> viewTriangulatedPoints;
-			viewTriangulatedPoints.reserve(triangulatedPoints3D.size());
-			for (const auto& point : triangulatedPoints3D)
-			{
-				const auto point2D = camera.project(point);
-				// point2D is a vec3 but adding to the vector of glm::vec2 removes the Z coordinate
-				viewTriangulatedPoints.emplace_back(point2D);
-			}
-			// Add the projected points to the list of all projected points
-			triangulatedPoints[i].emplace_back(std::move(viewTriangulatedPoints));
-
-			// List matches between points
-			std::vector<int> viewTriangulatedPointsMatches;
-			viewTriangulatedPointsMatches.reserve(setsOfRays.size());
-			for (const auto& setOfRays: setsOfRays)
-			{
-				// Look for the annotated point in the current view that corresponds to the current triangulated point
-				int annotatedPointIndex = -1;
-				// setOfRays is a list of (cameraIndex, pointIndex) for a triangulated point
-				for (const auto& [cameraIndex, pointIndex] : setOfRays)
-				{
-					if (cameraIndex == c)
-					{
-						annotatedPointIndex = pointIndex;
-						break;
-					}
-				}
-				viewTriangulatedPointsMatches.push_back(annotatedPointIndex);
-			}
-			// Add the projected points to the list of all projected points
-			triangulatedPointsMatches[i].emplace_back(std::move(viewTriangulatedPointsMatches));
-		}
-
-		// TODO: Apply the inverse transformation that was applied during calibration
+		triangulatedPoints[i] = std::move(plantPoints);
+		triangulatedPointsMatches[i] = std::move(plantMatches);
 	}
+
+	// TODO: Apply the inverse transformation that was applied during calibration
 
 	spdlog::info("Exporting annotations for {} plants in the folder {}", plants.size(), annotationFolderStr);
 
@@ -713,7 +681,6 @@ void runExportAnnotations(
 			}
 
 			const auto points = plant.pointsFromView(viewName);
-			// drawPointsInImage(outputViewFile.string(), viewFile.string(), points);
 			drawPointsInImageWithMatches(outputViewFile.string(),
 			                             viewFile.string(),
 			                             points,
