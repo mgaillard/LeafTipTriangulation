@@ -739,6 +739,26 @@ projectPhenotypePointsAndRetainMatches(
 	return { triangulatedPoints, triangulatedPointsMatches };
 }
 
+void applyInverseTranslationsOnPhenotypePoints(
+	const PlantImageTranslations& translations,
+	const std::string& plantName,
+	const std::vector<std::string>& viewNames,
+	std::vector<std::vector<glm::vec2>>& plantPoints)
+{
+	for (unsigned int v = 0; v < viewNames.size(); v++)
+	{
+		auto translation = translations.getTranslationForPlantAndView(plantName, viewNames[v]);
+
+		// Apply a translation of minus Y because the axis has been flipped previously
+		translation.y = -translation.y;
+
+		for (auto& viewPoint : plantPoints[v])
+		{
+			viewPoint -= translation;
+		}
+	}
+}
+
 bool drawPointsInImage(const std::string& filename,
                        const std::string& backgroundImage,
                        const std::vector<glm::vec2>& points)

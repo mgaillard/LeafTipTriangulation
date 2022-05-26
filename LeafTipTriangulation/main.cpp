@@ -602,6 +602,9 @@ void runExportAnnotations(
 	auto plants = readPhenotypePointsFromCsv(annotationFolderStr + "/leaf_tips.csv", type);
 	// Flip Y axis of annotations because our camera model origin is on the bottom left
 	flipYAxisOnAllPlants(setup, plants);
+	// Load the image translations to translate projected points back to the original images
+	PlantImageTranslations translations;
+	translations.loadFromCsv(annotationFolderStr + "/calibration.csv");
 
 	// Triangulate plants for displaying the results reprojected with the annotations
 	std::vector<std::vector<std::vector<glm::vec2>>> triangulatedPoints(plants_calibrated.size());
@@ -617,11 +620,15 @@ void runExportAnnotations(
 			                                                                      triangulatedPoints3D,
 			                                                                      setsOfRays);
 
+		// Apply the inverse translation that was applied during imaged based calibration to projected points
+		applyInverseTranslationsOnPhenotypePoints(translations,
+		                                          plants_calibrated[i].plantName(),
+		                                          plants_calibrated[i].getAllViews(),
+		                                          plantPoints);
+
 		triangulatedPoints[i] = std::move(plantPoints);
 		triangulatedPointsMatches[i] = std::move(plantMatches);
 	}
-
-	// TODO: Apply the inverse transformation that was applied during calibration
 
 	spdlog::info("Exporting annotations for {} plants in the folder {}", plants.size(), annotationFolderStr);
 

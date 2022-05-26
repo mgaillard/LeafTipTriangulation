@@ -353,6 +353,18 @@ projectPhenotypePointsAndRetainMatches(const PhenotypingSetup& setup,
                                        const std::vector<std::vector<std::pair<int, int>>>& setsOfRays);
 
 /**
+ * \brief Apply the inverse of image calibration translations to a set of projected points 
+ * \param translations The set of all image translations
+ * \param plantName The name of the plant
+ * \param viewNames The name of the views of the plant
+ * \param plantPoints A list of points projected on the views of the plant
+ */
+void applyInverseTranslationsOnPhenotypePoints(const PlantImageTranslations& translations,
+                                               const std::string& plantName,
+                                               const std::vector<std::string>& viewNames,
+                                               std::vector<std::vector<glm::vec2>>& plantPoints);
+
+/**
  * \brief Draw a list of points in 2D image
  * \param filename The filename where the resulting image is saved
  * \param backgroundImage Image to load as background
