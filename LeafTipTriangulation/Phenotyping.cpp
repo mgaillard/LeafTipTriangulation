@@ -113,6 +113,9 @@ std::vector<std::string> PlantPhenotypePoints::getAllViews() const
 		viewNames.push_back(viewName);
 	}
 
+	// Sort the name of views so that when executed in different contexts, the results are the same
+	std::sort(viewNames.begin(), viewNames.end());
+
 	return viewNames;
 }
 
