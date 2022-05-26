@@ -11,6 +11,30 @@
 
 #include "Camera.h"
 
+// ---------- Global constants for view names ----------
+const std::string ViewSv0 = "SV_0";
+const std::string ViewSv36 = "SV_36";
+const std::string ViewSv72 = "SV_72";
+const std::string ViewSv108 = "SV_108";
+const std::string ViewSv144 = "SV_144";
+const std::string ViewSv216 = "SV_216";
+const std::string ViewSv252 = "SV_252";
+const std::string ViewSv288 = "SV_288";
+const std::string ViewSv324 = "SV_324";
+const std::string ViewTv90 = "TV_90";
+
+// ---------- Global constants for views filename ----------
+const std::string ViewFileSv0 = "0_0_0";
+const std::string ViewFileSv36 = "0_36_0";
+const std::string ViewFileSv72 = "0_72_0";
+const std::string ViewFileSv108 = "0_108_0";
+const std::string ViewFileSv144 = "0_144_0";
+const std::string ViewFileSv216 = "0_216_0";
+const std::string ViewFileSv252 = "0_252_0";
+const std::string ViewFileSv288 = "0_288_0";
+const std::string ViewFileSv324 = "0_324_0";
+const std::string ViewFileTv90 = "top_0_90_0";
+
 enum class PlantPhenotypePointType
 {
 	LeafTip,
@@ -83,6 +107,7 @@ public:
 
 	/**
 	 * \brief Return the list of all views that have points
+	 *        The names of views are sorted in alphabetical order
 	 * \return The list of all views that have points
 	 */
 	[[nodiscard]] std::vector<std::string> getAllViews() const;

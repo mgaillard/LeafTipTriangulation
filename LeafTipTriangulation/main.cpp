@@ -434,12 +434,12 @@ void runPlantPhenotypingExample(const std::string& folder)
 
 	// List of annotated views
 	const std::vector<std::string> availableViews = {
-		"SV_0",
-		"SV_72",
-		"SV_144",
-		"SV_216",
-		"SV_288",
-		"TV_90"
+		ViewSv0,
+		ViewSv72,
+		ViewSv144,
+		ViewSv216,
+		ViewSv288,
+		ViewTv90
 	};
 
 	// List of all views available in the camera setup
@@ -487,7 +487,7 @@ loadPhenotypingSetupAndPhenotypePoints(const std::string& folder, PlantPhenotype
 	// Only for top views there is a 90 degrees rotation
 	// For the 2018 data set, the rotation is clockwise
 	// For the 2022 data set, the rotation is counterclockwise
-	apply90DegreesRotationToViews("TV_90", setup, rotationDirection, plants);
+	apply90DegreesRotationToViews(ViewTv90, setup, rotationDirection, plants);
 	// Flip Y axis because our camera model origin is on the bottom left
 	flipYAxisOnAllPlants(setup, plants);
 

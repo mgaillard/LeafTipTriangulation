@@ -383,45 +383,45 @@ std::string translateViewNameToFilename(const std::string& viewName, const std::
 {
 	std::string filename;
 
-	if (viewName == "SV_0")
+	if (viewName == ViewSv0)
 	{
-		filename = "0_0_0";
+		filename = ViewFileSv0;
 	}
-	else if (viewName == "SV_36")
+	else if (viewName == ViewSv36)
 	{
-		filename = "0_36_0";
+		filename = ViewFileSv36;
 	}
-	else if (viewName == "SV_72")
+	else if (viewName == ViewSv72)
 	{
-		filename = "0_72_0";
+		filename = ViewFileSv72;
 	}
-	else if (viewName == "SV_108")
+	else if (viewName == ViewSv108)
 	{
-		filename = "0_108_0";
+		filename = ViewFileSv108;
 	}
-	else if (viewName == "SV_144")
+	else if (viewName == ViewSv144)
 	{
-		filename = "0_144_0";
+		filename = ViewFileSv144;
 	}
-	else if (viewName == "SV_216")
+	else if (viewName == ViewSv216)
 	{
-		filename = "0_216_0";
+		filename = ViewFileSv216;
 	}
-	else if (viewName == "SV_252")
+	else if (viewName == ViewSv252)
 	{
-		filename = "0_252_0";
+		filename = ViewFileSv252;
 	}
-	else if (viewName == "SV_288")
+	else if (viewName == ViewSv288)
 	{
-		filename = "0_288_0";
+		filename = ViewFileSv288;
 	}
-	else if (viewName == "SV_324")
+	else if (viewName == ViewSv324)
 	{
-		filename = "0_324_0";
+		filename = ViewFileSv324;
 	}
-	else if (viewName == "TV_90")
+	else if (viewName == ViewTv90)
 	{
-		filename = "top_0_90_0";
+		filename = ViewFileTv90;
 	}
 	else
 	{
@@ -435,16 +435,16 @@ std::string translateViewNameToFilename(const std::string& viewName, const std::
 PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder)
 {
 	const std::array<std::pair<std::string, std::string>, 10> viewCameraNames = {{
-		{"SV_0", cameraFolder + "camera_0_0_0.txt"},
-		{"SV_36", cameraFolder + "camera_0_36_0.txt"},
-		{"SV_72", cameraFolder + "camera_0_72_0.txt"},
-		{"SV_108", cameraFolder + "camera_0_108_0.txt"},
-		{"SV_144", cameraFolder + "camera_0_144_0.txt"},
-		{"SV_216", cameraFolder + "camera_0_216_0.txt"},
-		{"SV_252", cameraFolder + "camera_0_252_0.txt"},
-		{"SV_288", cameraFolder + "camera_0_288_0.txt"},
-		{"SV_324", cameraFolder + "camera_0_324_0.txt"},
-		{"TV_90", cameraFolder + "camera_top_0_90_0.txt"}
+		{ViewSv0, cameraFolder + "camera_" + ViewFileSv0 + ".txt"},
+		{ViewSv36, cameraFolder + "camera_" + ViewFileSv36 + ".txt"},
+		{ViewSv72, cameraFolder + "camera_" + ViewFileSv72 + ".txt"},
+		{ViewSv108, cameraFolder + "camera_" + ViewFileSv108 + ".txt"},
+		{ViewSv144, cameraFolder + "camera_" + ViewFileSv144 + ".txt"},
+		{ViewSv216, cameraFolder + "camera_" + ViewFileSv216 + ".txt"},
+		{ViewSv252, cameraFolder + "camera_" + ViewFileSv252 + ".txt"},
+		{ViewSv288, cameraFolder + "camera_" + ViewFileSv288 + ".txt"},
+		{ViewSv324, cameraFolder + "camera_" + ViewFileSv324 + ".txt"},
+		{ViewTv90, cameraFolder + "camera_" + ViewFileTv90 + ".txt"}
 	}};
 
 	std::vector<std::string> views;
@@ -579,15 +579,15 @@ void convertCalibrationOutputToCsv(const std::string& inputFilename, const std::
 {
 	// Conversion between the name of the view in the calibration output and the name of the view in the CSV file
 	const std::unordered_map<std::string, std::string> viewName = {
-		{"0_0_0", "_Vis_SV_0.png"},
-		{"0_36_0", "_Vis_SV_36.png"},
-		{"0_72_0", "_Vis_SV_72.png"},
-		{"0_108_0", "_Vis_SV_108.png"},
-		{"0_144_0", "_Vis_SV_144.png"},
-		{"0_216_0", "_Vis_SV_216.png"},
-		{"0_288_0", "_Vis_SV_288.png"},
-		{"0_324_0", "_Vis_SV_324.png"},
-		{"top_0_90_0", "_Vis_TV_90.png"},
+		{"0_0_0", "_Vis_" + ViewSv0 + ".png"},
+		{"0_36_0", "_Vis_" + ViewSv36 + ".png"},
+		{"0_72_0", "_Vis_" + ViewSv72 + ".png"},
+		{"0_108_0", "_Vis_" + ViewSv108 + ".png"},
+		{"0_144_0", "_Vis_" + ViewSv144 + ".png"},
+		{"0_216_0", "_Vis_" + ViewSv216 + ".png"},
+		{"0_288_0", "_Vis_" + ViewSv288 + ".png"},
+		{"0_324_0", "_Vis_" + ViewSv324 + ".png"},
+		{"top_0_90_0", "_Vis_" + ViewTv90 + ".png"},
 	};
 
 	// Prefix to the name of the plant
