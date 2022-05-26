@@ -185,6 +185,52 @@ private:
 
 };
 
+class PlantImageTranslations
+{
+public:
+
+	PlantImageTranslations() = default;
+
+	/**
+	 * \brief Read translations used for calibration of views from a CSV file
+	 * \param filename Path to the CSV file
+	 */
+	void loadFromCsv(const std::string& filename);
+
+	/**
+	 * \brief Return the translation to apply to a view of a plant
+	 *        If the plant and view cannot be found in the list, by default return {0, 0}
+	 * \param plantName The name of the plant
+	 * \param viewName The name of the view
+	 * \return The translation to apply to the view of the plant
+	 */
+	glm::vec2 getTranslationForPlantAndView(const std::string& plantName, const std::string& viewName) const;
+
+	/**
+	 * \brief Apply the translations used for calibration of views to a list of plants
+	 * \param plants List of plants on which to apply the translation
+	 */
+	void applyTranslationToPlants(std::vector<PlantPhenotypePoints>& plants) const;
+
+private:
+	struct ViewTranslation
+	{
+		std::string plantName;
+		std::string viewName;
+		glm::vec2 translation;
+
+		ViewTranslation(std::string plantName, std::string viewName, double x, double y) :
+			plantName(std::move(plantName)),
+			viewName(std::move(viewName)),
+			translation(x, y)
+		{
+			
+		}
+	};
+
+	std::vector<ViewTranslation> m_viewTranslations;
+};
+
 /**
  * \brief Apply a 90 degrees rotation to a list of points
  * \param rotationDirection The rotation direction for the points and the images
@@ -261,13 +307,6 @@ void apply90DegreesRotationToViews(const std::string& viewName,
  * \param outputFilename Path to the output CSV file
  */
 void convertCalibrationOutputToCsv(const std::string& inputFilename, const std::string& outputFilename);
-
-/**
- * \brief Read and apply translations used for calibration of views from a CSV file
- * \param filename Path to the CSV file
- * \param plants List of plants on which to apply the transformations
- */
-void readAndApplyTranslationsFromCsv(const std::string& filename, std::vector<PlantPhenotypePoints>& plants);
 
 /**
  * \brief Only keep plants in the list with at least two views (required for 3D triangulation)

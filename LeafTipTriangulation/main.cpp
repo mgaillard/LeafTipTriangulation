@@ -480,7 +480,9 @@ loadPhenotypingSetupAndPhenotypePoints(const std::string& folder, PlantPhenotype
 	auto plants = readPhenotypePointsFromCsv(folder + "/leaf_tips.csv", type);
 	keepOnlyPlantsWithMultipleViews(plants);
 	// Apply the transformation from the image-based calibration
-	readAndApplyTranslationsFromCsv(folder + "/calibration.csv", plants);
+	PlantImageTranslations translations;
+	translations.loadFromCsv(folder + "/calibration.csv");
+	translations.applyTranslationToPlants(plants);
 	const auto rotationDirection = loadTopViewRotationDirection(folder + "/tv_90_rotation.txt");
 	// Only for top views there is a 90 degrees rotation
 	// For the 2018 data set, the rotation is clockwise

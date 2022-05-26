@@ -201,6 +201,75 @@ std::vector<std::vector<glm::vec2>> PlantPhenotypePoints::pointsFromViews(const 
 	return points;
 }
 
+void PlantImageTranslations::loadFromCsv(const std::string& filename)
+{
+	// Regex to match the name of the plant
+	const std::string matchPlantName = R"((.+)_Vis_(\w{2}_\d+)\.(?:png|jpg))";
+	// Regex to match a float number
+	const std::string matchFloatNumber = R"(([-+]?[0-9]*\.?[0-9]+))";
+	// Regex to match a space between sequences
+	const std::string matchSpace = R"(\s)";
+	// Regex to match a full line
+	const std::regex matchTranslationLine(matchPlantName + matchSpace +
+		matchFloatNumber + matchSpace + matchFloatNumber);
+
+	std::ifstream file(filename);
+
+	if (file.is_open())
+	{
+		std::string line;
+		while (std::getline(file, line))
+		{
+			// Match the current line and extract information
+			std::smatch matchesInLine;
+			if (std::regex_match(line, matchesInLine, matchTranslationLine) && matchesInLine.size() == 5)
+			{
+				const std::string plantName = matchesInLine[1];
+				const std::string plantView = matchesInLine[2];
+				const std::string translationStrX = matchesInLine[3];
+				const std::string translationStrY = matchesInLine[4];
+
+				const auto x = std::stod(translationStrX);
+				const auto y = std::stod(translationStrY);
+
+				m_viewTranslations.emplace_back(plantName, plantView, x, y);
+			}
+		}
+
+		file.close();
+	}
+}
+
+glm::vec2 PlantImageTranslations::getTranslationForPlantAndView(
+	const std::string& plantName,
+	const std::string& viewName) const
+{
+	// Search in the list of available translations
+	for (const auto& viewTranslation : m_viewTranslations)
+	{
+		if (viewTranslation.plantName == plantName && viewTranslation.viewName == viewName)
+		{
+			return viewTranslation.translation;
+		}
+	}
+
+	// By default no translation is a translation of (0, 0)
+	return { 0.0, 0.0 };
+}
+
+void PlantImageTranslations::applyTranslationToPlants(std::vector<PlantPhenotypePoints>& plants) const
+{
+	for (auto& plant : plants)
+	{
+		const auto viewNames = plant.getAllViews();
+		for (const auto& viewName : viewNames)
+		{
+			const auto translation = getTranslationForPlantAndView(plant.plantName(), viewName);
+			plant.applyTranslationToView(viewName, translation);
+		}
+	}
+}
+
 void apply90DegreesRotationToPoints(
 	const RotationDirection& rotationDirection,
 	double imageWidth,
@@ -562,56 +631,6 @@ void convertCalibrationOutputToCsv(const std::string& inputFilename, const std::
 
 	inputFile.close();
 	outputFile.close();
-}
-
-void readAndApplyTranslationsFromCsv(const std::string& filename, std::vector<PlantPhenotypePoints>& plants)
-{
-	// Regex to match the name of the plant
-	const std::string matchPlantName = R"((.+)_Vis_(\w{2}_\d+)\.(?:png|jpg))";
-	// Regex to match a float number
-	const std::string matchFloatNumber = R"(([-+]?[0-9]*\.?[0-9]+))";
-	// Regex to match a space between sequences
-	const std::string matchSpace = R"(\s)";
-	// Regex to match a full line
-	const std::regex matchTranslationLine(matchPlantName + matchSpace +
-		                                  matchFloatNumber + matchSpace + matchFloatNumber);
-
-	std::ifstream file(filename);
-
-	if (file.is_open())
-	{
-		std::string line;
-		while (std::getline(file, line))
-		{
-			// Match the current line and extract information
-			std::smatch matchesInLine;
-			if (std::regex_match(line, matchesInLine, matchTranslationLine) && matchesInLine.size() == 5)
-			{
-				const std::string plantName = matchesInLine[1];
-				const std::string plantView = matchesInLine[2];
-				const std::string translationStrX = matchesInLine[3];
-				const std::string translationStrY = matchesInLine[4];
-
-				const auto x = std::stod(translationStrX);
-				const auto y = std::stod(translationStrY);
-
-				// Find the plant whose name is plantName in the list
-				auto plantIt = std::find_if(plants.begin(), plants.end(),
-					[&plantName](const PlantPhenotypePoints& plant)
-					{
-						return plant.plantName() == plantName;
-					});
-
-				// If the plant is found
-				if (plantIt != plants.end())
-				{
-					plantIt->applyTranslationToView(plantView, { x, y });
-				}
-			}
-		}
-
-		file.close();
-	}
 }
 
 void keepOnlyPlantsWithMultipleViews(std::vector<PlantPhenotypePoints>& plants)
