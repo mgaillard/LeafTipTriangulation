@@ -180,6 +180,16 @@ void PlantPhenotypePoints::flipYAxis(double imageHeight)
 	}
 }
 
+void PlantPhenotypePoints::discardView(const std::string& viewName)
+{
+	const auto itView = m_points.find(viewName);
+
+	if (itView != m_points.end())
+	{
+		m_points.erase(itView);
+	}
+}
+
 std::vector<glm::vec2> PlantPhenotypePoints::pointsFromView(const std::string& viewName) const
 {
 	if (m_points.count(viewName) > 0)
@@ -561,6 +571,14 @@ void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantPhenot
 	for (auto& plant : plants)
 	{
 		plant.flipYAxis(setup.imageHeight());
+	}
+}
+
+void discardViewOnAllPlants(const std::string& viewName, std::vector<PlantPhenotypePoints>& plants)
+{
+	for (auto& plant : plants)
+	{
+		plant.discardView(viewName);
 	}
 }
 

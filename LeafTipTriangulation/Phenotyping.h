@@ -187,6 +187,13 @@ public:
 	}
 
 	/**
+	 * \brief Discard all points from a view of the plant
+	 *        If the view does not exist for the plant, nothing is done
+	 * \param viewName The name of the view to discard
+	 */
+	void discardView(const std::string& viewName);
+
+	/**
 	 * \brief Return a list of points from a view
 	 * \param viewName The list of the view, for example: {SV_0, SV_36, SV_72}
 	 * \return A list of 2D points
@@ -312,6 +319,13 @@ std::vector<PlantPhenotypePoints> readPhenotypePointsFromCsv(const std::string& 
  * \param plants The list of plants to modify
  */
 void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantPhenotypePoints>& plants);
+
+/**
+ * \brief Discard a view for all plants in a list
+ * \param viewName The name of the view to discard
+ * \param plants The list of plants to modify
+ */
+void discardViewOnAllPlants(const std::string& viewName, std::vector<PlantPhenotypePoints>& plants);
 
 /**
  * \brief Apply a 90 degrees clockwise rotation to points in a view for a list of plants
