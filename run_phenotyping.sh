@@ -44,9 +44,12 @@ do
         rm $annotationCsvFile
     done
 
-    # Use awk to compute the mean of each column of the result fole for probability $p
-    # Source: https://unix.stackexchange.com/questions/307168/using-awk-to-calculate-mean-and-variance-of-columns
-    awk -v P=$p '{ for(i=1;i<=NF;i++) total[i]+=$i ; } END { printf "%d\t",P ; for(i=1;i<=NF;i++) printf "%f ",total[i]/NR ; printf "\n" ; }' $resultProbabilityFile >> $resultFile
+    # First column of the result file is the probability of discarding a points
+    printf '%s\t' "$p" >> $resultFile
+
+    # Datamash is a GNU command line tool to compute statistics on input data files
+    # Compute the min, first quartile, median, last quartile, max, mean of the agreement
+    datamash min 3 q1 3 median 3 q3 3 max 3 mean 3 < $resultProbabilityFile >> $resultFile
 
     # Remove the result file for the probability $p
     rm $resultProbabilityFile
