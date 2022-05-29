@@ -693,7 +693,10 @@ void discardPointsRandomly(unsigned int seed, double probability, std::vector<Pl
 }
 
 std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>>
-triangulatePhenotypePoints(const PhenotypingSetup& setup, const PlantPhenotypePoints& plantPoints)
+triangulatePhenotypePoints(
+	const PhenotypingSetup& setup,
+	const PlantPhenotypePoints& plantPoints,
+	float thresholdNoPair)
 {
 	// Get the list of views from which the plant was annotated, order does matter
 	const auto viewNames = plantPoints.getAllViews();
@@ -704,7 +707,7 @@ triangulatePhenotypePoints(const PhenotypingSetup& setup, const PlantPhenotypePo
 	// Un-project annotated 2D points and get 3D rays
 	const auto rays = computeRays(cameras, points);
 	// Triangulate the 3D points
-	return matchRaysAndTriangulate(cameras, points, rays);
+	return matchRaysAndTriangulate(cameras, points, rays, thresholdNoPair);
 }
 
 std::tuple<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<int>>>

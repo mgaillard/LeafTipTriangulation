@@ -372,10 +372,13 @@ void discardPointsRandomly(unsigned int seed, double probability, std::vector<Pl
  * \brief Find the 3D position of phenotype points in a plant
  * \param setup The phenotyping setup used to image the plant
  * \param plantPoints The phenotype points of the plant
+ * \param thresholdNoPair Threshold in px above which two rays/points can't be paired together
  * \return A list of 3D points that correspond to the phenotype points and the correspondences
  */
 std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>>
-triangulatePhenotypePoints(const PhenotypingSetup& setup, const PlantPhenotypePoints& plantPoints);
+triangulatePhenotypePoints(const PhenotypingSetup& setup,
+                           const PlantPhenotypePoints& plantPoints,
+                           float thresholdNoPair = std::numeric_limits<float>::max());
 
 /**
  * \brief Find the 3D position of phenotype points in a plant and retain matches between 3D points and 2D points

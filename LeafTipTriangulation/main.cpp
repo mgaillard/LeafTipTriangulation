@@ -534,6 +534,7 @@ void runPlantPhenotyping(const std::string& folder, const std::string& phenotype
 void runLeafCounting(
 	const std::string& folder,
 	const std::string& phenotype,
+	float thresholdNoPair,
 	unsigned int seed,
 	double probabilityDiscard,
 	const std::string& outputFileNumberLeaves,
@@ -555,7 +556,7 @@ void runLeafCounting(
 	#pragma omp parallel for
 	for (int i = 0; i < static_cast<int>(plants.size()); i++)
 	{
-		const auto [triangulatedPoints3D, setsOfRays] = triangulatePhenotypePoints(setup, plants[i]);
+		const auto [triangulatedPoints3D, setsOfRays] = triangulatePhenotypePoints(setup, plants[i], thresholdNoPair);
 		numberLeafTips[i].first = plants[i].plantName();
 		numberLeafTips[i].second = static_cast<int>(triangulatedPoints3D.size());
 	}
@@ -853,25 +854,34 @@ int main(int argc, char *argv[])
 	}
 	else if (command == "leaf_counting")
 	{
-		if (args.size() < 6)
+		if (args.size() < 7)
 		{
 			spdlog::error("Missing arguments for leaf counting");
 			spdlog::error("Argument 1: Path to the folder for the phenotyping setup.");
 			spdlog::error("Argument 2: Phenotype to triangulate and count (tips, junctions).");
-			spdlog::error("Argument 3: Random seed (unsigned integer).");
-			spdlog::error("Argument 4: Percentage of points to discard between 0.0 and 1.0.");
-			spdlog::error("Argument 5: Output CSV file for the number of leaves.");
-			spdlog::error("Argument 6: Output CSV file for statistics about plants.");
+			spdlog::error("Argument 3: Theta parameter in px (threshold above which two points cannot be matched).");
+			spdlog::error("Argument 4: Random seed (unsigned integer).");
+			spdlog::error("Argument 5: Percentage of points to discard between 0.0 and 1.0.");
+			spdlog::error("Argument 6: Output CSV file for the number of leaves.");
+			spdlog::error("Argument 7: Output CSV file for statistics about plants.");
 			return 1;
+		}
+
+		// If theta is zero, set to to infinity
+		float thresholdNoPair = std::stof(args[2]);
+		if (thresholdNoPair <= 0.0)
+		{
+			thresholdNoPair = std::numeric_limits<float>::max();
 		}
 
 		// Counting leaves for a set of manually annotated plants
 		runLeafCounting(args[0],
 						args[1],
-						std::stoul(args[2]),
-		                std::stod(args[3]),
-		                args[4],
-		                args[5]);
+				        thresholdNoPair,
+						std::stoul(args[3]),
+		                std::stod(args[4]),
+		                args[5],
+		                args[6]);
 	}
 	else if (command == "export_annotations")
 	{
