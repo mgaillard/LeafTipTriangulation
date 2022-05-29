@@ -22,10 +22,40 @@ cat results/sorghum_2018/results.csv results/sorghum_2022/results.csv > results/
 cat Phenotyping/sorghum_2018/annotations/ground_truth.csv Phenotyping/sorghum_2022/annotations/ground_truth.csv > results/ground_truth.csv
 python3 Phenotyping/scripts/compare_to_ground_truth.py --command graphs --input results/results.csv --truth results/ground_truth.csv --output results
 
+# Function that computes agreement for different seeds
+compute_agreement_for_all_seeds() {
+    seeds=(14117 4173 6468 306 2456)
+
+    # Arguments of the function
+    local theta=$1
+    local directory=$2
+    local probability=$3
+    local resultProbabilityFile=$4
+    local resultBaseProbabilityFile=$5
+
+    for s in ${seeds[@]};
+    do
+        resultCsvFile="$directory/results_${t}_${s}_${p}.csv"
+        resultBaseCsvFile="$directory/results_baseline_${t}_${s}_${p}.csv"
+        annotationCsvFile="$directory/nb_annotations_${t}_${s}_${p}.csv"
+        $LeafTipTriangulationCmd leaf_counting Phenotyping/sorghum_2022 $phenotype $theta $s $probability $resultCsvFile $annotationCsvFile
+        # Find the maximum number of annotated leaves in any view of each plant
+        # This becomes the baseline for any single-view detection based method
+        # NR>1 skips the first line of the file, which is the header
+        awk 'NR>1 {m=$2;for(i=2;i<=NF;i++)if($i>m)m=$i;print $1"\t"m}' $annotationCsvFile > $resultBaseCsvFile
+        # Compare the number of leaves from the result file
+        # This is the result of our method
+        python3 Phenotyping/scripts/compare_to_ground_truth.py --command values --input $resultCsvFile --truth Phenotyping/sorghum_2022/annotations/ground_truth.csv --output results/sorghum_2022 >> $resultProbabilityFile
+        # This is the result of the baseline
+        python3 Phenotyping/scripts/compare_to_ground_truth.py --command values --input $resultBaseCsvFile --truth Phenotyping/sorghum_2022/annotations/ground_truth.csv --output results/sorghum_2022 >> $resultBaseProbabilityFile
+        rm $resultCsvFile
+        rm $resultBaseCsvFile
+        rm $annotationCsvFile
+    done
+}
 
 # Function that computes agreement with varying probability of discarding a 2D points
 compute_agreement_wrt_probability() {
-    seeds=(14117 4173 6468 306 2456)
     probabilities=("0" "5" "10" "15" "20" "25" "30" "35" "40" "45" "50")
 
     # Arguments of the function
@@ -46,28 +76,10 @@ compute_agreement_wrt_probability() {
         resultProbabilityFile="$directory/results_${p}.dat"
         resultBaseProbabilityFile="$directory/results_baseline_${p}.dat"
 
-        for s in ${seeds[@]};
-        do
-            resultCsvFile="$directory/results_${s}_${p}.csv"
-            resultBaseCsvFile="$directory/results_baseline_${s}_${p}.csv"
-            annotationCsvFile="$directory/nb_annotations_${s}_${p}.csv"
-            $LeafTipTriangulationCmd leaf_counting Phenotyping/sorghum_2022 $phenotype $theta $s $probability $resultCsvFile $annotationCsvFile
-            # Find the maximum number of annotated leaves in any view of each plant
-            # This becomes the baseline for any single-view detection based method
-            # NR>1 skips the first line of the file, which is the header
-            awk 'NR>1 {m=$2;for(i=2;i<=NF;i++)if($i>m)m=$i;print $1"\t"m}' $annotationCsvFile > $resultBaseCsvFile
-            # Compare the number of leaves from the result file
-            # This is the result of our method
-            python3 Phenotyping/scripts/compare_to_ground_truth.py --command values --input $resultCsvFile --truth Phenotyping/sorghum_2022/annotations/ground_truth.csv --output results/sorghum_2022 >> $resultProbabilityFile
-            # This is the result of the baseline
-            python3 Phenotyping/scripts/compare_to_ground_truth.py --command values --input $resultBaseCsvFile --truth Phenotyping/sorghum_2022/annotations/ground_truth.csv --output results/sorghum_2022 >> $resultBaseProbabilityFile
-            rm $resultCsvFile
-            rm $resultBaseCsvFile
-            rm $annotationCsvFile
-        done
+        compute_agreement_for_all_seeds $theta $directory $probability $resultProbabilityFile $resultBaseProbabilityFile
 
         # First column of the result file is the probability of discarding a points
-        printf '%s\t' "$p" >> $resultTriangulationFile
+        printf '%s\t%s\t' $p $theta >> $resultTriangulationFile
         # Datamash is a GNU command line tool to compute statistics on input data files
         # Compute the min, first quartile, median, last quartile, max, mean of the agreement
         datamash min 3 q1 3 median 3 q3 3 max 3 mean 3 sstdev 3 < $resultProbabilityFile >> $resultTriangulationFile
@@ -92,7 +104,8 @@ directory="results/sorghum_2022"
 resultThetaFile="$directory/results_theta.dat"
 # Clear the result file
 > $resultThetaFile
-thetaValues=(0 3000 2000 1000)
+# Theta values are ordered in such a way that only the 4 first values are plotted in the mean agreement plot
+thetaValues=(0 3000 2000 1000 2500 1500 500)
 for t in ${thetaValues[@]};
 do
     resultCurrThetaFile="$directory/results_theta_$t.dat"
@@ -108,3 +121,8 @@ resultThetaEqualZeroFile="$directory/results_theta_0.dat"
 gnuplot -e "filename='$resultThetaEqualZeroFile'" "plots/phenotyping_agreement.pg" > $directory/agreement.pdf
 # Plot the mean agreement with a varying threshold 
 gnuplot -e "filename='$resultThetaFile'" "plots/phenotyping_agreement_theta.pg" > $directory/agreement_theta.pdf
+# Plot the mean agreement with a varying probability
+resultThetaSortedFile="$directory/results_theta_sorted.dat"
+sort -n -k1,1 -k2,2 $resultThetaFile > $resultThetaSortedFile
+gnuplot -e "filename='$resultThetaSortedFile'" "plots/phenotyping_agreement_prob.pg" > $directory/agreement_prob.pdf
+rm $resultThetaSortedFile

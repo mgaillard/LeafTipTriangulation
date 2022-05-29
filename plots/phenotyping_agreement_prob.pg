@@ -1,0 +1,21 @@
+#!/usr/bin/gnuplot
+reset
+set terminal pdf
+
+set xlabel 'Theta (px)'
+set ylabel 'Agreement (%)'
+
+set grid ytics
+
+set yrange [0:100]
+
+set style fill empty
+
+set key top right
+
+plot filename using 2:8 every ::1::6 with lines lt 1 title "Prob = 0%", \
+     ''       using 2:8 every ::15::20 with lines lt 2 title "Prob = 10%", \
+     ''       using 2:8 every ::29::34 with lines lt 3 title "Prob = 20%", \
+     ''       using 2:8 every ::43::48 with lines lt 4 title "Prob = 30%", \
+     ''       using 2:8 every ::57::62 with lines lt 5 title "Prob = 40%", \
+     ''       using 2:8 every ::71::76 with lines lt 6 title "Prob = 50%"

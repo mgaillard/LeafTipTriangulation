@@ -12,7 +12,7 @@ set yrange [0:100]
 
 set key top right
 
-plot filename using 1:7 every ::0::10 with lines lt 1 title "Theta = inf", \
-     ''       using 1:7 every ::11::21 with lines lt 2 title "Theta = 3000 px", \
-     ''       using 1:7 every ::22::32 with lines lt 3 title "Theta = 2000 px", \
-     ''       using 1:7 every ::33::43 with lines lt 4 title "Theta = 1000 px"
+plot filename using 1:8 every ::0::10 with lines lt 1 title "Theta = inf", \
+     ''       using 1:8 every ::11::21 with lines lt 2 title "Theta = 3000 px", \
+     ''       using 1:8 every ::22::32 with lines lt 3 title "Theta = 2000 px", \
+     ''       using 1:8 every ::33::43 with lines lt 4 title "Theta = 1000 px"
