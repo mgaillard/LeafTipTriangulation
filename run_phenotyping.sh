@@ -88,7 +88,22 @@ compute_agreement_wrt_probability() {
 
 directory="results/sorghum_2022"
 
-# Plot the agreement with varying threshold for theta=inf
-resultFile="$directory/results_all.dat"
-compute_agreement_wrt_probability $theta $directory $resultFile
-gnuplot -e "filename='$resultFile'" "plots/phenotyping_agreement.pg" > $directory/agreement.pdf
+# Plot the agreement with varying probability of discarding points for different values of theta
+resultThetaFile="$directory/results_theta.dat"
+# Clear the result file
+> $resultThetaFile
+thetaValues=(0 1000 2000 3000)
+for t in ${thetaValues[@]};
+do
+    resultCurrThetaFile="$directory/results_theta_$t.dat"
+    compute_agreement_wrt_probability $t $directory $resultCurrThetaFile
+    cat $resultCurrThetaFile >> $resultThetaFile
+    # Delete the temporary file unless it is the one for which theta=0
+    if [[ $t -ne 0 ]]; then
+        rm $resultCurrThetaFile
+    fi
+done
+# Plot the agreement against the baseline with a threshold of theta=0
+resultThetaEqualZeroFile="$directory/results_theta_0.dat"
+gnuplot -e "filename='$resultThetaEqualZeroFile'" "plots/phenotyping_agreement.pg" > $directory/agreement.pdf
+# TODO: gnuplot other graphs
