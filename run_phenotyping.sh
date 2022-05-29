@@ -25,7 +25,7 @@ python3 Phenotyping/scripts/compare_to_ground_truth.py --command graphs --input 
 
 # Function that computes agreement with varying probability of discarding a 2D points
 compute_agreement_wrt_probability() {
-    seeds=(14117 4173 6468)
+    seeds=(14117 4173 6468 306 2456)
     probabilities=("0" "5" "10" "15" "20" "25" "30" "35" "40" "45" "50")
 
     # Arguments of the function
@@ -92,7 +92,7 @@ directory="results/sorghum_2022"
 resultThetaFile="$directory/results_theta.dat"
 # Clear the result file
 > $resultThetaFile
-thetaValues=(0 1000 2000 3000)
+thetaValues=(0 3000 2000 1000)
 for t in ${thetaValues[@]};
 do
     resultCurrThetaFile="$directory/results_theta_$t.dat"
@@ -106,4 +106,5 @@ done
 # Plot the agreement against the baseline with a threshold of theta=0
 resultThetaEqualZeroFile="$directory/results_theta_0.dat"
 gnuplot -e "filename='$resultThetaEqualZeroFile'" "plots/phenotyping_agreement.pg" > $directory/agreement.pdf
-# TODO: gnuplot other graphs
+# Plot the mean agreement with a varying threshold 
+gnuplot -e "filename='$resultThetaEqualZeroFile'" "plots/phenotyping_agreement_theta.pg" > $directory/agreement_theta.pdf
