@@ -107,4 +107,4 @@ done
 resultThetaEqualZeroFile="$directory/results_theta_0.dat"
 gnuplot -e "filename='$resultThetaEqualZeroFile'" "plots/phenotyping_agreement.pg" > $directory/agreement.pdf
 # Plot the mean agreement with a varying threshold 
-gnuplot -e "filename='$resultThetaEqualZeroFile'" "plots/phenotyping_agreement_theta.pg" > $directory/agreement_theta.pdf
+gnuplot -e "filename='$resultThetaFile'" "plots/phenotyping_agreement_theta.pg" > $directory/agreement_theta.pdf
