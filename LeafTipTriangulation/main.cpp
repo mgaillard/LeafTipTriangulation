@@ -361,9 +361,9 @@ void testCorrespondenceWithThreshold(float noiseStd)
 	}
 }
 
-void runPlantPhenotypingExample(const std::string& folder)
+void runPlantPhenotypingExample2018(const std::string& folderCameras2018)
 {
-	auto setup = loadPhenotypingSetup(folder + "/cameras/");
+	auto setup = loadPhenotypingSetup(folderCameras2018 + "/cameras/");
 
 	// X axis is from left to right
 	// Y axis is from bottom to top
@@ -466,6 +466,64 @@ void runPlantPhenotypingExample(const std::string& folder)
 	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(setup.cameras(), points2D, rays);
 
 	// Export the scene
+	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
+}
+
+void runPlantPhenotypingExample2022(const std::string& folderCameras2022)
+{
+	const auto setup = loadPhenotypingSetup(folderCameras2022 + "/cameras/");
+	
+	PlantPhenotypePoints plant("3-10-22-Schnable-Sorghum_310-219-42-3-BTx623_2022-03-11_15-17-51.394_5209300");
+
+	// 4 points are visible from 3 cameras
+	// Occlusions are simulated by discarding points
+	// None of the points are visible by all cameras
+	// No camera can see all points
+
+	// Camera 1
+	plant.addPointsFromView(ViewSv36, {
+		// { 1629.0, 6035.0 }, // Leaf 1
+		{ 1404.0, 5674.0 }, // Leaf 2
+		{ 3127.0, 4843.0 }, // Leaf 3
+		{ 2709.0, 4551.0 }  // Leaf 4
+	});
+
+	// Camera 2
+	plant.addPointsFromView(ViewSv72, {
+		{ 1455.0, 5913.0 }, // Leaf 1
+		// { 1022.0, 5520.0 }, // Leaf 2
+		{ 3248.0, 4977.0 }, // Leaf 3
+		{ 1869.0, 4541.0 }  // Leaf 4
+	});
+
+	// Camera 3
+	plant.addPointsFromView(ViewSv108, {
+		{ 1597.0, 5790.0 }, // Leaf 1
+		{ 1163.0, 5338.0 }, // Leaf 2
+		// { 2957.0, 5083.0 }, // Leaf 3
+		{ 1248.0, 4509.0 }  // Leaf 4
+	});
+
+	std::vector<PlantPhenotypePoints> plants = {std::move(plant)};
+
+	// Apply the transformation from the image-based calibration
+	PlantImageTranslations translations;
+	translations.loadFromCsv(folderCameras2022 + "/calibration.csv");
+	translations.applyTranslationToPlants(plants);
+
+	// Flip Y axis because our camera model origin is on the bottom left
+	flipYAxisOnAllPlants(setup, plants);
+
+	spdlog::info("Triangulating leaves of plant {}", plants.front().plantName());
+
+	const auto viewNames = plants.front().getAllViews();
+	const auto points = plants.front().pointsFromViews(viewNames);
+	const auto cameras = setup.camerasFromViews(viewNames);
+	const auto rays = computeRays(cameras, points);
+	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays, 100.f);
+
+	// Export the scene
+	spdlog::debug("Found {} leaves", triangulatedPoints3D.size());
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 
@@ -826,7 +884,7 @@ int main(int argc, char *argv[])
 		testCorrespondenceWithThreshold(0.5f);
 		testCorrespondenceWithThreshold(2.0f);
 	}
-	else if (command == "plant_phenotyping_example")
+	else if (command == "plant_phenotyping_example_2018")
 	{
 		if (args.empty())
 		{
@@ -836,7 +894,19 @@ int main(int argc, char *argv[])
 		}
 
 		// Example with a plant in a phenotyping facility
-		runPlantPhenotypingExample(args[0]);
+		runPlantPhenotypingExample2018(args[0]);
+	}
+	else if (command == "plant_phenotyping_example_2022")
+	{
+		if (args.empty())
+		{
+			spdlog::error("Missing arguments for plant phenotyping.");
+			spdlog::error("Argument 1: Path to the folder for the 2022 phenotyping setup.");
+			return 1;
+		}
+
+		// Example with a plant in a phenotyping facility
+		runPlantPhenotypingExample2022(args[0]);
 	}
 	else if (command == "plant_phenotyping")
 	{
