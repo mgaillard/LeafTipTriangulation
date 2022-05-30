@@ -609,6 +609,11 @@ void runLeafCounting(
 		discardPointsRandomly(seed, probabilityDiscard, plants);
 	}
 
+	if (thresholdNoPair < std::numeric_limits<float>::max())
+	{
+		spdlog::debug("Association threshold is {:.2f}", thresholdNoPair);
+	}
+
 	std::vector<std::pair<std::string, int>> numberLeafTips(plants.size());
 
 	#pragma omp parallel for
