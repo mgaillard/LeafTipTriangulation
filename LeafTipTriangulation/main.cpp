@@ -50,9 +50,7 @@ GroundTruthMatchingResult testWithSyntheticData(const Parameters& parameters)
 	const auto noisyPoints2D = addNoise(projectedPoints2D, cameras, parameters.noiseStd);
 	// Check that the problem can be solved
 	// One point must be visible from at least two cameras
-	std::vector<std::vector<glm::vec2>> points2D;
-	std::vector<std::vector<std::pair<int, int>>> trueCorrespondences;
-	std::tie(points2D, trueCorrespondences) = removePoints(noisyPoints2D, parameters.probabilityKeep, !verboseRemovePoints);
+	const auto [points2D, trueCorrespondences] = removePoints(noisyPoints2D, parameters.probabilityKeep, verboseRemovePoints);
 
 	// TODO: maybe let the single ray points and check that they are not matched with something else
 	
@@ -70,10 +68,8 @@ GroundTruthMatchingResult testWithSyntheticData(const Parameters& parameters)
 	// checkUnProject(points3D, rays);
 	
 	// Matching and triangulation of points
-	std::vector<glm::vec3> triangulatedPoints3D;
-	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
 	const auto startTime = std::chrono::steady_clock::now();
-	std::tie(triangulatedPoints3D, setsOfRays) = matchRaysAndTriangulate(cameras, points2D, rays, parameters.thresholdNoPair);
+	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points2D, rays, parameters.thresholdNoPair);
 	const auto endTime = std::chrono::steady_clock::now();
 
 	// Draw the scene in OBJ for Debugging
