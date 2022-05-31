@@ -181,6 +181,89 @@ TEST_CASE("Triangulation of many points from multiple views", "[triangulation]")
 	REQUIRE(error == Approx(triangulationError));
 }
 
+TEST_CASE("Rays pseudo intersections when parallel", "[rays]")
+{
+	// Rays that are parallel
+	const Ray parallelR1{{0.0, 0.0, 0.0}, {0.0, 0.0, 1.0}};
+	const Ray parallelR2{ {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0} };
+	glm::vec3 parallelIntersection;
+
+	const auto parallelSuccess = raysPseudoIntersection(parallelR1, parallelR2, parallelIntersection);
+	REQUIRE_FALSE(parallelSuccess);
+}
+
+TEST_CASE("Rays pseudo intersections simple", "[rays]")
+{
+	// Rays that are parallel
+	const Ray r1{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0} };
+	const Ray r2{ {1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0} };
+	glm::vec3 intersection;
+
+	const auto success = raysPseudoIntersection(r1, r2, intersection);
+	REQUIRE(success);
+
+	REQUIRE(intersection.x == Approx(0.0));
+	REQUIRE(intersection.y == Approx(1.0));
+	REQUIRE(intersection.z == Approx(0.5));
+}
+
+TEST_CASE("Rays pseudo intersections complex", "[rays]")
+{
+	// Rays that are parallel
+	const std::array<Ray, 4> r = 
+	{ {
+		{ {0.067, 0.310, 0.721}, {0.196, 0.362, 0.911} },
+		{ {0.867, 0.158, 0.293}, {0.762, 0.620, 0.189} },
+		{ {0.343, 0.805, 0.849}, {0.073, 0.021, 0.997} },
+		{ {0.808, 0.951, 0.391}, {0.111, 0.798, 0.592} }
+	} };
+
+	const std::array<std::array<glm::vec3, 4>, 4> intersections = {{
+		{{
+			{ 0.0, 0.0, 0.0},
+			{ 0.0727375, -0.162821, 0.0864283},
+			{ 0.398949, 0.84456, 2.09747},
+			{ 0.277871, -0.021413, -0.231952}
+		}},
+		{{
+			{ 0.0727375, -0.162821, 0.0864283},
+			{ 0.0, 0.0, 0.0},
+			{ 0.573574, 0.465986, 0.299925},
+			{ 0.793153, 0.272359, 0.134902}
+		}},
+		{{
+			{ 0.398949, 0.84456, 2.09747},
+			{ 0.573574, 0.465986, 0.299925},
+			{ 0.0, 0.0, 0.0},
+			{ 0.540688, 0.772329, 0.260252}
+		}},
+		{{
+			{ 0.277871, -0.021413, -0.231952},
+			{ 0.793153, 0.272359, 0.134902},
+			{ 0.540688, 0.772329, 0.260252},
+			{ 0.0, 0.0, 0.0}
+		}}
+	} };
+
+	for (unsigned int i = 0; i < r.size(); i++)
+	{
+		for (unsigned int j = 0; j < r.size(); j++)
+		{
+			if (i == j)
+			{
+				continue;
+			}
+
+			glm::vec3 intersection;
+			const auto success = raysPseudoIntersection(r[i], r[j], intersection);
+			REQUIRE(success);
+			REQUIRE(intersection.x == Approx(intersections[i][j].x));
+			REQUIRE(intersection.y == Approx(intersections[i][j].y));
+			REQUIRE(intersection.z == Approx(intersections[i][j].z));
+		}
+	}
+}
+
 #ifdef CATCH_CONFIG_ENABLE_BENCHMARKING
 TEST_CASE("Benchmark triangulation of one point", "[triangulation][benchmark]")
 {
