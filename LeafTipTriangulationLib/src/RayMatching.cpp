@@ -543,20 +543,7 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 		float triangulationError;
 		std::vector<glm::vec3> triangulatedPoints3D;
 		std::tie(triangulationError, triangulatedPoints3D) = triangulateManyPointsFromMultipleViews(cameras, points2D, setsOfRays);
-
-		// TODO: remove
-		for (const auto& point : triangulatedPoints3D)
-		{
-			for (const auto& camera : cameras)
-			{
-				const auto dist = glm::distance(point, camera.eye());
-				if (dist <= 1000.0 && (dist <= 3.0 || dist >= 6.0))
-				{
-					spdlog::error("Error triangulated point too far: {}, l = {}", dist, glm::length(point));
-				}
-			}
-		}
-		
+				
 		// Store in cache
 		cacheDP[cacheIndex].set(triangulatedPoints3D, setsOfRays);
 
