@@ -62,7 +62,7 @@ public:
 	                 double imageHeight,
 	                 std::vector<std::string> views,
 	                 std::vector<Camera> cameras,
-	                 double distanceToPot,
+	                 double distanceToPlant,
 					 double radiusPlant,
 					 RotationDirection topViewRotation);
 
@@ -74,7 +74,7 @@ public:
 
 	const std::vector<Camera>& cameras() const;
 
-	double distanceToPot() const;
+	double distanceToPlant() const;
 
 	double radiusPlant() const;
 
@@ -102,7 +102,7 @@ private:
 
 	std::vector<Camera> m_cameras;
 
-	double m_distanceToPot;
+	double m_distanceToPlant;
 	double m_radiusPlant;
 	RotationDirection m_topViewRotation;
 };
@@ -290,11 +290,11 @@ void apply90DegreesRotationToPoints(const RotationDirection& rotationDirection,
                                     std::vector<glm::vec2>& points);
 
 /**
- * \brief Load the rotation direction for the top view
- * \param rotationFile Path to the file containing the rotation direction
- * \return The rotation 
+ * \brief Load the rotation direction for the top view, distance to plant, and 
+ * \param configFile Path to the file containing the configuration of the phenotyping setup
+ * \return The parameters for the phenotyping setup
  */
-RotationDirection loadTopViewRotationDirection(const std::string& rotationFile);
+std::tuple<RotationDirection, double, double> loadSetupConfiguration(const std::filesystem::path& configFile);
 
 /**
  * \brief Read the type of phenotype from a string
@@ -380,6 +380,16 @@ void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::
  * \param plants The list of plants to process
  */
 void discardPointsRandomly(unsigned int seed, double probability, std::vector<PlantPhenotypePoints>& plants);
+
+/**
+ * \brief Clamp rays according to the distance to the object in the phenotyping setup
+ * \param setup The phenotyping setup used to image the plant
+ * \param viewNames Then ame of views associated to the rays
+ * \param rays The rays
+ */
+void clampRaysWithPhenotypingSetup(const PhenotypingSetup& setup,
+                                   const std::vector<std::string>& viewNames,
+                                   std::vector<std::vector<Ray>>& rays);
 
 /**
  * \brief Find the 3D position of phenotype points in a plant

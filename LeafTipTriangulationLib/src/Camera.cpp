@@ -161,7 +161,7 @@ std::vector<std::vector<Ray>> computeRays(
 
 	for (unsigned int c = 0; c < cameras.size(); c++)
 	{
-		for (auto point : points[c])
+		for (const auto& point : points[c])
 		{
 			const glm::vec3 points3D(point.x, point.y, 1.f);
 
@@ -170,7 +170,7 @@ std::vector<std::vector<Ray>> computeRays(
 			const auto origin = cameras[c].eye();
 			const auto direction = glm::normalize(unProjected - origin);
 
-			rays[c].push_back(Ray{ origin, direction });
+			rays[c].emplace_back(origin, direction);
 		}
 	}
 

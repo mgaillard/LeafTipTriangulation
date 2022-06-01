@@ -19,9 +19,9 @@ public:
 	 * \param origin Origin of the ray
 	 * \param direction Direction of the ray (normalized vector)
 	 */
-	Ray(glm::vec3 origin, glm::vec3 direction) :
-		origin(std::move(origin)),
-		direction(std::move(direction)),
+	Ray(const glm::vec3& origin, const glm::vec3& direction) :
+		origin(origin),
+		direction(direction),
 		m_clampRay(false),
 		m_start(0.f),
 		m_end(1.f)
@@ -36,9 +36,9 @@ public:
 	 * \param start Parametric coordinate of the start of the line segment
 	 * \param end Parametric coordinate of the end of the line segment
 	 */
-	Ray(glm::vec3 origin, glm::vec3 direction, float start, float end) :
-		origin(std::move(origin)),
-		direction(std::move(direction)),
+	Ray(const glm::vec3& origin, const glm::vec3& direction, float start, float end) :
+		origin(origin),
+		direction(direction),
 		m_clampRay(true),
 		m_start(start),
 		m_end(end)

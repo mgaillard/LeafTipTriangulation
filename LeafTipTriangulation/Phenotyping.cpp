@@ -20,14 +20,14 @@ PhenotypingSetup::PhenotypingSetup(
 	double imageHeight,
 	std::vector<std::string> views,
 	std::vector<Camera> cameras,
-	double distanceToPot,
+	double distanceToPlant,
 	double radiusPlant,
 	RotationDirection topViewRotation) :
 	m_imageWidth(imageWidth),
 	m_imageHeight(imageHeight),
 	m_views(std::move(views)),
 	m_cameras(std::move(cameras)),
-	m_distanceToPot(distanceToPot),
+	m_distanceToPlant(distanceToPlant),
 	m_radiusPlant(radiusPlant),
 	m_topViewRotation(topViewRotation)
 {
@@ -54,9 +54,9 @@ const std::vector<Camera>& PhenotypingSetup::cameras() const
 	return m_cameras;
 }
 
-double PhenotypingSetup::distanceToPot() const
+double PhenotypingSetup::distanceToPlant() const
 {
-	return m_distanceToPot;
+	return m_distanceToPlant;
 }
 
 double PhenotypingSetup::radiusPlant() const
@@ -360,11 +360,13 @@ void apply90DegreesRotationToPoints(
 	}
 }
 
-RotationDirection loadTopViewRotationDirection(const std::string& rotationFile)
+std::tuple<RotationDirection, double, double> loadSetupConfiguration(const std::filesystem::path& configFile)
 {
 	auto direction = RotationDirection::Unknown;
+	double distanceToPlant = 0.0;
+	double radiusPlant = 0.0;
 
-	std::ifstream file(rotationFile);
+	std::ifstream file(configFile);
 
 	if (file.is_open())
 	{
@@ -388,10 +390,12 @@ RotationDirection loadTopViewRotationDirection(const std::string& rotationFile)
 			direction = RotationDirection::CounterclockwiseWithoutCanvas;
 		}
 
+		file >> distanceToPlant >> radiusPlant;
+
 		file.close();
 	}
 
-	return direction;
+	return { direction, distanceToPlant, radiusPlant };
 }
 
 PlantPhenotypePointType readPhenotypingPointTypeFromString(const std::string& phenotype)
@@ -502,16 +506,16 @@ PhenotypingSetup loadPhenotypingSetup(const fs::path& setupFolder)
 	const auto imageHeight = static_cast<double>(cameras[0].viewport().w);
 
 	// Read the rotation direction for the top view
-	const auto topViewRotationFile = setupFolder / "tv_90_rotation.txt";
-	const auto rotationDirection = loadTopViewRotationDirection(topViewRotationFile.string());
+	const auto configFile = setupFolder / "setup_config.txt";
+	const auto [rotationDirection, distanceToPlant, radiusPlant] = loadSetupConfiguration(configFile);
 
 	return {
 		imageWidth,
 		imageHeight,
 		views,
 		cameras,
-		4.5, // TODO: these two values are hard coded for the 2022 setup
-		0.6, // TODO: these two values are hard coded for the 2022 setup
+		distanceToPlant,
+		radiusPlant,
 		rotationDirection
 	};
 }
@@ -722,6 +726,25 @@ void discardPointsRandomly(unsigned int seed, double probability, std::vector<Pl
 	}
 }
 
+void clampRaysWithPhenotypingSetup(
+	const PhenotypingSetup& setup,
+	const std::vector<std::string>& viewNames,
+	std::vector<std::vector<Ray>>& rays)
+{
+	for (unsigned int c = 0; c < viewNames.size(); c++)
+	{
+		// If it is not a top view, clamp the ray
+		if (viewNames[c] != ViewTv90)
+		{
+			for (auto& ray : rays[c])
+			{
+				ray.clampRay(static_cast<float>(setup.distanceToPlant() - setup.radiusPlant()),
+				             static_cast<float>(setup.distanceToPlant() + setup.radiusPlant()));
+			}
+		}
+	}
+}
+
 std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>>
 triangulatePhenotypePoints(
 	const PhenotypingSetup& setup,
@@ -735,8 +758,9 @@ triangulatePhenotypePoints(
 	// Get the cameras in the same order as the views
 	const auto cameras = setup.camerasFromViews(viewNames);
 	// Un-project annotated 2D points and get 3D rays
-	const auto rays = computeRays(cameras, points);
-	// TODO: clamp all rays according to the phenotyping setup
+	auto rays = computeRays(cameras, points);
+	// Clamp all rays according to the phenotyping setup
+	clampRaysWithPhenotypingSetup(setup, viewNames, rays);
 	// Triangulate the 3D points
 	return matchRaysAndTriangulate(cameras, points, rays, thresholdNoPair);
 }

@@ -576,7 +576,8 @@ void runPlantPhenotyping(const std::string& folder, const std::string& phenotype
 	const auto viewNames = plants.front().getAllViews();
 	const auto points = plants.front().pointsFromViews(viewNames);
 	const auto cameras = setup.camerasFromViews(viewNames);
-	const auto rays = computeRays(cameras, points);
+	auto rays = computeRays(cameras, points);
+	clampRaysWithPhenotypingSetup(setup, viewNames, rays);
 	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays, 400.0);
 
 	// Export the scene
