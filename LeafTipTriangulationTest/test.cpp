@@ -230,12 +230,12 @@ TEST_CASE("Rays pseudo intersections complex", "[rays]")
 	const std::array<std::array<glm::vec3, 4>, 4> intersections = {{
 		{{
 			{ 0.0, 0.0, 0.0},
-			{ 0.0727375, -0.162821, 0.0864283},
+			{ 0.0726320595, -0.162821, 0.0864283},
 			{ 0.398949, 0.84456, 2.09747},
 			{ 0.277871, -0.021413, -0.231952}
 		}},
 		{{
-			{ 0.0727375, -0.162821, 0.0864283},
+			{ 0.0726320595, -0.162821, 0.0864283},
 			{ 0.0, 0.0, 0.0},
 			{ 0.573574, 0.465986, 0.299925},
 			{ 0.793153, 0.272359, 0.134902}
@@ -301,6 +301,32 @@ TEST_CASE("Rays pseudo intersections line segments simple", "[rays]")
 	success = raysPseudoIntersection(ray0Long, ray1Short, intersection);
 	REQUIRE(success);
 	REQUIRE(intersection.x == Approx(0.25));
+	REQUIRE(intersection.y == Approx(1.0));
+	REQUIRE(intersection.z == Approx(0.5));
+}
+
+TEST_CASE("Rays pseudo intersections mixed", "[rays]")
+{
+	// Line ray (infinite)
+	const Ray r1{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0} };
+	// Line segment ray (finite)
+	const Ray r2{ {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, 0.0, 2.0 };
+	// Line segment ray (finite)
+	const Ray r3{ {1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0}, 0.0, 2.0 };
+	glm::vec3 intersection;
+	bool success;
+
+	success = raysPseudoIntersection(r1, r2, intersection);
+	REQUIRE(success);
+
+	REQUIRE(intersection.x == Approx(0.5));
+	REQUIRE(intersection.y == Approx(1.0));
+	REQUIRE(intersection.z == Approx(0.5));
+
+	success = raysPseudoIntersection(r1, r3, intersection);
+	REQUIRE(success);
+
+	REQUIRE(intersection.x == Approx(0.0));
 	REQUIRE(intersection.y == Approx(1.0));
 	REQUIRE(intersection.z == Approx(0.5));
 }

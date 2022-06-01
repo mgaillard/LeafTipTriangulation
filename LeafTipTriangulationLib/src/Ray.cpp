@@ -17,18 +17,27 @@
 /**
  * \brief Compute the pseudo intersection of two lines (defined by rays)
  *        Warning: the two directions cannot be parallel, it should be tested before calling this function.
- * \param ray0 The first line
- * \param ray1 The second line
+ * \param a0 Start of line 0
+ * \param b0 End of line 0
+ * \param a1 Start of line 1
+ * \param b1 End of line 1
  * \return The coordinates of the pseudo intersection of the two lines
  */
-glm::vec3 linesPseudoIntersection(const Ray& ray0, const Ray& ray1)
+glm::dvec3 linesPseudoIntersection(
+	const glm::dvec3& a0,
+	const glm::dvec3& b0,
+	const glm::dvec3& a1,
+	const glm::dvec3& b1)
 {
-	const std::array<glm::vec3, 2> u = { {ray0.direction, ray1.direction} };
+	const std::array<glm::dvec3, 2> u = {{
+		glm::normalize(b0 - a0),
+		glm::normalize(b1 - a1)
+	}};
 
-	std::array<glm::mat3, 2> A = { glm::mat3(0.f), glm::mat3(0.f) };
+	std::array<glm::dmat3, 2> A = { glm::dmat3(0.0), glm::dmat3(0.0) };
 	for (unsigned int i = 0; i < A.size(); i++)
 	{
-		// glm::mat3 is column major
+		// glm::dmat3 is column major
 		auto& Ai = A[i];
 		const auto& ui = u[i];
 
@@ -49,7 +58,7 @@ glm::vec3 linesPseudoIntersection(const Ray& ray0, const Ray& ray1)
 	}
 
 	// Closest point between the two lines
-	return glm::inverse(A[0] + A[1]) * ((A[0] * ray0.origin) + (A[1] * ray1.origin));
+	return glm::inverse(A[0] + A[1]) * ((A[0] * a0) + (A[1] * a1));
 }
 
 /**
@@ -90,6 +99,25 @@ double pointLineSegmentProjection(const glm::dvec3& p, const glm::dvec3& a, cons
 }
 
 /**
+ * \brief Computes the distance from the point P to the line defined by (AB(])
+ * \param p The point from which to compute the distance to the line segment
+ * \param a The starting point of the line
+ * \param b The ending point of the line
+ * \param c The projection of point P on the line
+ * \return The distance from the point P to the line (AB)
+ */
+double distToLine(const glm::dvec3& p, const glm::dvec3& a, const glm::dvec3& b, glm::dvec3& c)
+{
+	const auto ab = b - a;
+	const auto u = pointLineProjection(p, a, b);
+
+	// Projection of P is on the line (AB)
+	c = a + ab * u;
+
+	return glm::distance(p, c);
+}
+
+/**
  * \brief Computes the distance from the point P to the line segment defined by [AB]
  * \param p The point from which to compute the distance to the line segment
  * \param a The starting point of the line segment
@@ -109,6 +137,56 @@ double distToLineSegment(const glm::dvec3& p, const glm::dvec3& a, const glm::dv
 }
 
 /**
+ * \brief Compute the pseudo intersection of a line segment with a line
+ *        Warning: the two directions cannot be parallel, it should be tested before calling this function.
+ * \param lineA Start of line 0
+ * \param lineB End of line segment 0
+ * \param lineSegmentA Start of line segment 1
+ * \param lineSegmentB End of line segment 1
+ * \param c The pseudo intersection of the two line segments, if it exists
+ * \return True if the pseudo-intersection exists, false otherwise
+ */
+bool lineAndLineSegmentPseudoIntersection(
+	const glm::dvec3& lineA,
+	const glm::dvec3& lineB,
+	const glm::dvec3& lineSegmentA,
+	const glm::dvec3& lineSegmentB,
+	glm::dvec3& c)
+{
+	// TODO: Check if parallel
+	// TODO: Make dedicated parallel test
+
+	// Check the pseudo intersection of the two lines
+	auto pseudoIntersection = linesPseudoIntersection(lineA, lineB, lineSegmentA, lineSegmentB);
+
+	// Project back to the line segment and check that it is between A and B
+	const auto u = pointLineProjection(pseudoIntersection, lineSegmentA, lineSegmentB);
+
+	if (u >= 0.0 && u <= 1.0)
+	{
+		// Keep this pseudo intersection because it is equivalent to having two lines
+		c = pseudoIntersection;
+		return true;
+	}
+	else if (u < 0.0)
+	{
+		// Clamp at A
+		distToLine(lineSegmentA, lineA, lineB, pseudoIntersection);
+		c = (lineSegmentA + pseudoIntersection) / 2.0;
+		return true;
+	}
+	else if (u > 1.0)
+	{
+		// Clamp at B
+		distToLine(lineSegmentB, lineA, lineB, pseudoIntersection);
+		c = (lineSegmentB + pseudoIntersection) / 2.0;
+		return true;
+	}
+	
+	return false;
+}
+
+/**
  * \brief Compute the pseudo intersection of two line segments
  * \param a0 Start of line segment 0
  * \param b0 End of line segment 0
@@ -124,6 +202,9 @@ bool lineSegmentsPseudoIntersection(
 	const glm::dvec3& b1,
 	glm::dvec3& c)
 {
+	// TODO: If line segments are parallel it's possible that they have a unique pseudo intersection if one segment is "before" the other
+	// Source: https://stackoverflow.com/questions/2824478/shortest-distance-between-two-line-segments
+
 	// Failure case 1: ray0 and ray1 are parallel
 	// Epsilon is scaled to the magnitude of u0 + u1, which is 2.0f
 	if (glm::length(glm::cross(b0 - a0, b1 - a1)) <= 2.0 * glm::epsilon<double>())
@@ -163,7 +244,10 @@ bool lineSegmentsPseudoIntersection(
 
 bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
 {
-	const std::array<glm::vec3, 2> u = { {ray0.direction, ray1.direction} };
+	const std::array<glm::vec3, 2> u = {{
+		glm::normalize(ray0.direction),
+		glm::normalize(ray1.direction)
+	}};
 
 	// Failure case 1: ray0 and ray1 are parallel
 	// Epsilon is scaled to the magnitude of u0 + u1, which is 2.0f
@@ -176,7 +260,12 @@ bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
 	// If rays are lines
 	if (!ray0.isClamped() && !ray1.isClamped())
 	{
-		c = linesPseudoIntersection(ray0, ray1);
+		const glm::dvec3 a0 = ray0.origin;
+		const glm::dvec3 b0 = ray0.origin + ray0.direction;
+		const glm::dvec3 a1 = ray1.origin;
+		const glm::dvec3 b1 = ray1.origin + ray1.direction;
+
+		c = linesPseudoIntersection(a0, b0, a1, b1);
 	}
 	// If ray are line segments
 	else if (ray0.isClamped() && ray1.isClamped())
@@ -191,10 +280,29 @@ bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
 		c = pseudoIntersection;
 	}
 	// If the two rays are mixed: line and line segment
-	else
+	else if (ray0.isClamped() && !ray1.isClamped())
 	{
-		spdlog::error("The pseudo intersection between a ray that is clamped and another ray that is not clamped is not supported");
-		return false;
+		const glm::dvec3 lineSegmentA = ray0.at(ray0.start());
+		const glm::dvec3 lineSegmentB = ray0.at(ray0.end());
+		const glm::dvec3 lineA = ray1.origin;
+		const glm::dvec3 lineB = ray1.origin + ray1.direction;
+
+		glm::dvec3 pseudoIntersection;
+		lineAndLineSegmentPseudoIntersection(lineA, lineB, lineSegmentA, lineSegmentB, pseudoIntersection);
+		c = pseudoIntersection;
+		return true;
+	}
+	else if (!ray0.isClamped() && ray1.isClamped())
+	{
+		const glm::dvec3 lineA = ray0.origin;
+		const glm::dvec3 lineB = ray0.origin + ray0.direction;
+		const glm::dvec3 lineSegmentA = ray1.at(ray1.start());
+		const glm::dvec3 lineSegmentB = ray1.at(ray1.end());
+
+		glm::dvec3 pseudoIntersection;
+		lineAndLineSegmentPseudoIntersection(lineA, lineB, lineSegmentA, lineSegmentB, pseudoIntersection);
+		c = pseudoIntersection;
+		return true;
 	}
 
 	return true;
