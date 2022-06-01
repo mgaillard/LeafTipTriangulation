@@ -1,7 +1,6 @@
 #include "Phenotyping.h"
 
 #include <fstream>
-#include <filesystem>
 #include <iostream>
 #include <regex>
 #include <tuple>
@@ -14,15 +13,23 @@
 
 #include "RayMatching.h"
 
+namespace fs = std::filesystem;
+
 PhenotypingSetup::PhenotypingSetup(
 	double imageWidth,
 	double imageHeight,
 	std::vector<std::string> views,
-	std::vector<Camera> cameras) :
+	std::vector<Camera> cameras,
+	double distanceToPot,
+	double radiusPlant,
+	RotationDirection topViewRotation) :
 	m_imageWidth(imageWidth),
 	m_imageHeight(imageHeight),
 	m_views(std::move(views)),
-	m_cameras(std::move(cameras))
+	m_cameras(std::move(cameras)),
+	m_distanceToPot(distanceToPot),
+	m_radiusPlant(radiusPlant),
+	m_topViewRotation(topViewRotation)
 {
 
 }
@@ -45,6 +52,21 @@ const std::vector<std::string>& PhenotypingSetup::views() const
 const std::vector<Camera>& PhenotypingSetup::cameras() const
 {
 	return m_cameras;
+}
+
+double PhenotypingSetup::distanceToPot() const
+{
+	return m_distanceToPot;
+}
+
+double PhenotypingSetup::radiusPlant() const
+{
+	return m_radiusPlant;
+}
+
+RotationDirection PhenotypingSetup::topViewRotation() const
+{
+	return m_topViewRotation;
 }
 
 std::vector<Camera> PhenotypingSetup::camerasFromViews(const std::vector<std::string>& viewNames) const
@@ -442,19 +464,21 @@ std::string translateViewNameToFilename(const std::string& viewName, const std::
 	return filename + '.' + extension;
 }
 
-PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder)
+PhenotypingSetup loadPhenotypingSetup(const fs::path& setupFolder)
 {
-	const std::array<std::pair<std::string, std::string>, 10> viewCameraNames = {{
-		{ViewSv0, cameraFolder + "camera_" + ViewFileSv0 + ".txt"},
-		{ViewSv36, cameraFolder + "camera_" + ViewFileSv36 + ".txt"},
-		{ViewSv72, cameraFolder + "camera_" + ViewFileSv72 + ".txt"},
-		{ViewSv108, cameraFolder + "camera_" + ViewFileSv108 + ".txt"},
-		{ViewSv144, cameraFolder + "camera_" + ViewFileSv144 + ".txt"},
-		{ViewSv216, cameraFolder + "camera_" + ViewFileSv216 + ".txt"},
-		{ViewSv252, cameraFolder + "camera_" + ViewFileSv252 + ".txt"},
-		{ViewSv288, cameraFolder + "camera_" + ViewFileSv288 + ".txt"},
-		{ViewSv324, cameraFolder + "camera_" + ViewFileSv324 + ".txt"},
-		{ViewTv90, cameraFolder + "camera_" + ViewFileTv90 + ".txt"}
+	const auto cameraFolder = setupFolder / "cameras";
+
+	const std::array<std::pair<std::string, fs::path>, 10> viewCameraNames = {{
+		{ViewSv0, cameraFolder / ("camera_" + ViewFileSv0 + ".txt")},
+		{ViewSv36, cameraFolder / ("camera_" + ViewFileSv36 + ".txt")},
+		{ViewSv72, cameraFolder / ("camera_" + ViewFileSv72 + ".txt")},
+		{ViewSv108, cameraFolder / ("camera_" + ViewFileSv108 + ".txt")},
+		{ViewSv144, cameraFolder / ("camera_" + ViewFileSv144 + ".txt")},
+		{ViewSv216, cameraFolder / ("camera_" + ViewFileSv216 + ".txt")},
+		{ViewSv252, cameraFolder / ("camera_" + ViewFileSv252 + ".txt")},
+		{ViewSv288, cameraFolder / ("camera_" + ViewFileSv288 + ".txt")},
+		{ViewSv324, cameraFolder / ("camera_" + ViewFileSv324 + ".txt")},
+		{ViewTv90, cameraFolder / ("camera_" + ViewFileTv90 + ".txt")}
 	}};
 
 	std::vector<std::string> views;
@@ -467,7 +491,7 @@ PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder)
 		if (std::filesystem::exists(viewCameraName.second))
 		{
 			views.push_back(viewCameraName.first);
-			cameraFiles.push_back(viewCameraName.second);
+			cameraFiles.push_back(viewCameraName.second.string());
 		}
 	}
 
@@ -477,11 +501,18 @@ PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder)
 	const auto imageWidth = static_cast<double>(cameras[0].viewport().z);
 	const auto imageHeight = static_cast<double>(cameras[0].viewport().w);
 
+	// Read the rotation direction for the top view
+	const auto topViewRotationFile = setupFolder / "tv_90_rotation.txt";
+	const auto rotationDirection = loadTopViewRotationDirection(topViewRotationFile.string());
+
 	return {
 		imageWidth,
 		imageHeight,
 		views,
-		cameras
+		cameras,
+		4.5, // TODO: these two values are hard coded for the 2022 setup
+		0.6, // TODO: these two values are hard coded for the 2022 setup
+		rotationDirection
 	};
 }
 
@@ -584,12 +615,11 @@ void discardViewOnAllPlants(const std::string& viewName, std::vector<PlantPhenot
 
 void apply90DegreesRotationToViews(const std::string& viewName,
                                    const PhenotypingSetup& setup,
-                                   const RotationDirection& rotationDirection,
                                    std::vector<PlantPhenotypePoints>& plants)
 {
 	for (auto& plant : plants)
 	{
-		plant.apply90DegreesRotationToView(viewName, rotationDirection, setup.imageWidth(), setup.imageHeight());
+		plant.apply90DegreesRotationToView(viewName, setup.topViewRotation(), setup.imageWidth(), setup.imageHeight());
 	}
 }
 
@@ -706,6 +736,7 @@ triangulatePhenotypePoints(
 	const auto cameras = setup.camerasFromViews(viewNames);
 	// Un-project annotated 2D points and get 3D rays
 	const auto rays = computeRays(cameras, points);
+	// TODO: clamp all rays according to the phenotyping setup
 	// Triangulate the 3D points
 	return matchRaysAndTriangulate(cameras, points, rays, thresholdNoPair);
 }

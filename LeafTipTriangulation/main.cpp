@@ -359,7 +359,7 @@ void testCorrespondenceWithThreshold(float noiseStd)
 
 void runPlantPhenotypingExample2018(const std::string& folderCameras2018)
 {
-	auto setup = loadPhenotypingSetup(folderCameras2018 + "/cameras/");
+	auto setup = loadPhenotypingSetup(folderCameras2018);
 
 	// X axis is from left to right
 	// Y axis is from bottom to top
@@ -467,7 +467,7 @@ void runPlantPhenotypingExample2018(const std::string& folderCameras2018)
 
 void runPlantPhenotypingExample2022(const std::string& folderCameras2022)
 {
-	const auto setup = loadPhenotypingSetup(folderCameras2022 + "/cameras/");
+	const auto setup = loadPhenotypingSetup(folderCameras2022);
 	
 	PlantPhenotypePoints plant("3-10-22-Schnable-Sorghum_310-219-42-3-BTx623_2022-03-11_15-17-51.394_5209300");
 
@@ -530,18 +530,17 @@ loadPhenotypingSetupAndPhenotypePoints(const std::string& folder, PlantPhenotype
 	// Use the following line (and replace the name of files)
 	// convertCalibrationOutputToCsv(folder + "calibration_output.txt", folder + "calibration.csv");
 
-	auto setup = loadPhenotypingSetup(folder + "/cameras/");
+	auto setup = loadPhenotypingSetup(folder);
 	auto plants = readPhenotypePointsFromCsv(folder + "/leaf_tips.csv", type);
 	keepOnlyPlantsWithMultipleViews(plants);
 	// Apply the transformation from the image-based calibration
 	PlantImageTranslations translations;
 	translations.loadFromCsv(folder + "/calibration.csv");
 	translations.applyTranslationToPlants(plants);
-	const auto rotationDirection = loadTopViewRotationDirection(folder + "/tv_90_rotation.txt");
 	// Only for top views there is a 90 degrees rotation
 	// For the 2018 data set, the rotation is clockwise
 	// For the 2022 data set, the rotation is counterclockwise
-	apply90DegreesRotationToViews(ViewTv90, setup, rotationDirection, plants);
+	apply90DegreesRotationToViews(ViewTv90, setup, plants);
 	// Flip Y axis because our camera model origin is on the bottom left
 	flipYAxisOnAllPlants(setup, plants);
 
@@ -578,7 +577,7 @@ void runPlantPhenotyping(const std::string& folder, const std::string& phenotype
 	const auto points = plants.front().pointsFromViews(viewNames);
 	const auto cameras = setup.camerasFromViews(viewNames);
 	const auto rays = computeRays(cameras, points);
-	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays);
+	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays, 400.0);
 
 	// Export the scene
 	spdlog::debug("Found {} leaves", triangulatedPoints3D.size());

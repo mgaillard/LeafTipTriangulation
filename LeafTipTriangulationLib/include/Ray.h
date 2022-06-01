@@ -46,6 +46,13 @@ public:
 
 	}
 
+	void clampRay(float start, float end)
+	{
+		m_start = start;
+		m_end = end;
+		m_clampRay = true;
+	}
+
 	bool isClamped() const
 	{
 		return m_clampRay;
@@ -73,11 +80,11 @@ public:
 
 private:
 	// Boolean to clamp the ray to a line segment instead of a line
-	const bool m_clampRay;
+	bool m_clampRay;
 	// If clampRay is true, this is the starting parametric coordinate of the ray line segment
-	const float m_start;
+	float m_start;
 	// If clampRay is false, this is the starting parametric coordinate of the ray line segment
-	const float m_end;
+	float m_end;
 };
 
 /**

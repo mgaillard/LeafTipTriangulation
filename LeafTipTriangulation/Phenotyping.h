@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -60,7 +61,10 @@ public:
 	PhenotypingSetup(double imageWidth,
 	                 double imageHeight,
 	                 std::vector<std::string> views,
-	                 std::vector<Camera> cameras);
+	                 std::vector<Camera> cameras,
+	                 double distanceToPot,
+					 double radiusPlant,
+					 RotationDirection topViewRotation);
 
 	double imageWidth() const;
 
@@ -69,6 +73,12 @@ public:
 	const std::vector<std::string>& views() const;
 
 	const std::vector<Camera>& cameras() const;
+
+	double distanceToPot() const;
+
+	double radiusPlant() const;
+
+	RotationDirection topViewRotation() const;
 
 	/**
 	 * \brief Return a subset of cameras from a list of view names
@@ -91,6 +101,10 @@ private:
 	std::vector<std::string> m_views;
 
 	std::vector<Camera> m_cameras;
+
+	double m_distanceToPot;
+	double m_radiusPlant;
+	RotationDirection m_topViewRotation;
 };
 
 class PlantPhenotypePoints
@@ -300,10 +314,10 @@ std::string translateViewNameToFilename(const std::string& viewName, const std::
 
 /**
  * \brief Load a phenotyping setup
- * \param cameraFolder Path to the folder containing the camera calibration files
+ * \param setupFolder Path to the folder containing the annotations and camera calibration files
  * \return A phenotyping setup
  */
-PhenotypingSetup loadPhenotypingSetup(const std::string& cameraFolder);
+PhenotypingSetup loadPhenotypingSetup(const std::filesystem::path& setupFolder);
 
 /**
  * \brief Read leaf tips data from a CSV file
@@ -328,15 +342,14 @@ void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantPhenot
 void discardViewOnAllPlants(const std::string& viewName, std::vector<PlantPhenotypePoints>& plants);
 
 /**
- * \brief Apply a 90 degrees clockwise rotation to points in a view for a list of plants
+ * \brief Apply a 90 degrees rotation to points in a view for a list of plants
+ *        The rotation direction is defined in the Phenotyping setup
  * \param viewName The name of the view
  * \param setup The phenotyping setup used to image the plants
- * \param rotationDirection The direction of the rotation
  * \param plants The list of plants to modify
  */
 void apply90DegreesRotationToViews(const std::string& viewName,
                                    const PhenotypingSetup& setup,
-                                   const RotationDirection& rotationDirection,
                                    std::vector<PlantPhenotypePoints>& plants);
 
 /**
