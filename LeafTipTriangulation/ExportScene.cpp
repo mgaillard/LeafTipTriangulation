@@ -20,7 +20,14 @@ bool exportSceneAsOBJ(
 	{
 		for (const auto& ray : cameraRays)
 		{
-			objWriter.addLine(ray.origin, ray.at(6.f));
+			if (ray.isClamped())
+			{
+				objWriter.addLine(ray.at(ray.start()), ray.at(ray.end()));
+			}
+			else
+			{
+				objWriter.addLine(ray.origin, ray.at(6.f));
+			}
 		}
 	}
 

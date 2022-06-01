@@ -192,9 +192,19 @@ TEST_CASE("Rays pseudo intersections when parallel", "[rays]")
 	REQUIRE_FALSE(parallelSuccess);
 }
 
-TEST_CASE("Rays pseudo intersections simple", "[rays]")
+TEST_CASE("Rays pseudo intersections parallel line segments", "[rays]")
 {
 	// Rays that are parallel
+	const Ray parallelR1{ {0.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 0.0, 1.0 };
+	const Ray parallelR2{ {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 0.0, 1.0 };
+	glm::vec3 parallelIntersection;
+
+	const auto parallelSuccess = raysPseudoIntersection(parallelR1, parallelR2, parallelIntersection);
+	REQUIRE_FALSE(parallelSuccess);
+}
+
+TEST_CASE("Rays pseudo intersections simple", "[rays]")
+{
 	const Ray r1{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0} };
 	const Ray r2{ {1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0} };
 	glm::vec3 intersection;
@@ -209,7 +219,6 @@ TEST_CASE("Rays pseudo intersections simple", "[rays]")
 
 TEST_CASE("Rays pseudo intersections complex", "[rays]")
 {
-	// Rays that are parallel
 	const std::array<Ray, 4> r = 
 	{ {
 		{ {0.067, 0.310, 0.721}, {0.196, 0.362, 0.911} },
@@ -262,6 +271,38 @@ TEST_CASE("Rays pseudo intersections complex", "[rays]")
 			REQUIRE(intersection.z == Approx(intersections[i][j].z));
 		}
 	}
+}
+
+TEST_CASE("Rays pseudo intersections line segments simple", "[rays]")
+{
+	const Ray ray0Normal{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 1.0 };
+	const Ray ray0Long{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 2.0 };
+	const Ray ray1Short{ {1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0}, 0.0, 0.5 };
+	const Ray ray1Normal{ {1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0}, 0.0, 1.0 };
+	const Ray ray1Long{ {1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0}, 0.0, 2.0 };
+	glm::vec3 intersection;
+	bool success;
+
+	// Intersection right at the end of the two segments
+	success = raysPseudoIntersection(ray0Normal, ray1Normal, intersection);
+	REQUIRE(success);
+	REQUIRE(intersection.x == Approx(0.0));
+	REQUIRE(intersection.y == Approx(1.0));
+	REQUIRE(intersection.z == Approx(0.5));
+
+	// Intersection in the middle of the two segments
+	success = raysPseudoIntersection(ray0Long, ray1Long, intersection);
+	REQUIRE(success);
+	REQUIRE(intersection.x == Approx(0.0));
+	REQUIRE(intersection.y == Approx(1.0));
+	REQUIRE(intersection.z == Approx(0.5));
+
+	// Intersection at the end of one segment but not the other
+	success = raysPseudoIntersection(ray0Long, ray1Short, intersection);
+	REQUIRE(success);
+	REQUIRE(intersection.x == Approx(0.25));
+	REQUIRE(intersection.y == Approx(1.0));
+	REQUIRE(intersection.z == Approx(0.5));
 }
 
 #ifdef CATCH_CONFIG_ENABLE_BENCHMARKING
