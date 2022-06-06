@@ -181,29 +181,58 @@ TEST_CASE("Triangulation of many points from multiple views", "[triangulation]")
 	REQUIRE(error == Approx(triangulationError));
 }
 
-TEST_CASE("Rays pseudo intersections when parallel", "[rays]")
+TEST_CASE("Rays pseudo intersections parallel lines", "[rays]")
 {
 	// Rays that are parallel
 	const Ray parallelR1{{0.0, 0.0, 0.0}, {0.0, 0.0, 1.0}};
 	const Ray parallelR2{ {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0} };
-	glm::vec3 parallelIntersection;
+	glm::vec3 intersection;
 
-	const auto parallelSuccess = raysPseudoIntersection(parallelR1, parallelR2, parallelIntersection);
-	REQUIRE_FALSE(parallelSuccess);
+	const auto success = raysPseudoIntersection(parallelR1, parallelR2, intersection);
+	REQUIRE_FALSE(success);
 }
 
 TEST_CASE("Rays pseudo intersections parallel line segments", "[rays]")
 {
-	// Rays that are parallel
 	const Ray parallelR1{ {0.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 0.0, 1.0 };
 	const Ray parallelR2{ {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 0.0, 1.0 };
-	glm::vec3 parallelIntersection;
+	const Ray parallelR3{ {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 1.0, 2.0 };
+	const Ray parallelR4{ {1.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 0.0, 1.0 };
+	glm::vec3 intersection;
+	bool success;
 
-	const auto parallelSuccess = raysPseudoIntersection(parallelR1, parallelR2, parallelIntersection);
-	REQUIRE_FALSE(parallelSuccess);
+	// Line segment rays that are parallel and next to each other
+	// so that the pseudo intersection is not defined (infinity of points)
+	success = raysPseudoIntersection(parallelR1, parallelR2, intersection);
+	REQUIRE_FALSE(success);
+
+	// Line segments that are parallel but with no overlap in such a way that the
+	// pseudo intersection is unique
+	success = raysPseudoIntersection(parallelR1, parallelR3, intersection);
+	REQUIRE(success);
+	REQUIRE(intersection.x == Approx(0.5));
+	REQUIRE(intersection.y == Approx(0.0));
+	REQUIRE(intersection.z == Approx(1.0));
+
+	success = raysPseudoIntersection(parallelR1, parallelR4, intersection);
+	REQUIRE(success);
+	REQUIRE(intersection.x == Approx(0.5));
+	REQUIRE(intersection.y == Approx(0.0));
+	REQUIRE(intersection.z == Approx(1.0));
 }
 
-TEST_CASE("Rays pseudo intersections simple", "[rays]")
+TEST_CASE("Rays pseudo intersections parallel mixed line and line segments", "[rays]")
+{
+	// Rays that are parallel
+	const Ray parallelR1{ {0.0, 0.0, 0.0}, {0.0, 0.0, 1.0} };
+	const Ray parallelR2{ {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 0.0, 1.0 };
+	glm::vec3 intersection;
+
+	const auto success = raysPseudoIntersection(parallelR1, parallelR2, intersection);
+	REQUIRE_FALSE(success);
+}
+
+TEST_CASE("Rays pseudo intersections", "[rays]")
 {
 	const Ray r1{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0} };
 	const Ray r2{ {1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0} };
@@ -273,7 +302,7 @@ TEST_CASE("Rays pseudo intersections complex", "[rays]")
 	}
 }
 
-TEST_CASE("Rays pseudo intersections line segments simple", "[rays]")
+TEST_CASE("Rays pseudo intersections line segments", "[rays]")
 {
 	const Ray ray0Normal{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 1.0 };
 	const Ray ray0Long{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 2.0 };
@@ -305,7 +334,7 @@ TEST_CASE("Rays pseudo intersections line segments simple", "[rays]")
 	REQUIRE(intersection.z == Approx(0.5));
 }
 
-TEST_CASE("Rays pseudo intersections mixed", "[rays]")
+TEST_CASE("Rays pseudo intersections mixed line and line segments", "[rays]")
 {
 	// Line ray (infinite)
 	const Ray r1{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0} };
