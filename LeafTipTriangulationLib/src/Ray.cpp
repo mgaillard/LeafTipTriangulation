@@ -15,24 +15,33 @@
 // ------------------------------------------
 
 /**
- * \brief Compute the pseudo intersection of two lines (defined by rays)
- *        Warning: the two directions cannot be parallel, it should be tested before calling this function.
+ * \brief Compute the pseudo intersection of two lines
  * \param a0 Start of line 0
  * \param b0 End of line 0
  * \param a1 Start of line 1
  * \param b1 End of line 1
- * \return The coordinates of the pseudo intersection of the two lines
+ * \param c Output the coordinates of the pseudo intersection of the two lines if they are not parallel
+ * \return True if lines are not parallel and the pseudo-intersection is defined, false otherwise
  */
-glm::dvec3 linesPseudoIntersection(
+bool linesPseudoIntersection(
 	const glm::dvec3& a0,
 	const glm::dvec3& b0,
 	const glm::dvec3& a1,
-	const glm::dvec3& b1)
+	const glm::dvec3& b1,
+	glm::dvec3& c)
 {
 	const std::array<glm::dvec3, 2> u = {{
 		glm::normalize(b0 - a0),
 		glm::normalize(b1 - a1)
 	}};
+	
+	// Failure case: the lines are parallel and the pseudo-intersection does not exist
+	// Epsilon is scaled to the magnitude of u0 + u1, which is 2.0f
+	if (glm::length(glm::cross(u[0], u[1])) <= 2.0 * glm::epsilon<double>())
+	{
+		// We can't solve the equation system
+		return false;
+	}
 
 	std::array<glm::dmat3, 2> A = { glm::dmat3(0.0), glm::dmat3(0.0) };
 	for (unsigned int i = 0; i < A.size(); i++)
@@ -58,7 +67,9 @@ glm::dvec3 linesPseudoIntersection(
 	}
 
 	// Closest point between the two lines
-	return glm::inverse(A[0] + A[1]) * ((A[0] * a0) + (A[1] * a1));
+	c = glm::inverse(A[0] + A[1]) * ((A[0] * a0) + (A[1] * a1));
+
+	return true;
 }
 
 /**
@@ -153,11 +164,15 @@ bool lineAndLineSegmentPseudoIntersection(
 	const glm::dvec3& lineSegmentB,
 	glm::dvec3& c)
 {
-	// TODO: Check if parallel
-	// TODO: Make dedicated parallel test
-
 	// Check the pseudo intersection of the two lines
-	auto pseudoIntersection = linesPseudoIntersection(lineA, lineB, lineSegmentA, lineSegmentB);
+	glm::dvec3 pseudoIntersection;
+	const auto isNotParallel = linesPseudoIntersection(lineA, lineB, lineSegmentA, lineSegmentB, pseudoIntersection);
+
+	// If the line segment is parallel to the line, the pseudo-intersection is not defined
+	if (!isNotParallel)
+	{
+		return false;
+	}
 
 	// Project back to the line segment and check that it is between A and B
 	const auto u = pointLineProjection(pseudoIntersection, lineSegmentA, lineSegmentB);
@@ -171,15 +186,17 @@ bool lineAndLineSegmentPseudoIntersection(
 	else if (u < 0.0)
 	{
 		// Clamp at A
-		distToLine(lineSegmentA, lineA, lineB, pseudoIntersection);
-		c = (lineSegmentA + pseudoIntersection) / 2.0;
+		glm::dvec3 projectionOnLine;
+		distToLine(lineSegmentA, lineA, lineB, projectionOnLine);
+		c = (lineSegmentA + projectionOnLine) / 2.0;
 		return true;
 	}
 	else if (u > 1.0)
 	{
 		// Clamp at B
-		distToLine(lineSegmentB, lineA, lineB, pseudoIntersection);
-		c = (lineSegmentB + pseudoIntersection) / 2.0;
+		glm::dvec3 projectionOnLine;
+		distToLine(lineSegmentB, lineA, lineB, projectionOnLine);
+		c = (lineSegmentB + projectionOnLine) / 2.0;
 		return true;
 	}
 	
@@ -244,19 +261,6 @@ bool lineSegmentsPseudoIntersection(
 
 bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
 {
-	const std::array<glm::vec3, 2> u = {{
-		glm::normalize(ray0.direction),
-		glm::normalize(ray1.direction)
-	}};
-
-	// Failure case 1: ray0 and ray1 are parallel
-	// Epsilon is scaled to the magnitude of u0 + u1, which is 2.0f
-	if (glm::length(glm::cross(u[0], u[1])) <= 2.f * glm::epsilon<float>())
-	{
-		// We can't solve the equation system
-		return false;
-	}
-
 	// If rays are lines
 	if (!ray0.isClamped() && !ray1.isClamped())
 	{
@@ -264,10 +268,18 @@ bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
 		const glm::dvec3 b0 = ray0.origin + ray0.direction;
 		const glm::dvec3 a1 = ray1.origin;
 		const glm::dvec3 b1 = ray1.origin + ray1.direction;
+		
+		glm::dvec3 pseudoIntersection;
+		const auto success = linesPseudoIntersection(a0, b0, a1, b1, pseudoIntersection);
 
-		c = linesPseudoIntersection(a0, b0, a1, b1);
+		if (success)
+		{
+			c = pseudoIntersection;
+		}
+		
+		return success;
 	}
-	// If ray are line segments
+	// If rays are line segments
 	else if (ray0.isClamped() && ray1.isClamped())
 	{
 		const glm::dvec3 a0 = ray0.at(ray0.start());
@@ -278,6 +290,8 @@ bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
 		glm::dvec3 pseudoIntersection;
 		lineSegmentsPseudoIntersection(a0, b0, a1, b1, pseudoIntersection);
 		c = pseudoIntersection;
+
+		return true;
 	}
 	// If the two rays are mixed: line and line segment
 	else if (ray0.isClamped() && !ray1.isClamped())
@@ -288,9 +302,14 @@ bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
 		const glm::dvec3 lineB = ray1.origin + ray1.direction;
 
 		glm::dvec3 pseudoIntersection;
-		lineAndLineSegmentPseudoIntersection(lineA, lineB, lineSegmentA, lineSegmentB, pseudoIntersection);
-		c = pseudoIntersection;
-		return true;
+		const auto success = lineAndLineSegmentPseudoIntersection(lineA, lineB, lineSegmentA, lineSegmentB, pseudoIntersection);
+
+		if (success)
+		{
+			c = pseudoIntersection;
+		}
+
+		return success;
 	}
 	else if (!ray0.isClamped() && ray1.isClamped())
 	{
@@ -300,12 +319,17 @@ bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
 		const glm::dvec3 lineSegmentB = ray1.at(ray1.end());
 
 		glm::dvec3 pseudoIntersection;
-		lineAndLineSegmentPseudoIntersection(lineA, lineB, lineSegmentA, lineSegmentB, pseudoIntersection);
-		c = pseudoIntersection;
-		return true;
+		const auto success = lineAndLineSegmentPseudoIntersection(lineA, lineB, lineSegmentA, lineSegmentB, pseudoIntersection);
+
+		if (success)
+		{
+			c = pseudoIntersection;
+		}
+
+		return success;
 	}
 
-	return true;
+	return false;
 }
 
 
