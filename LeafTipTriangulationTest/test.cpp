@@ -4,6 +4,15 @@
 #include "Camera.h"
 #include "Triangulation.h"
 
+// Hold the test data for rays
+struct RayTestData
+{
+	Ray ray0;
+	Ray ray1;
+	bool success;
+	glm::vec3 intersection;
+};
+
 /**
  * \brief Test the triangulation from multiple views:
  *         - Project the 3D point on all views
@@ -181,7 +190,7 @@ TEST_CASE("Triangulation of many points from multiple views", "[triangulation]")
 	REQUIRE(error == Approx(triangulationError));
 }
 
-TEST_CASE("Rays pseudo intersections parallel lines", "[rays]")
+TEST_CASE("Rays pseudo intersections parallel (lines)", "[rays]")
 {
 	// Rays that are parallel
 	const Ray parallelR1{{0.0, 0.0, 0.0}, {0.0, 0.0, 1.0}};
@@ -192,8 +201,72 @@ TEST_CASE("Rays pseudo intersections parallel lines", "[rays]")
 	REQUIRE_FALSE(success);
 }
 
-TEST_CASE("Rays pseudo intersections parallel line segments", "[rays]")
+TEST_CASE("Rays pseudo intersections parallel (line segments)", "[rays]")
 {
+	const std::vector<RayTestData> tests = {
+		// Line segment 0 on top, line segment 1 at the bottom
+		{
+			{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 2.0, 3.0 },
+			{{0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 1.0 },
+			true,
+			{ 0.5, 1.5, 0.0 }
+		},
+		// Line segment 0 on top, line segment 1 at the bottom (exact match)
+		{
+			{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 1.0, 2.0 },
+			{{0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 1.0 },
+			true,
+			{ 0.0, 1.0, 0.0 }
+		},
+		// Line segment 0 on top, line segment 1 at the bottom (overlap A1-A0-B1-B0)
+		{
+			{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 1.0, 3.0 },
+			{{0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 2.0 },
+			false,
+			{ 0.0, 0.0, 0.0 }
+		},
+		// Line segment 0 on the left, line segment 1 the right (overlap A0-A1-B1-B0)
+		{
+			{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 3.0 },
+			{{0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 1.0, 2.0 },
+			false,
+			{ 0.0, 0.0, 0.0 }
+		}
+	};
+
+	for (const auto& test : tests)
+	{
+		glm::vec3 intersection;
+		bool success;
+		// Run the test one way
+		success = raysPseudoIntersection(test.ray0, test.ray1, intersection);
+
+		REQUIRE(success == test.success);
+
+		// If the test case has a unique pseudo-intersection, check its coordinates
+		if (test.success)
+		{
+			REQUIRE(intersection.x == Approx(test.intersection.x));
+			REQUIRE(intersection.y == Approx(test.intersection.y));
+			REQUIRE(intersection.z == Approx(test.intersection.z));
+		}
+
+		// Run the test the other way (swap ray0 and ray1)
+		// Run the test one way
+		success = raysPseudoIntersection(test.ray1, test.ray0, intersection);
+
+		REQUIRE(success == test.success);
+
+		// If the test case has a unique pseudo-intersection, check its coordinates
+		if (test.success)
+		{
+			REQUIRE(intersection.x == Approx(test.intersection.x));
+			REQUIRE(intersection.y == Approx(test.intersection.y));
+			REQUIRE(intersection.z == Approx(test.intersection.z));
+		}
+	}
+
+
 	const Ray parallelR1{ {0.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 0.0, 1.0 };
 	const Ray parallelR2{ {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 0.0, 1.0 };
 	const Ray parallelR3{ {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 1.0, 2.0 };
@@ -221,7 +294,7 @@ TEST_CASE("Rays pseudo intersections parallel line segments", "[rays]")
 	REQUIRE(intersection.z == Approx(1.0));
 }
 
-TEST_CASE("Rays pseudo intersections parallel mixed line and line segments", "[rays]")
+TEST_CASE("Rays pseudo intersections parallel (mixed line and line segments)", "[rays]")
 {
 	// Rays that are parallel
 	const Ray parallelR1{ {0.0, 0.0, 0.0}, {0.0, 0.0, 1.0} };
@@ -232,23 +305,22 @@ TEST_CASE("Rays pseudo intersections parallel mixed line and line segments", "[r
 	REQUIRE_FALSE(success);
 }
 
-TEST_CASE("Rays pseudo intersections", "[rays]")
+TEST_CASE("Rays pseudo intersections (lines)", "[rays]")
 {
+	// Very simple hard coded test
 	const Ray r1{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0} };
 	const Ray r2{ {1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0} };
 	glm::vec3 intersection;
+	bool success;
 
-	const auto success = raysPseudoIntersection(r1, r2, intersection);
+	success = raysPseudoIntersection(r1, r2, intersection);
 	REQUIRE(success);
-
 	REQUIRE(intersection.x == Approx(0.0));
 	REQUIRE(intersection.y == Approx(1.0));
 	REQUIRE(intersection.z == Approx(0.5));
-}
 
-TEST_CASE("Rays pseudo intersections complex", "[rays]")
-{
-	const std::array<Ray, 4> r = 
+	// Test against the current implementation on random input rays
+	const std::array<Ray, 4> r =
 	{ {
 		{ {0.067, 0.310, 0.721}, {0.196, 0.362, 0.911} },
 		{ {0.867, 0.158, 0.293}, {0.762, 0.620, 0.189} },
@@ -256,7 +328,7 @@ TEST_CASE("Rays pseudo intersections complex", "[rays]")
 		{ {0.808, 0.951, 0.391}, {0.111, 0.798, 0.592} }
 	} };
 
-	const std::array<std::array<glm::vec3, 4>, 4> intersections = {{
+	const std::array<std::array<glm::vec3, 4>, 4> intersections = { {
 		{{
 			{ 0.0, 0.0, 0.0},
 			{ 0.07263205945491791, -0.1626813411712646, 0.08639559149742126 },
@@ -291,9 +363,8 @@ TEST_CASE("Rays pseudo intersections complex", "[rays]")
 			{
 				continue;
 			}
-
-			glm::vec3 intersection;
-			const auto success = raysPseudoIntersection(r[i], r[j], intersection);
+			
+			success = raysPseudoIntersection(r[i], r[j], intersection);
 			REQUIRE(success);
 			REQUIRE(intersection.x == Approx(intersections[i][j].x));
 			REQUIRE(intersection.y == Approx(intersections[i][j].y));
@@ -302,39 +373,93 @@ TEST_CASE("Rays pseudo intersections complex", "[rays]")
 	}
 }
 
-TEST_CASE("Rays pseudo intersections line segments", "[rays]")
+TEST_CASE("Rays pseudo intersections (line segments)", "[rays]")
 {
-	const Ray ray0Normal{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 1.0 };
-	const Ray ray0Long{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 2.0 };
-	const Ray ray1Short{ {1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0}, 0.0, 0.5 };
-	const Ray ray1Normal{ {1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0}, 0.0, 1.0 };
-	const Ray ray1Long{ {1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0}, 0.0, 2.0 };
-	glm::vec3 intersection;
-	bool success;
+	const std::vector<RayTestData> tests = {
+		// Intersection in the middle of the two line segments, equivalent to lines
+		{
+			{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 2.0 },
+			{ {1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0}, 0.0, 2.0 },
+			true,
+			{ 0.0, 1.0, 0.5 }
+		},
+		// Intersection at A of line segment 0 and middle of line segment 1
+		{
+			{ {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, 0.0, 1.0 },
+			{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 2.0 },
+			true,
+			{ 0.5, 1.0, 0.5 }
+		},
+		// Intersection at B of line segment 0 and middle of line segment 1
+		{
+			{ {-1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0}, 0.0, 1.0 },
+			{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 2.0 },
+			true,
+			{ -0.5, 1.0, 0.5 }
+		},
+		// Intersection at A of line segment 1 and middle of line segment 0
+		{
+			{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 2.0 },
+			{ {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, 0.0, 1.0 },
+			true,
+			{ 0.5, 1.0, 0.5 }
+		},
+		// Intersection at B of line segment 1 and middle of line segment 0
+		{
+			{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 2.0 },
+			{ {-1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0}, 0.0, 1.0 },
+			true,
+			{ -0.5, 1.0, 0.5 }
+		},
+		// Intersection at both line segments in A
+		{
+			{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 1.0 },
+			{ {0.0, 0.0, 1.0}, {1.0, 0.0, 0.0}, 0.0, 1.0 },
+			true,
+			{ 0.0, 0.0, 0.5 }
+		},
+		// Intersection at A of line segments 0 and at B of line segment 1
+		{
+			{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 1.0 },
+			{ {-1.0, 0.0, 1.0}, {1.0, 0.0, 0.0}, 0.0, 1.0 },
+			true,
+			{ 0.0, 0.0, 0.5 }
+		},
+		// Intersection at B of line segments 0 and at A of line segment 1
+		{
+			{ {-1.0, 0.0, 1.0}, {1.0, 0.0, 0.0}, 0.0, 1.0 },
+			{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 1.0 },
+			true,
+			{ 0.0, 0.0, 0.5 }
+		},
+		// Intersection at both line segments in B
+		{
+			{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 1.0 },
+			{ {-1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, 0.0, 1.0 },
+			true,
+			{ 0.0, 1.0, 0.5 }
+		},
+	};
 
-	// Intersection right at the end of the two segments
-	success = raysPseudoIntersection(ray0Normal, ray1Normal, intersection);
-	REQUIRE(success);
-	REQUIRE(intersection.x == Approx(0.0));
-	REQUIRE(intersection.y == Approx(1.0));
-	REQUIRE(intersection.z == Approx(0.5));
+	for (const auto& test: tests)
+	{
+		// Run the test
+		glm::vec3 intersection;
+		const auto success = raysPseudoIntersection(test.ray0, test.ray1, intersection);
 
-	// Intersection in the middle of the two segments
-	success = raysPseudoIntersection(ray0Long, ray1Long, intersection);
-	REQUIRE(success);
-	REQUIRE(intersection.x == Approx(0.0));
-	REQUIRE(intersection.y == Approx(1.0));
-	REQUIRE(intersection.z == Approx(0.5));
+		REQUIRE(success == test.success);
 
-	// Intersection at the end of one segment but not the other
-	success = raysPseudoIntersection(ray0Long, ray1Short, intersection);
-	REQUIRE(success);
-	REQUIRE(intersection.x == Approx(0.25));
-	REQUIRE(intersection.y == Approx(1.0));
-	REQUIRE(intersection.z == Approx(0.5));
+		// If the test case has a unique pseudo-intersection, check its coordinates
+		if (test.success)
+		{
+			REQUIRE(intersection.x == Approx(test.intersection.x));
+			REQUIRE(intersection.y == Approx(test.intersection.y));
+			REQUIRE(intersection.z == Approx(test.intersection.z));
+		}
+	}
 }
 
-TEST_CASE("Rays pseudo intersections mixed line and line segments", "[rays]")
+TEST_CASE("Rays pseudo intersections (mixed line and line segments)", "[rays]")
 {
 	// Line ray (infinite)
 	const Ray r1{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0} };

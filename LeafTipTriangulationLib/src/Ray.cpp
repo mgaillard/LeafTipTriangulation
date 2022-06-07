@@ -219,41 +219,93 @@ bool lineSegmentsPseudoIntersection(
 	const glm::dvec3& b1,
 	glm::dvec3& c)
 {
-	// TODO: If line segments are parallel it's possible that they have a unique pseudo intersection if one segment is "before" the other
 	// Source: https://stackoverflow.com/questions/2824478/shortest-distance-between-two-line-segments
 
-	// Failure case 1: ray0 and ray1 are parallel
-	// Epsilon is scaled to the magnitude of u0 + u1, which is 2.0f
-	if (glm::length(glm::cross(b0 - a0, b1 - a1)) <= 2.0 * glm::epsilon<double>())
+	// Check the pseudo intersection of the two line segments as if they were lines
+	glm::dvec3 pseudoIntersection;
+	const auto isNotParallel = linesPseudoIntersection(a0, b0, a1, b1, pseudoIntersection);
+
+	// If the lines are parallel, the pseudo-intersection may not be defined
+	if (!isNotParallel)
 	{
-		// We can't solve the equation system
+		// TODO: try to find if there is a unique pseudo intersection even if line segments are parallel
 		return false;
 	}
 
-	// Brute force approach
-	// TODO: Implement better approach
+	// Project back to the line segment and check that it is between A and B
+	const auto u = pointLineProjection(pseudoIntersection, a0, b0);
+	const auto v = pointLineProjection(pseudoIntersection, a1, b1);
 
-	double minDist = std::numeric_limits<double>::max();
-
-	constexpr int N = 10000;
-	for (int i = 0; i < N; i++)
+	// u and v can be in 3 different zones w.r.t. the line segment
+	// - Before the start of the line segment (u < 0.0)
+	// - In the line segment (u >= 0.0 && u <= 1.0)
+	// - After the end of the line segment (u > 1.0)
+	// Therefore, there are a total of 9 cases to handle differently
+	if (u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0)
 	{
-		const auto u = static_cast<double>(i) / (N - 1);
-		const auto point = a1 + u * (b1 - a1);
-
-		glm::dvec3 closestPoint;
-		const auto dist = distToLineSegment(point, a0, b0, closestPoint);
-
-		if (dist < minDist)
-		{
-			minDist = dist;
-			c = (closestPoint + point) / 2.0;
-		}
+		// Keep this pseudo intersection because it is equivalent to having two lines
+		c = pseudoIntersection;
+		return true;
+	}
+	else if (u < 0.0 && v >= 0.0 && v <= 1.0)
+	{
+		// Clamp line segment 0 at A
+		glm::dvec3 projectionOnLine;
+		distToLine(a0, a1, b1, projectionOnLine);
+		c = (a0 + projectionOnLine) / 2.0;
+		return true;
+	}
+	else if (u > 1.0 && v >= 0.0 && v <= 1.0)
+	{
+		// Clamp line segment 0 at B
+		glm::dvec3 projectionOnLine;
+		distToLine(b0, a1, b1, projectionOnLine);
+		c = (b0 + projectionOnLine) / 2.0;
+		return true;
+	}
+	else if (u >= 0.0 && u <= 1.0 && v < 0.0)
+	{
+		// Clamp line segment 1 at A
+		glm::dvec3 projectionOnLine;
+		distToLine(a1, a0, b0, projectionOnLine);
+		c = (a1 + projectionOnLine) / 2.0;
+		return true;
+	}
+	else if (u >= 0.0 && u <= 1.0 && v > 1.0)
+	{
+		// Clamp line segment 1 at B
+		glm::dvec3 projectionOnLine;
+		distToLine(b1, a0, b0, projectionOnLine);
+		c = (b1 + projectionOnLine) / 2.0;
+		return true;
+	}
+	else if (u < 0.0 && v < 0.0)
+	{
+		// Clamp both line segments at A
+		c = (a0 + a1) / 2.0;
+		return true;
+	}
+	else if (u < 0.0 && v > 1.0)
+	{
+		// Clamp line segment 0 at A and line segment 1 at B
+		c = (a0 + b1) / 2.0;
+		return true;
+	}
+	else if (u > 1.0 && v < 0.0)
+	{
+		// Clamp line segment 0 at B and line segment 1 at A
+		c = (a1 + b0) / 2.0;
+		return true;
+	}
+	else if (u > 1.0 && v > 1.0)
+	{
+		// Clamp both line segments at B
+		c = (b0 + b1) / 2.0;
+		return true;
 	}
 
-	return true;
+	return false;
 }
-
 
 // ------------------------------------------
 // Public functions
@@ -288,10 +340,14 @@ bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
 		const glm::dvec3 b1 = ray1.at(ray1.end());
 
 		glm::dvec3 pseudoIntersection;
-		lineSegmentsPseudoIntersection(a0, b0, a1, b1, pseudoIntersection);
-		c = pseudoIntersection;
+		const auto success = lineSegmentsPseudoIntersection(a0, b0, a1, b1, pseudoIntersection);
+		
+		if (success)
+		{
+			c = pseudoIntersection;
+		}
 
-		return true;
+		return success;
 	}
 	// If the two rays are mixed: line and line segment
 	else if (ray0.isClamped() && !ray1.isClamped())
