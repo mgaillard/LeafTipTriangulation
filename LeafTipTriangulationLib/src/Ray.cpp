@@ -228,7 +228,47 @@ bool lineSegmentsPseudoIntersection(
 	// If the lines are parallel, the pseudo-intersection may not be defined
 	if (!isNotParallel)
 	{
-		// TODO: try to find if there is a unique pseudo intersection even if line segments are parallel
+		// Project all the end points A and B on the line 0
+		// The projection of A on the line (AB) has parametric coordinate 0.0
+		const auto ua0 = 0.0;
+		// The projection of B on the line (AB) has parametric coordinate 1.0
+		const auto ub0 = 1.0;
+		const auto ua1 = pointLineProjection(a1, a0, b0);
+		const auto ub1 = pointLineProjection(b1, a0, b0);
+
+		// Sort the line segments to make mirror cases easier to handle
+		// By default, line segment 1 is in the same direction as line segment 0
+		double ustart1 = ua1;
+		double uend1 = ub1;
+		glm::dvec3 start1 = a1;
+		glm::dvec3 end1 = b1;
+		// In case the line segment 1 is in the opposite direction as line segment 0
+		if (ub1 < ua1)
+		{
+			// Swap the end points
+			std::swap(ustart1, uend1);
+			std::swap(start1, end1);
+		}
+
+		// For the rest of the block, we can assume that the points are in this order
+		assert(ua0 < ub0);
+		assert(ustart1 < uend1);
+
+		// Handle different cases based on the ordering of points
+		// The line segment 1 is below the line segment 0
+		if (uend1 <= ua0)
+		{
+			c = (a0 + end1) / 2.0;
+			return true;
+		}
+		// The line segment 1 is above the line segment 0
+		if (ustart1 >= ub0)
+		{
+			c = (b0 + start1) / 2.0;
+			return true;
+		}
+
+		// In all other cases, there is no unique pseudo-intersection
 		return false;
 	}
 

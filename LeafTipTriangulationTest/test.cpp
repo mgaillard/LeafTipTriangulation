@@ -216,7 +216,7 @@ TEST_CASE("Rays pseudo intersections parallel (line segments)", "[rays]")
 			{{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 1.0, 2.0 },
 			{{0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, 0.0, 1.0 },
 			true,
-			{ 0.0, 1.0, 0.0 }
+			{ 0.5, 1.0, 0.0 }
 		},
 		// Line segment 0 on top, line segment 1 at the bottom (overlap A1-A0-B1-B0)
 		{
@@ -265,33 +265,6 @@ TEST_CASE("Rays pseudo intersections parallel (line segments)", "[rays]")
 			REQUIRE(intersection.z == Approx(test.intersection.z));
 		}
 	}
-
-
-	const Ray parallelR1{ {0.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 0.0, 1.0 };
-	const Ray parallelR2{ {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 0.0, 1.0 };
-	const Ray parallelR3{ {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 1.0, 2.0 };
-	const Ray parallelR4{ {1.0, 0.0, 1.0}, {0.0, 0.0, 1.0}, 0.0, 1.0 };
-	glm::vec3 intersection;
-	bool success;
-
-	// Line segment rays that are parallel and next to each other
-	// so that the pseudo intersection is not defined (infinity of points)
-	success = raysPseudoIntersection(parallelR1, parallelR2, intersection);
-	REQUIRE_FALSE(success);
-
-	// Line segments that are parallel but with no overlap in such a way that the
-	// pseudo intersection is unique
-	success = raysPseudoIntersection(parallelR1, parallelR3, intersection);
-	REQUIRE(success);
-	REQUIRE(intersection.x == Approx(0.5));
-	REQUIRE(intersection.y == Approx(0.0));
-	REQUIRE(intersection.z == Approx(1.0));
-
-	success = raysPseudoIntersection(parallelR1, parallelR4, intersection);
-	REQUIRE(success);
-	REQUIRE(intersection.x == Approx(0.5));
-	REQUIRE(intersection.y == Approx(0.0));
-	REQUIRE(intersection.z == Approx(1.0));
 }
 
 TEST_CASE("Rays pseudo intersections parallel (mixed line and line segments)", "[rays]")
