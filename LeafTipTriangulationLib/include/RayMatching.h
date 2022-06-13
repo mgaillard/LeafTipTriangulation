@@ -43,7 +43,7 @@ bool computeDistributionOfSimilarities(
 	const std::string& filename,
 	const std::vector<Camera>& cameras,
 	const std::vector<std::vector<glm::vec2>>& points2D,
-	const std::vector<std::vector<Ray>>& rays, 
+	const std::vector<std::vector<Ray>>& rays,
 	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays);
 
 /**

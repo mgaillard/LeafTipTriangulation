@@ -108,6 +108,16 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 	float thresholdNoPair);
 
 /**
+ * \brief Triangulate many points in 3D from two 2D views using the pseudo intersection of rays
+ * \param rays A list of 3D rays associated to 2D points per camera
+ * \param setsOfRays Correspondences of the points in the 2D views
+ * \return All 3D triangulated points
+ */
+std::vector<glm::vec3> pseudoIntersectionManyPointsFromTwoViews(
+	const std::vector<std::vector<Ray>>& rays,
+	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays);
+
+/**
  * \brief Match each ray to a 3D point based on the re-projected error
  * \param cameras A list of cameras
  * \param points2D A list of 2D points per camera
@@ -349,6 +359,44 @@ std::vector<std::vector<std::pair<int, int>>> findSetsOfRays(
 	return setsOfRays;
 }
 
+std::vector<glm::vec3> pseudoIntersectionManyPointsFromTwoViews(
+	const std::vector<std::vector<Ray>>& rays,
+	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
+{
+	std::vector<glm::vec3> points3d;
+
+	points3d.reserve(setsOfRays.size());
+	for (const auto& pointProjections : setsOfRays)
+	{
+		if (pointProjections.size() <= 1)
+		{
+			// It's impossible to triangulate a point with only one projection
+			// Add an infinity point
+			points3d.emplace_back(
+				std::numeric_limits<float>::max(),
+				std::numeric_limits<float>::max(),
+				std::numeric_limits<float>::max()
+			);
+			// Go on with the next point to triangulate
+			continue;
+		}
+
+		// A point should have exactly two projections to be triangulated
+		assert(pointProjections.size() == 2);
+
+		const auto& [cameraIndex0, rayIndex0] = pointProjections[0];
+		const auto& [cameraIndex1, rayIndex1] = pointProjections[1];
+		const auto& ray0 = rays[cameraIndex0][rayIndex0];
+		const auto& ray1 = rays[cameraIndex1][rayIndex1];
+
+		glm::vec3 pseudoIntersection;
+		raysPseudoIntersection(ray0, ray1, pseudoIntersection);
+		points3d.push_back(pseudoIntersection);
+	}
+
+	return points3d;
+}
+
 std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 	const std::vector<Camera>& cameras,
 	const std::vector<std::vector<glm::vec2>>& points2D,
@@ -540,10 +588,9 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 			}
 		}
 
-		float triangulationError;
-		std::vector<glm::vec3> triangulatedPoints3D;
-		std::tie(triangulationError, triangulatedPoints3D) = triangulateManyPointsFromMultipleViews(cameras, points2D, setsOfRays);
-				
+		// Use pseudo-intersection to triangulate points instead of multiple-view triangulation
+		const auto triangulatedPoints3D = pseudoIntersectionManyPointsFromTwoViews(rays, setsOfRays);
+
 		// Store in cache
 		cacheDP[cacheIndex].set(triangulatedPoints3D, setsOfRays);
 
