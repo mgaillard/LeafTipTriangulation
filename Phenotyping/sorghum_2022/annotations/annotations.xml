@@ -317,7 +317,7 @@
           <overlap>0</overlap>
           <bugtracker></bugtracker>
           <created>2022-05-12 20:52:35.661925+01:00</created>
-          <updated>2022-05-14 22:18:58.767225+01:00</updated>
+          <updated>2022-06-11 10:37:52.766022+01:00</updated>
           <subset>Validation</subset>
           <start_frame>0</start_frame>
           <stop_frame>9</stop_frame>
@@ -691,7 +691,7 @@
       </owner>
       <assignee></assignee>
     </project>
-    <dumped>2022-05-19 22:43:46.226059+01:00</dumped>
+    <dumped>2022-06-11 10:38:11.347411+01:00</dumped>
   </meta>
   <image id="9" name="top_0_90_0.jpg" subset="Validation" task_id="258559" width="6576" height="4384">
     <points label="Leaf tip" occluded="0" source="manual" points="2957.35,2694.71" z_order="0">
@@ -764,10 +764,6 @@
     </points>
   </image>
   <image id="5" name="0_288_0.jpg" subset="Validation" task_id="258559" width="4384" height="6576">
-    <points label="Leaf tip" occluded="0" source="manual" points="1524.84,5249.93" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2106.15,5330.51" z_order="0">
-    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2813.65,5243.97" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2742.37,4686.86" z_order="0">
@@ -781,6 +777,10 @@
     <points label="Leaf junction" occluded="0" source="manual" points="2196.64,4612.93" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2224.97,4044.34" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1524.84,5249.93" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2106.15,5330.51" z_order="0">
     </points>
   </image>
   <image id="4" name="0_252_0.jpg" subset="Validation" task_id="258559" width="4384" height="6576">
@@ -876,27 +876,27 @@
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2292.51,5159.51" z_order="0">
     </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2299.85,5456.41" z_order="0">
+    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2312.70,5098.41" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2328.53,4612.40" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2376.50,4035.16" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2299.85,5456.41" z_order="0">
-    </points>
   </image>
   <image id="19" name="top_0_90_0_1.jpg" subset="Validation" task_id="258571" width="6576" height="4384">
+    <points label="Leaf tip" occluded="0" source="manual" points="4524.01,1668.71" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="4456.51,2039.72" z_order="0">
+    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2704.38,3288.75" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2270.72,2880.34" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2034.38,2595.44" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="4524.01,1668.71" z_order="0">
-    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="4670.51,1638.76" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="4456.51,2039.72" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="4443.95,2405.01" z_order="0">
     </points>
@@ -908,33 +908,33 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1345.52,4379.10" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1101.76,3837.14" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3144.15,3172.98" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3256.28,3825.30" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3200.51,4135.68" z_order="0">
-    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2442.16,5198.53" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2391.42,5148.28" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1101.76,3837.14" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3144.15,3172.98" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3483.63,4834.00" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3163.51,5021.31" z_order="0">
     </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3256.28,3825.30" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3200.51,4135.68" z_order="0">
+    </points>
   </image>
   <image id="17" name="0_36_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
-    <points label="Leaf tip" occluded="0" source="manual" points="2135.80,4431.60" z_order="0">
-    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2686.34,3176.86" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1717.13,3861.62" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2423.16,5134.14" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="2135.80,4431.60" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2669.83,4953.21" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2423.16,5134.14" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2769.48,4977.69" z_order="0">
     </points>
@@ -944,35 +944,25 @@
     </points>
   </image>
   <image id="16" name="0_324_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
-    <points label="Leaf junction" occluded="0" source="manual" points="2249.59,4978.03" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2248.58,5075.61" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2253.66,5165.73" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2324.81,5116.94" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2253.66,5165.73" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2248.58,5075.61" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3329.46,3819.84" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2317.69,5037.32" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3488.30,4303.44" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2249.59,4978.03" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3514.60,4527.03" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2301.43,4926.86" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3224.20,4810.30" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1036.79,3851.83" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1581.90,3199.88" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2245.53,4839.79" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2289.57,4715.78" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2244.85,4445.06" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2245.53,4839.79" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2301.43,4926.86" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2317.69,5037.32" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="3514.60,4527.03" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1530.91,4968.77" z_order="0">
     </points>
@@ -980,27 +970,27 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1090.21,4173.56" z_order="0">
     </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1036.79,3851.83" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1581.90,3199.88" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3329.46,3819.84" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3488.30,4303.44" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3224.20,4810.30" z_order="0">
+    </points>
   </image>
   <image id="15" name="0_288_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
-    <points label="Leaf junction" occluded="0" source="manual" points="2175.99,4993.34" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2246.95,5048.85" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2246.25,5130.35" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2178.10,5175.31" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2176.69,5081.87" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2178.10,5175.31" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2246.25,5130.35" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2231.49,4945.57" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2246.95,5048.85" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2177.39,4847.91" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3141.24,4448.16" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3415.84,4188.27" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3552.78,3777.43" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2175.99,4993.34" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1236.78,5113.45" z_order="0">
     </points>
@@ -1012,15 +1002,33 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1264.47,3187.54" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2183.02,4439.71" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="3552.78,3777.43" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2213.93,4732.68" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="3415.84,4188.27" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3141.24,4448.16" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2971.45,4708.12" z_order="0">
     </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2177.39,4847.91" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2231.49,4945.57" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2213.93,4732.68" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2183.02,4439.71" z_order="0">
+    </points>
   </image>
   <image id="14" name="0_252_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
-    <points label="Leaf tip" occluded="0" source="manual" points="1314.00,3157.97" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2138.47,5101.47" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2132.85,5190.70" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2137.07,4985.54" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2134.26,4845.03" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2157.24,4454.73" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1319.74,5238.15" z_order="0">
     </points>
@@ -1030,6 +1038,8 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1041.57,3944.68" z_order="0">
     </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1314.00,3157.97" z_order="0">
+    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3294.92,3750.97" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3053.02,4189.10" z_order="0">
@@ -1038,95 +1048,73 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2444.17,4690.79" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2132.85,5190.70" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2138.47,5101.47" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2137.07,4985.54" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2134.26,4845.03" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2157.24,4454.73" z_order="0">
-    </points>
   </image>
   <image id="13" name="0_216_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
-    <points label="Leaf junction" occluded="0" source="manual" points="2178.63,4459.45" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2138.16,4994.65" z_order="0">
-    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2152.33,4854.02" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2178.63,4459.45" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1992.97,4413.50" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1797.65,4378.37" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2729.07,3738.39" z_order="0">
-    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1792.30,3161.47" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2729.07,3738.39" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1329.74,5066.38" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1833.57,5346.82" z_order="0">
     </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2138.16,4994.65" z_order="0">
+    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2145.25,5213.18" z_order="0">
     </points>
   </image>
   <image id="12" name="0_144_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
-    <points label="Leaf junction" occluded="0" source="manual" points="2323.18,4444.97" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3145.53,5274.18" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2315.42,5220.94" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2313.08,5126.10" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2246.33,5166.49" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2313.08,5126.10" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2315.42,5220.94" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2258.04,5082.77" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="1312.50,4873.34" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2317.76,5023.63" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="1003.40,4574.07" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2271.50,4983.24" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="1198.86,4228.07" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2317.17,4894.24" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="1402.83,3770.37" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2278.53,4761.92" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3079.77,5059.70" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="3076.13,3152.31" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3709.16,3920.00" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3647.97,4283.64" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1003.40,4574.07" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2278.53,4761.92" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1312.50,4873.34" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2317.17,4894.24" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1402.83,3770.37" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2271.50,4983.24" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1198.86,4228.07" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2317.76,5023.63" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3076.13,3152.31" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2258.04,5082.77" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2323.18,4444.97" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3145.53,5274.18" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3079.77,5059.70" z_order="0">
     </points>
   </image>
   <image id="11" name="0_108_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
-    <points label="Leaf tip" occluded="0" source="manual" points="3652.16,4194.93" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2381.72,4451.64" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3549.90,4839.40" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2398.15,5208.88" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3361.09,5131.36" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1516.95,4952.40" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1212.46,4655.20" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="995.39,4323.03" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1018.70,3788.36" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3309.79,3167.80" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3798.18,3850.04" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2328.47,5156.19" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2398.15,5130.43" z_order="0">
     </points>
@@ -1140,27 +1128,33 @@
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2354.23,4747.52" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2381.72,4451.64" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="1516.95,4952.40" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2328.47,5156.19" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="1212.46,4655.20" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2398.15,5208.88" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="995.39,4323.03" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1018.70,3788.36" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3309.79,3167.80" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3798.18,3850.04" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3652.16,4194.93" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3549.90,4839.40" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3361.09,5131.36" z_order="0">
     </points>
   </image>
   <image id="10" name="0_0_0_1.jpg" subset="Validation" task_id="258571" width="4384" height="6576">
-    <points label="Leaf tip" occluded="0" source="manual" points="1709.33,3840.35" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2378.25,5030.21" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1708.21,4124.51" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2084.64,4932.83" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2381.37,5119.78" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3175.84,4902.60" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3514.56,4594.23" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2381.37,5119.78" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2378.25,5030.21" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3015.58,4425.47" z_order="0">
     </points>
@@ -1168,9 +1162,15 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2090.29,3182.27" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2366.57,4915.72" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="1709.33,3840.35" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1708.21,4124.51" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2084.64,4932.83" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2348.66,4722.56" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2366.57,4915.72" z_order="0">
     </points>
   </image>
   <image id="29" name="top_0_90_0_2.jpg" subset="Validation" task_id="258573" width="6576" height="4384">
@@ -1624,30 +1624,6 @@
     </points>
   </image>
   <image id="34" name="0_252_0_3.jpg" subset="Validation" task_id="258574" width="4384" height="6576">
-    <points label="Leaf tip" occluded="0" source="manual" points="1666.84,5348.97" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1501.36,5288.80" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="856.82,4965.74" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="493.45,4881.44" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="961.37,3206.12" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2124.78,3390.54" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3661.90,3336.29" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2815.60,4348.98" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3175.67,4115.37" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3472.28,4257.04" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2181.05,5205.80" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2102.36,5149.60" z_order="0">
-    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2164.19,5079.34" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2087.60,4964.12" z_order="0">
@@ -1664,10 +1640,32 @@
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="1940.77,3652.39" z_order="0">
     </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2815.60,4348.98" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3175.67,4115.37" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3472.28,4257.04" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2181.05,5205.80" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2102.36,5149.60" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1666.84,5348.97" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1501.36,5288.80" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="856.82,4965.74" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="493.45,4881.44" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="961.37,3206.12" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2124.78,3390.54" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3661.90,3336.29" z_order="0">
+    </points>
   </image>
   <image id="33" name="0_216_0_3.jpg" subset="Validation" task_id="258574" width="4384" height="6576">
-    <points label="Leaf junction" occluded="0" source="manual" points="2283.39,5168.48" z_order="0">
-    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2257.00,5315.67" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1927.30,5415.18" z_order="0">
@@ -1684,11 +1682,25 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1596.10,3412.40" z_order="0">
     </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2283.39,5168.48" z_order="0">
+    </points>
   </image>
   <image id="32" name="0_144_0_3.jpg" subset="Validation" task_id="258574" width="4384" height="6576">
-    <points label="Leaf junction" occluded="0" source="manual" points="2652.88,4662.28" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="2362.77,3361.64" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2635.75,4458.99" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2701.17,4106.17" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2835.14,3624.05" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3449.94,5148.55" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2837.75,5283.14" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3859.95,3200.88" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1239.45,3394.92" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1724.79,4373.88" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2566.43,4790.79" z_order="0">
     </points>
@@ -1702,27 +1714,23 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="4091.85,4928.35" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3449.94,5148.55" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2635.75,4458.99" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2837.75,5283.14" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3859.95,3200.88" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1239.45,3394.92" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2362.77,3361.64" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1724.79,4373.88" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2652.88,4662.28" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2711.30,4294.65" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2701.17,4106.17" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2835.14,3624.05" z_order="0">
     </points>
   </image>
   <image id="31" name="0_108_0_3.jpg" subset="Validation" task_id="258574" width="4384" height="6576">
     <points label="Leaf tip" occluded="0" source="manual" points="1574.51,4404.44" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2478.77,5157.89" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2567.17,5093.48" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2507.46,5006.25" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2587.67,4909.05" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2549.03,4753.32" z_order="0">
     </points>
@@ -1751,14 +1759,6 @@
     <points label="Leaf tip" occluded="0" source="manual" points="3342.17,4920.81" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2933.63,5311.28" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2478.77,5157.89" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2567.17,5093.48" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2507.46,5006.25" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2587.67,4909.05" z_order="0">
     </points>
   </image>
   <image id="30" name="0_0_0_3.jpg" subset="Validation" task_id="258574" width="4384" height="6576">
@@ -2450,8 +2450,6 @@
     </points>
   </image>
   <image id="68" name="0_72_0_6.jpg" subset="Validation" task_id="258578" width="4384" height="6576">
-    <points label="Leaf tip" occluded="0" source="manual" points="1800.37,5811.98" z_order="0">
-    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1886.01,5661.43" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1859.99,5432.35" z_order="0">
@@ -2486,6 +2484,8 @@
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2462.59,3116.46" z_order="0">
     </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1800.37,5811.98" z_order="0">
+    </points>
   </image>
   <image id="67" name="0_36_0_6.jpg" subset="Validation" task_id="258578" width="4384" height="6576">
     <points label="Leaf junction" occluded="0" source="manual" points="2384.42,5103.81" z_order="0">
@@ -2495,18 +2495,6 @@
     <points label="Leaf junction" occluded="0" source="manual" points="2353.05,4876.17" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2374.30,4977.35" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2370.25,4647.53" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2340.91,4355.14" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2359.12,4064.78" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2341.92,3709.66" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2362.16,3123.88" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2009.64,5876.28" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2033.06,5683.07" z_order="0">
     </points>
@@ -2519,6 +2507,18 @@
     <points label="Leaf tip" occluded="0" source="manual" points="1811.84,4716.53" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2299.90,3669.94" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2370.25,4647.53" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2340.91,4355.14" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2359.12,4064.78" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2341.92,3709.66" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2362.16,3123.88" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2009.64,5876.28" z_order="0">
     </points>
   </image>
   <image id="66" name="0_324_0_6.jpg" subset="Validation" task_id="258578" width="4384" height="6576">
@@ -2678,6 +2678,20 @@
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2331.02,4997.37" z_order="0">
     </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2299.79,4881.73" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2350.54,4660.71" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2341.94,4360.44" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2385.45,4075.42" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2371.09,3727.71" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2484.27,3110.93" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1801.06,5725.03" z_order="0">
+    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1854.81,5584.96" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2012.56,5576.01" z_order="0">
@@ -2693,20 +2707,6 @@
     <points label="Leaf tip" occluded="0" source="manual" points="2686.97,5825.66" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2657.70,5901.69" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2299.79,4881.73" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2350.54,4660.71" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2341.94,4360.44" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2385.45,4075.42" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2371.09,3727.71" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2484.27,3110.93" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1801.06,5725.03" z_order="0">
     </points>
   </image>
   <image id="60" name="0_0_0_6.jpg" subset="Validation" task_id="258578" width="4384" height="6576">
@@ -3396,12 +3396,6 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1959.09,6302.31" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2856.99,6199.45" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2673.19,6162.35" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2285.03,4335.44" z_order="0">
-    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2298.01,4772.17" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2263.45,4079.14" z_order="0">
@@ -3413,6 +3407,12 @@
     <points label="Leaf junction" occluded="0" source="manual" points="2191.78,3327.94" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2162.49,2880.87" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2856.99,6199.45" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2673.19,6162.35" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2285.03,4335.44" z_order="0">
     </points>
   </image>
   <image id="99" name="top_0_90_0_9.jpg" subset="Validation" task_id="258583" width="6576" height="4384">
@@ -3794,25 +3794,17 @@
     </points>
   </image>
   <image id="109" name="top_0_90_0_10.jpg" subset="Validation" task_id="258584" width="6576" height="4384">
+    <points label="Leaf tip" occluded="0" source="manual" points="2588.36,1910.74" z_order="0">
+    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3377.87,3496.19" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3962.80,1242.90" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3871.01,2020.30" z_order="0">
-    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="4194.44,2259.22" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2588.36,1910.74" z_order="0">
     </points>
   </image>
   <image id="108" name="0_72_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
     <points label="Leaf junction" occluded="0" source="manual" points="2370.05,4968.64" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2309.35,4820.94" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2378.14,4592.29" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2346.78,4353.52" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2399.39,4095.53" z_order="0">
     </points>
@@ -3860,16 +3852,20 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3411.76,2703.43" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2352.90,3326.61" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2676.79,3742.54" z_order="0">
-    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2586.90,3680.77" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2737.44,3609.14" z_order="0">
     </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2378.14,4592.29" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2309.35,4820.94" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2346.78,4353.52" z_order="0">
+    </points>
   </image>
   <image id="107" name="0_36_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
+    <points label="Leaf junction" occluded="0" source="manual" points="2552.16,2593.26" z_order="0">
+    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2700.95,5982.56" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2199.78,6218.57" z_order="0">
@@ -3912,8 +3908,6 @@
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2270.53,2763.54" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2552.16,2593.26" z_order="0">
-    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2182.22,1871.38" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2588.12,2134.54" z_order="0">
@@ -3922,10 +3916,6 @@
     </points>
   </image>
   <image id="106" name="0_324_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
-    <points label="Leaf junction" occluded="0" source="manual" points="2303.17,3797.56" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2266.75,3423.63" z_order="0">
-    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2338.38,3458.84" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2340.81,3158.96" z_order="0">
@@ -3960,27 +3950,19 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2238.78,2764.66" z_order="0">
     </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3159.68,3571.24" z_order="0">
+    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1851.44,3751.95" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2303.17,3797.56" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2266.75,3423.63" z_order="0">
     </points>
   </image>
   <image id="105" name="0_288_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
-    <points label="Leaf tip" occluded="0" source="manual" points="1642.36,2699.70" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2880.06,2631.88" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1510.55,4084.41" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1168.17,3852.81" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2751.66,3701.76" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2837.26,4316.02" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3076.42,3636.30" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2171.46,3431.05" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2583.99,3565.87" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1711.39,3755.56" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2201.19,5211.86" z_order="0">
     </points>
@@ -4002,7 +3984,7 @@
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2255.77,3802.86" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2171.46,3431.05" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="3076.42,3636.30" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2282.75,3453.82" z_order="0">
     </points>
@@ -4014,14 +3996,28 @@
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2104.02,2594.70" z_order="0">
     </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1510.55,4084.41" z_order="0">
+    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2083.78,2159.66" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2527.90,1905.08" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="1992.50,1520.23" z_order="0">
     </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2880.06,2631.88" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1642.36,2699.70" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1168.17,3852.81" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2751.66,3701.76" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2837.26,4316.02" z_order="0">
+    </points>
   </image>
   <image id="104" name="0_252_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="2103.41,6298.76" z_order="0">
+    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2210.66,4982.00" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2261.65,4824.17" z_order="0">
@@ -4054,8 +4050,6 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1942.99,6185.41" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2103.41,6298.76" z_order="0">
-    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2552.22,6030.00" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2685.71,5829.77" z_order="0">
@@ -4078,8 +4072,20 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2451.71,2723.86" z_order="0">
     </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1792.25,3870.94" z_order="0">
+    </points>
   </image>
   <image id="103" name="0_216_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
+    <points label="Leaf junction" occluded="0" source="manual" points="1979.63,2558.37" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="1958.99,2121.31" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2334.13,1947.70" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="1823.01,1389.23" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2088.89,3022.14" z_order="0">
+    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1179.22,2702.71" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2410.31,3710.03" z_order="0">
@@ -4122,34 +4128,10 @@
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2264.93,3141.12" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2088.89,3022.14" z_order="0">
-    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2262.50,2763.54" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="1979.63,2558.37" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="1958.99,2121.31" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2334.13,1947.70" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="1823.01,1389.23" z_order="0">
     </points>
   </image>
   <image id="102" name="0_144_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
-    <points label="Leaf junction" occluded="0" source="manual" points="2318.52,4591.02" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2276.37,4812.33" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2281.63,4349.80" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2297.44,4089.85" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2245.33,3820.52" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2280.11,3425.32" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2249.28,3009.08" z_order="0">
-    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2148.95,2769.64" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2272.89,2537.79" z_order="0">
@@ -4168,8 +4150,6 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2810.56,4176.85" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2805.30,3754.30" z_order="0">
-    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3527.19,3810.67" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1252.52,3621.41" z_order="0">
@@ -4184,8 +4164,36 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2190.53,4169.28" z_order="0">
     </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2276.37,4812.33" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2281.63,4349.80" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2297.44,4089.85" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2245.33,3820.52" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2280.11,3425.32" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2249.28,3009.08" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2318.52,4591.02" z_order="0">
+    </points>
   </image>
   <image id="101" name="0_108_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
+    <points label="Leaf junction" occluded="0" source="manual" points="2371.46,3018.36" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2146.86,2754.30" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2454.43,2544.87" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2011.29,1912.55" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2445.32,2094.66" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2562.11,1357.42" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2298.62,4816.18" z_order="0">
+    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1917.95,6123.46" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2412.07,5880.65" z_order="0">
@@ -4193,6 +4201,8 @@
     <points label="Leaf tip" occluded="0" source="manual" points="2526.20,6210.87" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2543.19,6259.43" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1887.77,3627.95" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2249.39,5482.44" z_order="0">
     </points>
@@ -4210,15 +4220,11 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3238.29,3771.34" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2830.09,3752.37" z_order="0">
-    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3049.20,2657.42" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1572.66,2555.14" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2360.24,4967.43" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2298.62,4816.18" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2361.35,4591.58" z_order="0">
     </points>
@@ -4234,25 +4240,39 @@
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2233.87,3154.94" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2371.46,3018.36" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2146.86,2754.30" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2454.43,2544.87" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2011.29,1912.55" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2445.32,2094.66" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2562.11,1357.42" z_order="0">
-    </points>
   </image>
   <image id="100" name="0_0_0_10.jpg" subset="Validation" task_id="258584" width="4384" height="6576">
+    <points label="Leaf junction" occluded="0" source="manual" points="2460.48,2164.89" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2331.49,1871.49" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2498.42,1530.88" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2972.28,2676.47" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2818.08,2752.00" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3225.07,3725.42" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3455.84,3582.77" z_order="0">
+    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2294.19,4802.93" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2309.20,4337.02" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="2460.89,6214.85" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2316.35,4584.29" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2188.29,5940.84" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2039.34,5579.72" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2701.87,5687.21" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2483.68,5320.59" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1874.10,4274.10" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="1328.54,3768.63" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2305.35,4964.82" z_order="0">
     </points>
@@ -4268,35 +4288,7 @@
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2349.19,2764.33" z_order="0">
     </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2460.48,2164.89" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2331.49,1871.49" z_order="0">
-    </points>
-    <points label="Leaf junction" occluded="0" source="manual" points="2498.42,1530.88" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2972.28,2676.47" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2818.08,2752.00" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3225.07,3725.42" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="3455.84,3582.77" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2460.89,6214.85" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2188.29,5940.84" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2039.34,5579.72" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2701.87,5687.21" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2483.68,5320.59" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1874.10,4274.10" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1328.54,3768.63" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2091.12,3744.87" z_order="0">
+    <points label="Leaf junction" occluded="0" source="manual" points="2309.20,4337.02" z_order="0">
     </points>
   </image>
   <image id="119" name="top_0_90_0_11.jpg" subset="Validation" task_id="258585" width="6576" height="4384">
@@ -5646,6 +5638,8 @@
     </points>
   </image>
   <image id="169" name="top_0_90_0_16.jpg" subset="Validation" task_id="258592" width="6576" height="4384">
+    <points label="Leaf tip" occluded="0" source="manual" points="2299.54,2304.32" z_order="0">
+    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2711.15,3274.35" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3273.88,3301.45" z_order="0">
@@ -5656,11 +5650,9 @@
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3521.58,3541.74" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2299.54,2304.32" z_order="0">
-    </points>
   </image>
   <image id="168" name="0_72_0_16.jpg" subset="Validation" task_id="258592" width="4384" height="6576">
-    <points label="Leaf tip" occluded="0" source="manual" points="3335.90,5028.80" z_order="0">
+    <points label="Leaf tip" occluded="0" source="manual" points="1445.87,5892.57" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="1023.82,5500.50" z_order="0">
     </points>
@@ -5688,6 +5680,8 @@
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2304.48,4353.83" z_order="0">
     </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="3335.90,5028.80" z_order="0">
+    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2243.62,4150.42" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2290.07,3955.83" z_order="0">
@@ -5696,12 +5690,8 @@
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2258.84,3022.09" z_order="0">
     </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="1445.87,5892.57" z_order="0">
-    </points>
   </image>
   <image id="167" name="0_36_0_16.jpg" subset="Validation" task_id="258592" width="4384" height="6576">
-    <points label="Leaf junction" occluded="0" source="manual" points="2386.10,4358.10" z_order="0">
-    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2327.31,5102.21" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2399.91,5004.88" z_order="0">
@@ -5711,6 +5701,8 @@
     <points label="Leaf junction" occluded="0" source="manual" points="2390.60,4732.00" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2332.73,4554.23" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2386.10,4358.10" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2330.72,4129.80" z_order="0">
     </points>
@@ -5738,6 +5730,8 @@
     </points>
   </image>
   <image id="166" name="0_324_0_16.jpg" subset="Validation" task_id="258592" width="4384" height="6576">
+    <points label="Leaf tip" occluded="0" source="manual" points="2139.20,3956.03" z_order="0">
+    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2678.63,6060.37" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2177.55,4774.12" z_order="0">
@@ -5747,8 +5741,6 @@
     <points label="Leaf tip" occluded="0" source="manual" points="3195.79,4540.03" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3463.33,4405.11" z_order="0">
-    </points>
-    <points label="Leaf tip" occluded="0" source="manual" points="2139.20,3956.03" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="3440.86,4986.38" z_order="0">
     </points>
@@ -5778,9 +5770,9 @@
     </points>
   </image>
   <image id="165" name="0_288_0_16.jpg" subset="Validation" task_id="258592" width="4384" height="6576">
-    <points label="Leaf junction" occluded="0" source="manual" points="2276.65,4969.95" z_order="0">
-    </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2341.04,5080.46" z_order="0">
+    </points>
+    <points label="Leaf junction" occluded="0" source="manual" points="2276.65,4969.95" z_order="0">
     </points>
     <points label="Leaf junction" occluded="0" source="manual" points="2368.90,4873.86" z_order="0">
     </points>
@@ -5962,9 +5954,9 @@
     </points>
   </image>
   <image id="160" name="0_0_0_16.jpg" subset="Validation" task_id="258592" width="4384" height="6576">
-    <points label="Leaf tip" occluded="0" source="manual" points="2264.63,5715.21" z_order="0">
-    </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2138.53,6109.86" z_order="0">
+    </points>
+    <points label="Leaf tip" occluded="0" source="manual" points="2264.63,5715.21" z_order="0">
     </points>
     <points label="Leaf tip" occluded="0" source="manual" points="2663.15,5254.69" z_order="0">
     </points>
