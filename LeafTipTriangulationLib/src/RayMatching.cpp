@@ -664,6 +664,97 @@ void sortSetsOfRays(std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
 	}
 }
 
+bool computeDistributionOfSimilarities(
+	const std::string& filename,
+	const std::vector<Camera>& cameras,
+	const std::vector<std::vector<glm::vec2>>& points2D,
+	const std::vector<std::vector<Ray>>& rays,
+	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
+{
+	// Distances between rays of the same group
+	std::vector<float> similaritiesInGroup;
+	// Distances between rays of different groups
+	std::vector<float> similaritiesOutOfGroup;
+
+	// For each set of rays corresponding to a 3D point
+	for (unsigned int p = 0; p < setsOfRays.size(); p++)
+	{
+		for (unsigned int q = 0; q < setsOfRays.size(); q++)
+		{
+			for (unsigned int i = 0; i < setsOfRays[p].size(); i++)
+			{
+				for (unsigned int j = 0; j < setsOfRays[q].size(); j++)
+				{
+					// Ignore the similarities between the same rays
+					if (p == q && i == j)
+					{
+						continue;
+					}
+
+					const auto& [cameraI, rayI] = setsOfRays[p][i];
+					const auto& [cameraJ, rayJ] = setsOfRays[q][j];
+					const auto s = similarity(cameras[cameraI],
+					                          rays[cameraI][rayI],
+					                          points2D[cameraI][rayI],
+					                          cameras[cameraJ],
+					                          rays[cameraJ][rayJ],
+					                          points2D[cameraJ][rayJ]);
+
+					if (p == q)
+					{
+						// The two rays belong to the same group
+						// We expect them to be similar
+						similaritiesInGroup.push_back(s);
+					}
+					else
+					{
+						// The two rays belong to two different groups
+						// We expect them to not be similar
+						similaritiesOutOfGroup.push_back(s);
+					}
+				}
+			}
+		}
+	}
+
+	// Sort the two distributions so that it is easier to compute stats
+	std::sort(similaritiesInGroup.begin(), similaritiesInGroup.end());
+	std::sort(similaritiesOutOfGroup.begin(), similaritiesOutOfGroup.end());
+
+	// Report the min, max, and median for each group
+	spdlog::info("In group similarity distribution: min = {:.2f}, max = {:.2f}",
+	             similaritiesInGroup.front(),
+	             similaritiesInGroup.back());
+
+	spdlog::info("Out of group similarity distribution: min = {:.2f}, max = {:.2f}",
+	             similaritiesOutOfGroup.front(),
+	             similaritiesOutOfGroup.back());
+
+	// Export the two distributions
+	std::ofstream file(filename, std::fstream::out);
+
+	if (!file.is_open())
+	{
+		return false;
+	}
+
+	file << "In group" << std::endl;
+	for (const auto& s : similaritiesInGroup)
+	{
+		file << s << "\n";
+	}
+
+	file << "Out of group" << std::endl;
+	for (const auto& s : similaritiesOutOfGroup)
+	{
+		file << s << "\n";
+	}
+
+	file.close();
+
+	return true;
+}
+
 std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>> matchRaysAndTriangulate(
 	const std::vector<Camera>& cameras,
 	const std::vector<std::vector<glm::vec2>>& points2D,

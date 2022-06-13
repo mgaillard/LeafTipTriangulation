@@ -518,6 +518,8 @@ void runPlantPhenotypingExample2022(const std::string& folderCameras2022)
 	const auto rays = computeRays(cameras, points);
 	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays, 100.f);
 
+	computeDistributionOfSimilarities("distribution_similarities.txt", cameras, points, rays, setsOfRays);
+
 	// Export the scene
 	spdlog::debug("Found {} leaves", triangulatedPoints3D.size());
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
