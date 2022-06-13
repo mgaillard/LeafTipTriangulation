@@ -762,7 +762,13 @@ triangulatePhenotypePoints(
 	// Clamp all rays according to the phenotyping setup
 	clampRaysWithPhenotypingSetup(setup, viewNames, rays);
 	// Triangulate the 3D points
-	return matchRaysAndTriangulate(cameras, points, rays, thresholdNoPair);
+	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays, thresholdNoPair);
+	// If some of the points are triangulated with only one ray, we remove them because it's probably a failed match
+	removePointsFromSingleRays(triangulatedPoints3D, setsOfRays);
+	// Sort the set of rays to make it uniquely identifiable even if it has been permuted
+	sortSetsOfRays(setsOfRays);
+
+	return { triangulatedPoints3D, setsOfRays };
 }
 
 std::tuple<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<int>>>

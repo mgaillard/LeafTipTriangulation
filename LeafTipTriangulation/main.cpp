@@ -574,18 +574,20 @@ void runPlantPhenotyping(const std::string& folder, const std::string& phenotype
 	}
 
 	spdlog::info("Triangulating leaves of plant {}", plantName);
-	
+
+	const auto [triangulatedPoints3D, setsOfRays] = triangulatePhenotypePoints(setup, plants.front(), 1500.0);
+
+	// Export the scene
+	// Re-compute the rays because it is needed for exporting some of the information
 	const auto viewNames = plants.front().getAllViews();
 	const auto points = plants.front().pointsFromViews(viewNames);
 	const auto cameras = setup.camerasFromViews(viewNames);
-	auto rays = computeRays(cameras, points);
-	clampRaysWithPhenotypingSetup(setup, viewNames, rays);
-	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays, 1500.0);
-
-	computeDistributionOfSimilarities("distribution_similarities.txt", cameras, points, rays, setsOfRays);
-	// Export the scene
+	const auto rays = computeRays(cameras, points);
 	spdlog::debug("Found {} leaves", triangulatedPoints3D.size());
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
+
+	// Compute and save the distribution of similarities
+	computeDistributionOfSimilarities("distribution_similarities.txt", cameras, points, rays, setsOfRays);
 }
 
 void runLeafCounting(
