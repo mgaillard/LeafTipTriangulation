@@ -206,6 +206,7 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
                 rule = MakeRule()
                 rule.addTarget(aggregateSeedsResultFile)
                 rule.addDependencies(allResultFiles)
+                rule.addRecipe('> {}'.format(aggregateSeedsResultFile)) # Clear the result file
                 for currentResultFile in allResultFiles:
                     rule.addRecipe('$(PROGRAM_COMPARE) --command values --input {} --truth {} --output {} >> {}'.format(currentResultFile, currentGroundTruthFile, currentResultDirectory, aggregateSeedsResultFile))
                 rule.print()
@@ -214,6 +215,7 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
                 rule = MakeRule()
                 rule.addTarget(aggregateSeedsResultBaseFile)
                 rule.addDependencies(allResultBaseFiles)
+                rule.addRecipe('> {}'.format(aggregateSeedsResultBaseFile)) # Clear the result file
                 for currentResultBaseFile in allResultBaseFiles:
                     rule.addRecipe('$(PROGRAM_COMPARE) --command values --input {} --truth {} --output {} >> {}'.format(currentResultBaseFile, currentGroundTruthFile, currentResultDirectory, aggregateSeedsResultBaseFile))
                 rule.print()
@@ -228,6 +230,7 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
             rule = MakeRule()
             rule.addTarget(aggregateProbabilitiesAndSeedsResultFile)
             rule.addDependencies(allAggregateSeedsResultFile)
+            rule.addRecipe('> {}'.format(aggregateProbabilitiesAndSeedsResultFile)) # Clear the result file
             for probability, aggregateSeedsResultFile in zip(probabilities, allAggregateSeedsResultFile):
                 probabilityStr = integerProbabilityStr(probability)
                 rule.addRecipe("printf '%s\t%s\t' {} {:d} >> {}".format(probabilityStr, theta, aggregateProbabilitiesAndSeedsResultFile))
@@ -238,6 +241,7 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
             rule = MakeRule()
             rule.addTarget(aggregateProbabilitiesAndSeedsResultBaseFile)
             rule.addDependencies(allAggregateSeedsResultBaseFile)
+            rule.addRecipe('> {}'.format(aggregateProbabilitiesAndSeedsResultBaseFile)) # Clear the result file
             for probability, aggregateSeedsResultBaseFile in zip(probabilities, allAggregateSeedsResultBaseFile):
                 probabilityStr = integerProbabilityStr(probability)
                 rule.addRecipe('datamash min 3 q1 3 median 3 q3 3 max 3 mean 3 sstdev 3 < {} >> {}'.format(aggregateSeedsResultBaseFile, aggregateProbabilitiesAndSeedsResultBaseFile))
@@ -255,6 +259,7 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
         rule = MakeRule()
         rule.addTarget(currentResultAllFile)
         rule.addDependencies(allAggregateProbabilitiesAndSeedsResultAllFile)
+        rule.addRecipe('> {}'.format(currentResultAllFile)) # Clear the result file
         for aggregateProbabilitiesAndSeedsResultAllFile in allAggregateProbabilitiesAndSeedsResultAllFile:
             rule.addRecipe('cat {} >> {}'.format(aggregateProbabilitiesAndSeedsResultAllFile, currentResultAllFile))
         rule.print()
@@ -270,10 +275,10 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
         rule.print()
 
     # Rule for all results
-    rule = MakeRule()
-    rule.addTarget('all')
-    rule.addDependencies(agreementThetaGraphFiles)
-    rule.print()
+    # rule = MakeRule()
+    # rule.addTarget('all')
+    # rule.addDependencies(agreementThetaGraphFiles)
+    # rule.print()
 
 
 def main():
