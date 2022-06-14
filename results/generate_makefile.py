@@ -72,8 +72,21 @@ def resultAllFile(directory):
     return '{}/results_all.csv'.format(resultDir)
 
 
+def resultAllSortedFile(directory):
+    resultDir = directoryForResultFiles(directory)
+    return '{}/results_all_sorted.csv'.format(resultDir)
+
+
+def agreementGraph(directory, theta):
+    return '{}_agreement_{:d}.pdf'.format(directory, theta)
+
+
 def agreementThetaGraph(directory):
     return '{}_agreement_theta.pdf'.format(directory)
+
+
+def agreementProbabilityGraph(directory):
+    return '{}_agreement_prob.pdf'.format(directory)
 
 
 class MakeRule:
@@ -115,7 +128,10 @@ class MakeRule:
         for recipe in self.recipes:
             print("\n\t" + recipe + " && \\", end = '')
         # End of the recipes
-        print(":\n")
+        if len(self.recipes) > 0:
+            print(":\n")
+        else:
+            print("\n")
 
 
 class PhonyMakeRule:
@@ -150,8 +166,7 @@ def writeDefines():
 
 
 def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
-    allResultAllFile = []
-    agreementThetaGraphFiles = []
+    graphFiles = []
 
     for directory in directories:
         currentResultDirectory = directoryForResultFiles(directory)
@@ -159,7 +174,7 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
         currentGroundTruthFile = groundTruthFile(directory)
 
         currentResultAllFile = resultAllFile(directory)
-        allResultAllFile.append(currentResultAllFile)
+        currentResultAllSortedFile = resultAllSortedFile(directory)
 
         allAggregateProbabilitiesAndSeedsResultAllFile = []
 
@@ -255,6 +270,15 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
             rule.addRecipe('paste {} {} > {}'.format(aggregateProbabilitiesAndSeedsResultFile, aggregateProbabilitiesAndSeedsResultBaseFile, aggregateProbabilitiesAndSeedsResultAllFile))
             rule.print()
 
+            agreementGraphFile = agreementGraph(directory, theta)
+            graphFiles.append(agreementGraphFile)
+            # Rule to generate a graph for the specific value of theta
+            rule = MakeRule()
+            rule.addTarget(agreementGraphFile)
+            rule.addDependency(aggregateProbabilitiesAndSeedsResultAllFile)
+            rule.addRecipe('gnuplot -e "filename=\'{}\'" "../plots/phenotyping_agreement.pg" > {}'.format(aggregateProbabilitiesAndSeedsResultAllFile, agreementGraphFile))
+            rule.print()
+
         # Rule to merge all results for all theta values
         rule = MakeRule()
         rule.addTarget(currentResultAllFile)
@@ -265,7 +289,10 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
         rule.print()
 
         agreementThetaGraphFile = agreementThetaGraph(directory)
-        agreementThetaGraphFiles.append(agreementThetaGraphFile)
+        agreementProbabilityGraphFile = agreementProbabilityGraph(directory)
+
+        graphFiles.append(agreementThetaGraphFile)
+        graphFiles.append(agreementProbabilityGraphFile)
 
         # Rule to generate graphs
         rule = MakeRule()
@@ -274,15 +301,22 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
         rule.addRecipe('gnuplot -e "filename=\'{}\'" "../plots/phenotyping_agreement_theta.pg" > {}'.format(currentResultAllFile, agreementThetaGraphFile))
         rule.print()
 
+        rule = MakeRule()
+        rule.addTarget(agreementProbabilityGraphFile)
+        rule.addDependency(currentResultAllFile)
+        rule.addRecipe('sort -n -k1,1 -k2,2 {} > {}'.format(currentResultAllFile, currentResultAllSortedFile))
+        rule.addRecipe('gnuplot -e "filename=\'{}\'" "../plots/phenotyping_agreement_prob.pg" > {}'.format(currentResultAllSortedFile, agreementProbabilityGraphFile))
+        rule.print()
+
     # Rule for all results
-    # rule = MakeRule()
-    # rule.addTarget('all')
-    # rule.addDependencies(agreementThetaGraphFiles)
-    # rule.print()
+    rule = MakeRule()
+    rule.addTarget('all')
+    rule.addDependencies(graphFiles)
+    rule.print()
 
 
 def main():
-    directories = ['sorghum_2022']
+    directories = ['sorghum_2018', 'sorghum_2022']
     thetas = [0, 500, 1000, 1500, 2000, 2500, 3000]
     probabilities = [0.0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50]
     seeds = [14117, 4173, 6468, 306, 2456]
