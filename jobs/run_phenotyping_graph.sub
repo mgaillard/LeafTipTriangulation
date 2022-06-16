@@ -13,4 +13,4 @@ export OMP_NUM_THREADS=8
 
 cd results
 python3 generate_makefile.py > Makefile 
-./build/make-4.3/make all -j16
+../build/make-4.3/make all -j16
