@@ -1,8 +1,8 @@
 #!/bin/sh -l
-#FILENAME: run_phenotyping.sub
+#FILENAME: run_phenotyping_graph.sub
 #SBATCH --nodes=1
-#SBATCH --ntasks=8
-#SBATCH --time=0:10:00
+#SBATCH --ntasks=128
+#SBATCH --time=1:30:00
 #SBATCH --job-name LeafTipTriangulation
 
 module load anaconda/2020.11-py38
@@ -11,4 +11,6 @@ module load gnuplot
 
 export OMP_NUM_THREADS=8
 
-bash run_phenotyping.sh
+cd results
+python3 generate_makefile.py > Makefile 
+make all -j16
