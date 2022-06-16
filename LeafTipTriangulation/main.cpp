@@ -537,7 +537,7 @@ void runPlantPhenotypingSyntheticData(const fs::path& folder)
 	// Set the random seed for reproducibility
 	srand(seed);
 	std::minstd_rand randomGenerator(seed);
-	const std::uniform_int_distribution<int> leafDistribution(numberLeavesMin, numberLeavesMax);
+	std::uniform_int_distribution<int> leafDistribution(numberLeavesMin, numberLeavesMax);
 
 	const auto setup = loadPhenotypingSetup(folder);
 
