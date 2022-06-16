@@ -915,7 +915,7 @@ bool drawPointsInImageWithMatches(
 		// Draw a line between projection i and annotation match[i]
 		const auto indexMatch = projectionMatches[i];
 
-		if (indexMatch >= 0 && indexMatch < annotationPoints.size())
+		if (indexMatch >= 0 && indexMatch < static_cast<int>(annotationPoints.size()))
 		{
 			cv::Point2f pt1(projectionPoints[i].x, static_cast<float>(image.rows) - projectionPoints[i].y);
 			cv::Point2f pt2(annotationPoints[indexMatch].x, static_cast<float>(image.rows) - annotationPoints[indexMatch].y);
