@@ -34,6 +34,10 @@ mkdir -p results/sorghum_2022
 python3 Phenotyping/scripts/convert_cvat_to_csv.py --input Phenotyping/sorghum_2022/annotations/annotations.xml > Phenotyping/sorghum_2022/leaf_tips.csv
 process_sorghum_dataset sorghum_2022
 
+# Processing the sorghum 2022 (synthetic) dataset
+mkdir -p results/sorghum_2022_synthetic
+process_sorghum_dataset sorghum_2022_synthetic
+
 # Merge the results of the two datasets and compare to observations
 cat results/sorghum_2018/results.csv results/sorghum_2022/results.csv > results/results.csv
 cat Phenotyping/sorghum_2018/annotations/ground_truth.csv Phenotyping/sorghum_2022/annotations/ground_truth.csv > results/ground_truth.csv

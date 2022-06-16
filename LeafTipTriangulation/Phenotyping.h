@@ -208,6 +208,12 @@ public:
 	void discardView(const std::string& viewName);
 
 	/**
+	 * \brief Export the points of the plant in CSV format
+	 * \return The points of the plant in CSV format
+	 */
+	[[nodiscard]] std::string exportToCsv() const;
+
+	/**
 	 * \brief Return a list of points from a view
 	 * \param viewName The list of the view, for example: {SV_0, SV_36, SV_72}
 	 * \return A list of 2D points
@@ -468,6 +474,14 @@ bool exportPlantStatsToCsv(const std::string& filename,
 	                       const std::vector<PlantPhenotypePoints>& plants);
 
 /**
+ * \brief Export plant 2D points in a CSV file
+ * \param filename The path to the CSV file
+ * \param plants The list of plants
+ * \return True if the list was saved successfully
+ */
+bool exportPlantPointsToCsv(const std::string& filename, const std::vector<PlantPhenotypePoints>& plants);
+
+/**
  * \brief Save the number of leaves per plant in a CSV file
  * \param filename The path to the CSV file
  * \param numberLeafTips A list of name of plants with the number of leaves
@@ -475,3 +489,14 @@ bool exportPlantStatsToCsv(const std::string& filename,
  */
 bool exportNumberLeavesToCsv(const std::string& filename,
 	                         const std::vector<std::pair<std::string, int>>& numberLeafTips);
+
+/**
+ * \brief Export the 3D points associated to plants
+ * \param filename The path to the TXT file
+ * \param plants The list of plants
+ * \param points3d The list of 3D points per plant
+ * \return True if the points were saved successfully
+ */
+bool exportPositionLeavesToTxt(const std::string& filename,
+	                           const std::vector<PlantPhenotypePoints>& plants,
+	                           const std::vector<std::vector<glm::vec3>>& points3d);

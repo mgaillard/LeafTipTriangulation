@@ -3,12 +3,14 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
+#include <sstream>
 #include <tuple>
 
 #include <utils/warnoff.h>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include <spdlog/spdlog.h>
 #include <utils/warnon.h>
 
 #include "RayMatching.h"
@@ -210,6 +212,33 @@ void PlantPhenotypePoints::discardView(const std::string& viewName)
 	{
 		m_points.erase(itView);
 	}
+}
+
+std::string PlantPhenotypePoints::exportToCsv() const
+{
+	std::stringstream out;
+
+	for (const auto& [viewName, points] : m_points)
+	{
+		out << m_plantName << "_Vis_" << viewName << ".png" << "\t";
+
+		out << "[";
+		for (unsigned int i = 0; i < points.size(); i++)
+		{
+			const auto x = static_cast<int>(points[i].x);
+			const auto y = static_cast<int>(points[i].y);
+
+			out << "[" << x << ", " << y << "]";
+
+			if (i + 1 < points.size())
+			{
+				out << ", ";
+			}
+		}
+		out << "]\t[]\n";
+	}
+
+	return out.str();
 }
 
 std::vector<glm::vec2> PlantPhenotypePoints::pointsFromView(const std::string& viewName) const
@@ -966,6 +995,25 @@ bool exportPlantStatsToCsv(
 	return true;
 }
 
+bool exportPlantPointsToCsv(const std::string& filename, const std::vector<PlantPhenotypePoints>& plants)
+{
+	std::ofstream file(filename, std::ofstream::out);
+
+	if (!file.is_open())
+	{
+		return false;
+	}
+
+	for (const auto& plant : plants)
+	{
+		file << plant.exportToCsv();
+	}
+
+	file.close();
+
+	return true;
+}
+
 bool exportNumberLeavesToCsv(const std::string& filename, const std::vector<std::pair<std::string, int>>& numberLeafTips)
 {
 	std::ofstream file(filename, std::ofstream::out);
@@ -978,6 +1026,38 @@ bool exportNumberLeavesToCsv(const std::string& filename, const std::vector<std:
 	for (const auto& [plantName, number] : numberLeafTips)
 	{
 		file << plantName << "\t" << number << "\n";
+	}
+
+	file.close();
+
+	return true;
+}
+
+bool exportPositionLeavesToTxt(
+	const std::string& filename,
+	const std::vector<PlantPhenotypePoints>& plants,
+	const std::vector<std::vector<glm::vec3>>& points3d)
+{
+	assert(plants.size() == points3d.size());
+
+	std::ofstream file(filename, std::ofstream::out);
+
+	if (!file.is_open())
+	{
+		return false;
+	}
+
+	// Use full precision when writing floats
+	file << std::setprecision(std::numeric_limits<float>::digits10 + 1);
+
+	for (unsigned int i = 0; i < plants.size(); i++)
+	{
+		file << plants[i].plantName() << "\t" << points3d[i].size() << "\n";
+
+		for (const auto& point3d : points3d[i])
+		{
+			file << point3d.x << " " << point3d.y << " " << point3d.z << std::endl;
+		}
 	}
 
 	file.close();

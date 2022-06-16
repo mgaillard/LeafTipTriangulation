@@ -1,6 +1,7 @@
 #include <chrono>
 #include <filesystem>
 #include <iostream>
+#include <random>
 #include <tuple>
 #include <vector>
 
@@ -525,6 +526,77 @@ void runPlantPhenotypingExample2022(const std::string& folderCameras2022)
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 }
 
+void runPlantPhenotypingSyntheticData(const fs::path& folder)
+{
+	constexpr unsigned int seed = 0;
+	constexpr int numberPlants = 100;
+	constexpr int numberLeavesMin = 5;
+	constexpr int numberLeavesMax = 15;
+	constexpr float radius = 0.5f;
+
+	// Set the random seed for reproducibility
+	srand(seed);
+	std::minstd_rand randomGenerator(seed);
+	const std::uniform_int_distribution<int> leafDistribution(numberLeavesMin, numberLeavesMax);
+
+	const auto setup = loadPhenotypingSetup(folder);
+
+	std::vector<std::vector<glm::vec3>> points3d(numberPlants);
+	std::vector<PlantPhenotypePoints> plants;
+	plants.reserve(numberPlants);
+
+	for (int i = 0; i < numberPlants; i++)
+	{
+		// Generate the number of leaves
+		const auto numberLeaves = leafDistribution(randomGenerator);
+		// Generate the leaf tips
+		points3d[i] = generatePointsInSphere(numberLeaves, radius);
+
+		// Project points to cameras
+		const auto& viewNames = setup.views();
+		const auto& cameras = setup.cameras();
+		const auto points2d = projectPoints(points3d[i], cameras);
+
+		assert(viewNames.size() == points2d.size());
+
+		// Convert to a PlantPhenotypePoints object
+		PlantPhenotypePoints plant("synthetic_plant_" + std::to_string(i));
+		for (unsigned int j = 0; j < points2d.size(); j++)
+		{
+			plant.addPointsFromView(viewNames[j], points2d[j]);
+		}
+
+		plants.push_back(plant);
+	}
+
+	// Flip axis for all views to get the coordinates with the Y axis origin on the top of the image
+	flipYAxisOnAllPlants(setup, plants);
+
+	// Apply the rotation 3 times, because it is equivalent as applying it once the other way
+	for (int i = 0; i < 3; i++)
+	{
+		apply90DegreesRotationToViews(ViewTv90, setup, plants);
+	}
+
+	// Export the 2D points to CSV
+	const auto leafTipsCsvPath = folder / "leaf_tips.csv";
+	exportPlantPointsToCsv(leafTipsCsvPath.string(), plants);
+
+	// Export the ground truth number of leaves to CSV
+	std::vector<std::pair<std::string, int>> numberLeaves(numberPlants);
+	for (int i = 0; i < numberPlants; i++)
+	{
+		numberLeaves[i].first = plants[i].plantName();
+		numberLeaves[i].second = static_cast<int>(points3d[i].size());
+	}
+	const auto groundTruthCsvPath = folder / "annotations" / "ground_truth.csv";
+	exportNumberLeavesToCsv(groundTruthCsvPath.string(), numberLeaves);
+
+	// Export the ground truth 3D position of points
+	const auto groundTruthTxtPath = folder / "annotations" / "ground_truth_position.txt";
+	exportPositionLeavesToTxt(groundTruthTxtPath.string(), plants, points3d);
+}
+
 std::tuple<PhenotypingSetup, std::vector<PlantPhenotypePoints>>
 loadPhenotypingSetupAndPhenotypePoints(const std::string& folder, PlantPhenotypePointType type)
 {
@@ -582,7 +654,8 @@ void runPlantPhenotyping(const std::string& folder, const std::string& phenotype
 	const auto viewNames = plants.front().getAllViews();
 	const auto points = plants.front().pointsFromViews(viewNames);
 	const auto cameras = setup.camerasFromViews(viewNames);
-	const auto rays = computeRays(cameras, points);
+	auto rays = computeRays(cameras, points);
+	clampRaysWithPhenotypingSetup(setup, viewNames, rays);
 	spdlog::debug("Found {} leaves", triangulatedPoints3D.size());
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
 
@@ -913,6 +986,18 @@ int main(int argc, char *argv[])
 
 		// Example with a plant in a phenotyping facility
 		runPlantPhenotypingExample2022(args[0]);
+	}
+	else if (command == "plant_phenotyping_synthetic_data")
+	{
+		if (args.empty())
+		{
+			spdlog::error("Missing arguments for plant phenotyping.");
+			spdlog::error("Argument 1: Path to the folder for the phenotyping setup.");
+			return 1;
+		}
+
+		// Example with a plant in a phenotyping facility
+		runPlantPhenotypingSyntheticData(args[0]);
 	}
 	else if (command == "plant_phenotyping")
 	{
