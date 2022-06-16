@@ -159,8 +159,9 @@ class PhonyMakeRule:
 
 
 def writeDefines():
-    print("PROGRAM := ../build/bin/Release/LeafTipTriangulation.exe")
+    print("PROGRAM_LEAF_COUNT := ../build/bin/Release/LeafTipTriangulation.exe")
     print("PROGRAM_COMPARE := python3 ../Phenotyping/scripts/compare_to_ground_truth.py")
+    print("PROGRAM_DATAMASH := datamash")
     print("PHENOTYPE := tips")
     print("\n")
 
@@ -201,7 +202,7 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
                     rule.addTarget(currentResultFile)
                     rule.addTarget(currentAnnotationFile)
                     rule.addRecipe("mkdir -p {}".format(currentResultDirectory))
-                    rule.addRecipe('$(PROGRAM) leaf_counting {} $(PHENOTYPE) {:d} {:d} {:.2f} {} {}'.format(currentAnnotationDirectory, theta, seed, probability, currentResultFile, currentAnnotationFile))
+                    rule.addRecipe('$(PROGRAM_LEAF_COUNT) leaf_counting {} $(PHENOTYPE) {:d} {:d} {:.2f} {} {}'.format(currentAnnotationDirectory, theta, seed, probability, currentResultFile, currentAnnotationFile))
                     rule.print()
 
                     # Rule to convert the number of annotations to a baseline result CSV file
@@ -249,7 +250,7 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
             for probability, aggregateSeedsResultFile in zip(probabilities, allAggregateSeedsResultFile):
                 probabilityStr = integerProbabilityStr(probability)
                 rule.addRecipe("printf '%s\t%s\t' {} {:d} >> {}".format(probabilityStr, theta, aggregateProbabilitiesAndSeedsResultFile))
-                rule.addRecipe('datamash min 3 q1 3 median 3 q3 3 max 3 mean 3 sstdev 3 < {} >> {}'.format(aggregateSeedsResultFile, aggregateProbabilitiesAndSeedsResultFile))
+                rule.addRecipe('$(PROGRAM_DATAMASH) min 3 q1 3 median 3 q3 3 max 3 mean 3 sstdev 3 < {} >> {}'.format(aggregateSeedsResultFile, aggregateProbabilitiesAndSeedsResultFile))
             rule.print()
 
             # Rule to aggregate the baseline results from all probabilities
@@ -259,7 +260,7 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
             rule.addRecipe('> {}'.format(aggregateProbabilitiesAndSeedsResultBaseFile)) # Clear the result file
             for probability, aggregateSeedsResultBaseFile in zip(probabilities, allAggregateSeedsResultBaseFile):
                 probabilityStr = integerProbabilityStr(probability)
-                rule.addRecipe('datamash min 3 q1 3 median 3 q3 3 max 3 mean 3 sstdev 3 < {} >> {}'.format(aggregateSeedsResultBaseFile, aggregateProbabilitiesAndSeedsResultBaseFile))
+                rule.addRecipe('$(PROGRAM_DATAMASH) min 3 q1 3 median 3 q3 3 max 3 mean 3 sstdev 3 < {} >> {}'.format(aggregateSeedsResultBaseFile, aggregateProbabilitiesAndSeedsResultBaseFile))
             rule.print()
 
             # Rule to merge the results and baseline into the same file
