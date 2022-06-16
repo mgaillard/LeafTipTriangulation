@@ -11,5 +11,4 @@ module load gnuplot
 
 export OMP_NUM_THREADS=8
 
-cd ..
 bash run_phenotyping.sh
