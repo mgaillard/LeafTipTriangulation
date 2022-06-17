@@ -4,9 +4,8 @@
 # Launch from the root of the repository from the login node
 #-----------------------------------------------------------
 
-module load anaconda/2020.11-py38
 module load cmake/3.20.6
-module load gcc/10.2.0
+module load gcc/9.3.0
 module load gnuplot
 
 # Launch the build

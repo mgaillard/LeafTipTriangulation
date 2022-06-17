@@ -6,7 +6,7 @@
 #SBATCH --job-name LeafTipTriangulation
 
 module load anaconda/2020.11-py38
-module load gcc/10.2.0
+module load gcc/9.3.0
 module load gnuplot
 
 export OMP_NUM_THREADS=8
