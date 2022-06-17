@@ -2,7 +2,7 @@
 #FILENAME: run_benchmark.sub
 #SBATCH --nodes=1
 #SBATCH --ntasks=128
-#SBATCH --time=0:30:00
+#SBATCH --time=1:00:00
 #SBATCH --job-name LeafTipTriangulation
 
 module load gcc/9.3.0
