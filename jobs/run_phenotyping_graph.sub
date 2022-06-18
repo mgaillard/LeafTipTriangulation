@@ -12,5 +12,5 @@ module load gnuplot
 export OMP_NUM_THREADS=8
 
 cd results
-python3 generate_makefile.py > Makefile 
+python3 generate_makefile.py --datamash "../build/datamash-1.7/datamash" > Makefile 
 ../build/make-4.3/make all -j16

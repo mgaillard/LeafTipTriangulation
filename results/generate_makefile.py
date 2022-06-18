@@ -1,4 +1,5 @@
 import os
+import argparse
 
 # AWK command to copy a file without the header line and get the maximum number of annotation in a view
 # Variables have double $ because make escapes them
@@ -158,10 +159,10 @@ class PhonyMakeRule:
         print("\n")
 
 
-def writeDefines():
+def writeDefines(datamash):
     print("PROGRAM_LEAF_COUNT := ../build/bin/Release/LeafTipTriangulation.exe")
     print("PROGRAM_COMPARE := python3 ../Phenotyping/scripts/compare_to_ground_truth.py")
-    print("PROGRAM_DATAMASH := datamash")
+    print("PROGRAM_DATAMASH := {}".format(datamash))
     print("PHENOTYPE := tips")
     print("\n")
 
@@ -316,15 +317,24 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
     rule.print()
 
 
-def main():
+def main() -> int:
+    parser = argparse.ArgumentParser()
+
+    # Argument for the path to the datamash program
+    parser.add_argument('--datamash', type=str, help='Path to the datamash program', default='datamash')
+
+    args = parser.parse_args()
+
     directories = ['sorghum_2018', 'sorghum_2022']
     thetas = [0, 500, 1000, 1500, 2000, 2500, 3000]
     probabilities = [0.0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50]
     seeds = [14117, 4173, 6468, 306, 2456]
 
-    writeDefines()
+    writeDefines(args.datamash)
     writeAllLeafCountingRuns(directories, thetas, probabilities, seeds)
+    
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
