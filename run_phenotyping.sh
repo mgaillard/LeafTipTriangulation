@@ -3,9 +3,9 @@
 LeafTipTriangulationCmd="./build/bin/Release/LeafTipTriangulation.exe"
 phenotype="tips"
 # Best value of theta per dataset
-theta2018="1250"
-theta2022="2000"
-theta2022_synthetic="1000"
+theta2018="250"
+theta2022="750"
+theta2022_synthetic="500"
 
 copy_without_header_line() {
     # NR>1 skips the first line of the file, which is the header
