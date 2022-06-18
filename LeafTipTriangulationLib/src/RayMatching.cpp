@@ -401,7 +401,7 @@ std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 	const std::vector<Camera>& cameras,
 	const std::vector<std::vector<glm::vec2>>& points2D,
 	const std::vector<std::vector<Ray>>& rays,
-	const std::vector<glm::vec3>& points3D,
+	[[maybe_unused]] const std::vector<glm::vec3>& points3D, // TODO: Remove this argument if useless
 	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
 	int cameraIndex,
 	float thresholdNoPair)
@@ -446,9 +446,14 @@ std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 			// Check if point i is a 3D point or a single ray
 			if (setsOfRays[i].size() > 1)
 			{
-				// It's a 3D point
-				// Project the 3D point i on the current camera
-				const auto projectedPoint = glm::vec2(currentCamera.project(points3D[i]));
+				// Copy the current set of rays and add the candidate set of rays
+				auto setOfRays = setsOfRays[i];
+				setOfRays.emplace_back(cameraIndex, j);
+				// Triangulate with this new set of rays
+				const auto [error, triangulatedPoint] = triangulatePointFromMultipleViews(cameras, points2D, setOfRays);
+				
+				// Project the triangulated 3D point i on the current camera
+				const auto projectedPoint = glm::vec2(currentCamera.project(triangulatedPoint));
 
 				// Compare to the 2D point j
 				// Compute the re-projection error of the 3D point on the camera
