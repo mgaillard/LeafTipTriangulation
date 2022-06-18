@@ -428,4 +428,26 @@ bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
 	return false;
 }
 
+float pointToRayDistance(const glm::vec3& point, const Ray& ray)
+{
+	double dist = 0.0;
 
+	// If the ray is a line
+	if (!ray.isClamped())
+	{
+		const glm::dvec3 lineA = ray.origin;
+		const glm::dvec3 lineB = ray.origin + ray.direction;
+		glm::dvec3 c;
+		dist = distToLine(point, lineA, lineB, c);
+	}
+	// If the ray is a line segment
+	else
+	{
+		const glm::dvec3 lineSegmentA = ray.at(ray.start());
+		const glm::dvec3 lineSegmentB = ray.at(ray.end());
+		glm::dvec3 c;
+		dist = distToLineSegment(point, lineSegmentA, lineSegmentB, c);
+	}
+
+	return static_cast<float>(dist);
+}

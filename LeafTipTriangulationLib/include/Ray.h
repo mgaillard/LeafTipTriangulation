@@ -96,3 +96,11 @@ private:
  * \return True if the pseudo-intersection exist, false otherwise
  */
 bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c);
+
+/**
+ * \brief Compute the distance from a 3D point to a ray in 3D space
+ * \param point The 3D point
+ * \param ray The ray in 3D space
+ * \return The shortest distance from the point to the ray
+ */
+float pointToRayDistance(const glm::vec3& point, const Ray& ray);

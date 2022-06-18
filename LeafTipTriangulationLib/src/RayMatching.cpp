@@ -596,7 +596,7 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 
 		return {triangulatedPoints3D, setsOfRays};
 	}
-		// If there are more than 2 cameras, we split to smaller cases
+	// If there are more than 2 cameras, we split to smaller cases
 	else if (numberActiveCameras > 2)
 	{
 		float bestReprojError = std::numeric_limits<float>::max();
