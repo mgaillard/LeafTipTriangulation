@@ -25,8 +25,8 @@ struct RayTestData
 void testTriangulationOnePoint(const std::vector<Camera>& cameras, const glm::vec3& point)
 {
 	// Matrices to project a 3D point to 2D point in viewport coordinates
-	std::vector<glm::mat4> projectionMatrices;
-	std::vector<glm::vec2> points2d;
+	std::vector<glm::dmat4> projectionMatrices;
+	std::vector<glm::dvec2> points2d;
 
 	for (const auto& camera : cameras)
 	{
@@ -34,24 +34,22 @@ void testTriangulationOnePoint(const std::vector<Camera>& cameras, const glm::ve
 		const auto projectedPoint = camera.windowToViewport(camera.project(point));
 
 		// Check that re-projecting the point with the homography gives the right result
-		const glm::vec4 homogeneousPoint(point[0], point[1], point[2], 1.0f);
+		const glm::dvec4 homogeneousPoint(point[0], point[1], point[2], 1.0);
 		const auto reProjectedPoint = projectPoint(projectionMatrix, homogeneousPoint);
 		REQUIRE(reProjectedPoint[0] == Approx(projectedPoint[0]));
 		REQUIRE(reProjectedPoint[1] == Approx(projectedPoint[1]));
 
 		// Projection matrix
-		projectionMatrices.push_back(projectionMatrix);
+		projectionMatrices.emplace_back(projectionMatrix);
 		// Projected point in viewport coordinates
-		points2d.push_back(projectedPoint);
+		points2d.emplace_back(projectedPoint);
 	}
 
 	// Error when re-projecting the ground truth should almost 0
 	const auto groundTruthError = reprojectionErrorFromMultipleViews(projectionMatrices, points2d, point);
 	REQUIRE(groundTruthError == Approx(0.0).margin(1e-12));
-
-	float error;
-	glm::vec3 triangulatedPoint;
-	std::tie(error, triangulatedPoint) = triangulatePointFromMultipleViews(projectionMatrices, points2d);
+	
+	const auto [error, triangulatedPoint] = triangulatePointFromMultipleViews(projectionMatrices, points2d);
 
 	REQUIRE(triangulatedPoint[0] == Approx(point.x));
 	REQUIRE(triangulatedPoint[1] == Approx(point.y));
@@ -161,7 +159,7 @@ TEST_CASE("Triangulation of many points from multiple views", "[triangulation]")
 			
 			const auto projectedPoint = camera.project(point3d);
 
-			points2d[c].push_back(projectedPoint);
+			points2d[c].emplace_back(projectedPoint);
 			correspondences[i].emplace_back(c, i);
 		}
 	}
@@ -171,9 +169,7 @@ TEST_CASE("Triangulation of many points from multiple views", "[triangulation]")
 	REQUIRE(groundTruthError == Approx(0.0).margin(1e-12));
 
 	// Run the triangulation
-	float triangulationError;
-	std::vector<glm::vec3> triangulatedPoints;
-	std::tie(triangulationError, triangulatedPoints) = triangulateManyPointsFromMultipleViews(cameras, points2d, correspondences);
+	const auto [triangulationError, triangulatedPoints] = triangulateManyPointsFromMultipleViews(cameras, points2d, correspondences);
 
 	// Check that points are triangulated correctly
 	REQUIRE(points3d.size() == triangulatedPoints.size());
