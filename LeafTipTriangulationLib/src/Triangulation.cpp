@@ -265,6 +265,32 @@ float reprojectionErrorManyPointsFromMultipleViews(
 	return totalError;
 }
 
+std::tuple<float, glm::vec3> triangulatePointFromMultipleViews(
+	const std::vector<Camera>& cameras,
+	const std::vector<std::vector<glm::vec2>>& points2d,
+	const std::vector<std::pair<int, int>>& setOfRays)
+{
+	if (setOfRays.size() <= 1)
+	{
+		// It's impossible to triangulate a point with only one projection
+		// Use an infinity point instead
+		return {
+			std::numeric_limits<float>::max(),
+			{
+				std::numeric_limits<float>::max(),
+				std::numeric_limits<float>::max(),
+				std::numeric_limits<float>::max()
+			}
+		};
+	}
+
+	// A point should at least have two projections to be triangulated
+	assert(setOfRays.size() >= 2);
+
+	const auto [currentProjectionMatrices, currentPoints2d] = getProjectionMatricesAndPoints(cameras, points2d, setOfRays);
+	return triangulatePointFromMultipleViews(currentProjectionMatrices, currentPoints2d);
+}
+
 std::tuple<float, std::vector<glm::vec3>> triangulateManyPointsFromMultipleViews(
 	const std::vector<Camera>& cameras,
 	const std::vector<std::vector<glm::vec2>>& points2d,
@@ -275,29 +301,15 @@ std::tuple<float, std::vector<glm::vec3>> triangulateManyPointsFromMultipleViews
 	std::vector<glm::vec3> points3d;
 
 	points3d.reserve(setsOfRays.size());
-	for (const auto& pointProjections : setsOfRays)
+	for (const auto& setOfRays : setsOfRays)
 	{
-		if (pointProjections.size() <= 1)
+		const auto [error, point3d] = triangulatePointFromMultipleViews(cameras, points2d, setOfRays);
+
+		if (error < std::numeric_limits<float>::max())
 		{
-			// It's impossible to triangulate a point with only one projection
-			// Add an infinity point
-			points3d.emplace_back(
-				std::numeric_limits<float>::max(),
-				std::numeric_limits<float>::max(),
-				std::numeric_limits<float>::max()
-			);
-			// Go on with the next point to triangulate
-			continue;
+			// Sum up the re-projection errors if the point could be triangulated
+			totalError += error;
 		}
-
-		// A point should at least have two projections to be triangulated
-		assert(pointProjections.size() >= 2);
-		
-		const auto [currentProjectionMatrices, currentPoints2d] = getProjectionMatricesAndPoints(cameras, points2d, pointProjections);
-		const auto [error, point3d] = triangulatePointFromMultipleViews(currentProjectionMatrices, currentPoints2d);
-
-		// Sum up the re-projection errors
-		totalError += error;
 
 		// Add the point to the list of all points
 		points3d.push_back(point3d);

@@ -63,6 +63,19 @@ float reprojectionErrorManyPointsFromMultipleViews(const std::vector<Camera>& ca
 );
 
 /**
+ * \brief Triangulate one point in 3D from multiple 2D views
+ * \param cameras The list of cameras on which the point is projected
+ * \param points2d The 2D points projected from all views
+ * \param setOfRays Correspondences of the point in the 2D views
+ * \return The reprojection error and the 3D triangulated points
+ */
+std::tuple<float, glm::vec3> triangulatePointFromMultipleViews(
+	const std::vector<Camera>& cameras,
+	const std::vector<std::vector<glm::vec2>>& points2d,
+	const std::vector<std::pair<int, int>>& setOfRays
+);
+
+/**
  * \brief Triangulate many points in 3D from multiple 2D views
  * \param cameras The list of cameras on which points are projected
  * \param points2d The 2D points projected from all views
