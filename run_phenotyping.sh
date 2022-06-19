@@ -44,5 +44,11 @@ process_sorghum_dataset sorghum_2022_synthetic $theta2022_synthetic
 
 # Merge the results of the two datasets and compare to observations
 cat results/sorghum_2018/results.csv results/sorghum_2022/results.csv > results/results.csv
+cat results/sorghum_2018/results_baseline.csv results/sorghum_2022/results_baseline.csv > results/results_baseline.csv
 cat Phenotyping/sorghum_2018/annotations/ground_truth.csv Phenotyping/sorghum_2022/annotations/ground_truth.csv > results/ground_truth.csv
+# This is the result of the baseline
+python3 Phenotyping/scripts/compare_to_ground_truth.py --command graphs --input results/results_baseline.csv --truth results/ground_truth.csv --output results
+# Rename the output files for the baseline
+mv "results/histogram.png" "results/histogram_baseline.png"
+mv "results/scatter.png" "results/scatter_baseline.png"
 python3 Phenotyping/scripts/compare_to_ground_truth.py --command graphs --input results/results.csv --truth results/ground_truth.csv --output results
