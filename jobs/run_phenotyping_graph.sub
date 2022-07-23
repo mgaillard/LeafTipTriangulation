@@ -2,7 +2,7 @@
 #FILENAME: run_phenotyping_graph.sub
 #SBATCH --nodes=1
 #SBATCH --ntasks=128
-#SBATCH --time=1:30:00
+#SBATCH --time=4:00:00
 #SBATCH --job-name LeafTipTriangulation
 
 module load anaconda/2020.11-py38
