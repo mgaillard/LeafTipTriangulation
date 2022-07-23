@@ -6,6 +6,7 @@ phenotype="tips"
 theta2018="250"
 theta2022="750"
 theta2022_synthetic="500"
+probability="0.0"
 
 copy_without_header_line() {
     # NR>1 skips the first line of the file, which is the header
@@ -15,7 +16,7 @@ copy_without_header_line() {
 process_sorghum_dataset() {
     local directory=$1
     local theta=$2
-    $LeafTipTriangulationCmd leaf_counting "Phenotyping/$directory" $phenotype $theta 0 0.0 "results/$directory/results.csv" "results/$directory/nb_annotations.csv"
+    $LeafTipTriangulationCmd leaf_counting "Phenotyping/$directory" $phenotype $theta 0 $probability "results/$directory/results.csv" "results/$directory/nb_annotations.csv"
     # Find the maximum number of annotated leaves in any view of each plant
     # This becomes the baseline for any single-view detection based method
     copy_without_header_line "results/$directory/nb_annotations.csv" "results/$directory/results_baseline.csv"
