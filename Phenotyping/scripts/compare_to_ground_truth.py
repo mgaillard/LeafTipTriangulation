@@ -192,7 +192,9 @@ def generate_histogram(results, truths, output: Path):
     # Plot
     fig, ax = plt.subplots(figsize=(4, 4), dpi=216)
 
-    ax.hist(diff, bins=np.arange(-n_bins, n_bins + 2), rwidth=0.95, align='left')
+    n, bins, patches = ax.hist(diff, bins=np.arange(-n_bins, n_bins + 2), rwidth=0.95, align='left')
+    logging.info("Histogram bins: {}".format(bins))
+    logging.info("Histogram vals: {}".format(n))
 
     ax.set_xlabel('Human observation - Predictions')
     ax.set_ylabel('Count')
