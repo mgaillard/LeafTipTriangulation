@@ -755,6 +755,19 @@ void discardPointsRandomly(unsigned int seed, double probability, std::vector<Pl
 	}
 }
 
+void addPointsRandomly(const PhenotypingSetup& setup,
+                       unsigned int seed,
+                       double probability,
+                       std::vector<PlantPhenotypePoints>& plants)
+{
+	std::default_random_engine generator(seed);
+
+	for (auto& plant : plants)
+	{
+		plant.addPointsRandomly(setup, generator, probability);
+	}
+}
+
 void clampRaysWithPhenotypingSetup(
 	const PhenotypingSetup& setup,
 	const std::vector<std::string>& viewNames,

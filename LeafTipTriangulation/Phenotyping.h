@@ -169,14 +169,17 @@ public:
 	void flipYAxis(double imageHeight);
 
 	/**
-	 * \brief Randomly discard leaf tips in the plant
+	 * \brief Randomly discard phenotype points in the plant
+	 *        For each phenotype point, discard it with a certain probability
 	 * \tparam RandomGenerator A std random generator initialized with a seed
 	 * \param generator A random generator
-	 * \param probability A probability to discard a leaf tip
+	 * \param probability A probability to discard a phenotype point
 	 */
 	template<class RandomGenerator>
 	void discardPointsRandomly(RandomGenerator& generator, double probability)
 	{
+		assert(probability >= 0.0 && probability <= 1.0);
+
 		std::uniform_real_distribution<double> dist(0.0, 1.0);
 
 		for (auto& [viewName, points] : m_points)
@@ -195,6 +198,46 @@ public:
 				{
 					// Discard the point
 					itPoint = points.erase(itPoint);
+				}
+			}
+		}
+	}
+
+	/**
+	 * \brief Randomly add phenotype point in the plant
+	 *		  For each phenotype point in the plant, add another point with a certain probability
+	 *		  For example, if the plant has 10 points and the probability is 0.2,
+	 *		  on average 2 random phenotype points will be added to the plant
+	 * \tparam RandomGenerator A std random generator initialized with a seed
+	 * \param setup The phenotyping setup used to image the plant, 
+	 * \param generator A random generator
+	 * \param probability A probability to add a phenotype point
+	 */
+	template<class RandomGenerator>
+	void addPointsRandomly(const PhenotypingSetup& setup, RandomGenerator& generator, double probability)
+	{
+		assert(probability >= 0.0 && probability <= 1.0);
+
+		std::uniform_real_distribution<double> dist(0.0, 1.0);
+		std::uniform_real_distribution<double> distWidth(0.0, setup.imageWidth());
+		std::uniform_real_distribution<double> distHeight(0.0, setup.imageHeight());
+
+		for (auto& [viewName, points] : m_points)
+		{
+			const auto originalNumberPoints = points.size();
+
+			for (unsigned int i = 0; i < originalNumberPoints; i++)
+			{
+				// Generate a random number between 0 and 1
+				const auto randomNumber = dist(generator);
+				// If the random number is lower than the probability, we add a point
+				if (randomNumber <= probability)
+				{
+					// Add a random point
+					points.emplace_back(
+						distWidth(generator),
+						distHeight(generator)
+					);
 				}
 			}
 		}
@@ -386,6 +429,18 @@ void keepOnlyPlantsWithAllViews(const std::vector<std::string>& viewNames, std::
  * \param plants The list of plants to process
  */
 void discardPointsRandomly(unsigned int seed, double probability, std::vector<PlantPhenotypePoints>& plants);
+
+/**
+ * \brief Add some annotated points randomly in the plant
+ * \param setup The imaging setup for which to generate points
+ * \param seed Initialization value for the random generator
+ * \param probability Probability to add an extra point
+ * \param plants The list of plants to process
+ */
+void addPointsRandomly(const PhenotypingSetup& setup,
+                       unsigned int seed,
+                       double probability,
+                       std::vector<PlantPhenotypePoints>& plants);
 
 /**
  * \brief Clamp rays according to the distance to the object in the phenotyping setup

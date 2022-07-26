@@ -676,11 +676,17 @@ void runLeafCounting(
 	auto [setup, plants] = loadPhenotypingSetupAndPhenotypePoints(folder, type);
 
 	spdlog::info("Triangulating leaves for {} plants in the folder {}", plants.size(), folder);
-	
-	if (probabilityDiscard > 0.0)
+
+	constexpr auto eps = 1e-4;
+	if (probabilityDiscard > eps)
 	{
 		spdlog::debug("Discarding points with probability {:.2f} % (seed = {:d})", 100.0 * probabilityDiscard, seed);
 		discardPointsRandomly(seed, probabilityDiscard, plants);
+	}
+	else if (probabilityDiscard < -eps)
+	{
+		spdlog::debug("Adding points with probability {:.2f} % (seed = {:d})", -100.0 * probabilityDiscard, seed);
+		addPointsRandomly(setup, seed, -probabilityDiscard, plants);
 	}
 
 	if (thresholdNoPair < std::numeric_limits<float>::max())
