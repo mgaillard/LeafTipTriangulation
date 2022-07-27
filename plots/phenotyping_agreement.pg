@@ -7,7 +7,7 @@ set ylabel 'Agreement (%)'
 
 set grid ytics
 
-set xrange [0:51]
+set xrange [-10:51]
 set yrange [0:100]
 
 set boxwidth 0.5
