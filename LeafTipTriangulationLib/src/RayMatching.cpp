@@ -120,9 +120,9 @@ std::vector<glm::vec3> pseudoIntersectionManyPointsFromTwoViews(
 /**
  * \brief Match each ray to a 3D point based on the re-projected error
  * \param cameras A list of cameras
- * \param points2D A list of 2D points per camera
+ * \param points2d A list of 2D points per camera
  * \param rays A list of 3D rays associated to 2D points per camera
- * \param points3D A set of points in 3D
+ * \param points3d A set of points in 3D
  * \param setsOfRays The matching of rays used to triangulate the 3D points
  * \param cameraIndex The index of the camera for which to do the matching
  * \param thresholdNoPair Threshold in px above which two rays/points can't be paired together
@@ -130,9 +130,9 @@ std::vector<glm::vec3> pseudoIntersectionManyPointsFromTwoViews(
  */
 std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::vec2>>& points2D,
+	const std::vector<std::vector<glm::vec2>>& points2d,
 	const std::vector<std::vector<Ray>>& rays,
-	const std::vector<glm::vec3>& points3D,
+	const std::vector<glm::vec3>& points3d,
 	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
 	int cameraIndex,
 	float thresholdNoPair);
@@ -399,21 +399,21 @@ std::vector<glm::vec3> pseudoIntersectionManyPointsFromTwoViews(
 
 std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::vec2>>& points2D,
-	const std::vector<std::vector<Ray>>& rays,
-	[[maybe_unused]] const std::vector<glm::vec3>& points3D, // TODO: Remove this argument if useless
+	const std::vector<std::vector<glm::vec2>>& points2d,
+	[[maybe_unused]] const std::vector<std::vector<Ray>>& rays, // TODO: remove the maybe_unused
+	const std::vector<glm::vec3>& points3d,
 	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
 	int cameraIndex,
 	float thresholdNoPair)
 {
 	// Check that we receive coherent sets 
-	assert(points3D.size() == setsOfRays.size());
+	assert(points3d.size() == setsOfRays.size());
 	
 	// The camera index is not out of bounds
 	assert(cameraIndex >= 0 && cameraIndex < cameras.size());
 	
 	const auto& currentCamera = cameras[cameraIndex];
-	const auto& currentPoints2D = points2D[cameraIndex];
+	const auto& currentPoints2D = points2d[cameraIndex];
 	const auto& currentRays = rays[cameraIndex];
 
 	// The number of 3D points and single rays that we can match to the current camera
@@ -421,42 +421,54 @@ std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 	assert(setsOfRays.size() >= currentPoints2D.size());
 	assert(currentPoints2D.size() == currentRays.size());
 
-	// Compute an upper bound on the maximum distance between two pixel with the camera
-	const auto maximumDistancePixels = computeMaximumCameraResolution(currentCamera) * std::sqrt(2.f);
-	// Make sure that this distance is about 1G for the maximum distance in the image
-	constexpr long maximumSimilarity = 1000000000;
-
-	// Multiplier used to convert a floating point value to an integer value
-	const double realToLongMultiplier = static_cast<double>(maximumSimilarity) / maximumDistancePixels;
+	// Compute an upper bound on the reprojection error between two 2D points in viewport coordinates (between -1 and 1)
+	// The maximum distance between two points is: 2*sqrt(2)
+	// The reprojection error for this distance is: 0.5*2*sqrt(2)*2*sqrt(2) = 4
+	constexpr auto maximumDeltaError = 4.0;
 
 	// Number of 3D points and single rays available for matching
 	const int costSize = static_cast<int>(setsOfRays.size());
 	// Number of 2D points to match 
 	const int costCols = static_cast<int>(currentPoints2D.size());
 
-	dlib::matrix<long> cost(costSize, costSize);
+	// Compute the change in reprojection error for all assignments
+	dlib::matrix<double> realCost(costSize, costSize);
 	for (int i = 0; i < costSize; i++)
 	{
+		// Compute the current reprojection error for the 3D point i
+		// If the 3D point i is a single ray, the reprojection is 0.0 by default
+		double currentError = 0.0;
+
+		if (setsOfRays[i].size() > 1)
+		{
+			currentError = reprojectionErrorFromMultipleViews(cameras, points2d, setsOfRays[i], points3d[i]);
+		}
+
+		// Try to assign a ray from the other camera to the point i
 		for (int j = 0; j < costCols; j++)
 		{
-			// Project the 3D point i (or single ray) on 2D point j from the current camera
+			// The change in error caused by assigning the 2D point j to the 3D point i
+			double deltaError = 0.0;
+
+			// Reprojection error of the 3D point i (or single ray) on 2D point j from the current camera
 			// By default the distance is maximum to prevent the matching
-			double dist = maximumDistancePixels;
+			double dist = maximumDeltaError;
 			
 			// Check if point i is a 3D point or a single ray
 			if (setsOfRays[i].size() > 1)
 			{
 				// Copy the current set of rays and add the candidate set of rays
-				auto setOfRays = setsOfRays[i];
-				setOfRays.emplace_back(cameraIndex, j);
+				auto newSetOfRays = setsOfRays[i];
+				newSetOfRays.emplace_back(cameraIndex, j);
 				// Triangulate with this new set of rays
-				const auto [error, triangulatedPoint] = triangulatePointFromMultipleViews(cameras, points2D, setOfRays);
-				
-				// Project the triangulated 3D point i on the current camera
-				const auto projectedPoint = glm::vec2(currentCamera.project(triangulatedPoint));
+				const auto [newError, newTriangulatedPoint] = triangulatePointFromMultipleViews(cameras, points2d, newSetOfRays);
 
 				// Compare to the 2D point j
 				// Compute the re-projection error of the 3D point on the camera
+				deltaError = static_cast<double>(newError) - currentError;
+				
+				// Project the triangulated 3D point i on the current camera
+				const auto projectedPoint = glm::vec2(currentCamera.project(newTriangulatedPoint));
 				dist = static_cast<double>(glm::distance(projectedPoint, currentPoints2D[j]));
 			}
 			else
@@ -466,38 +478,79 @@ std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 				const auto singleRayCameraIndex = singleRay.first;
 				const auto singleRayIndex = singleRay.second;
 
-				// Compute the sum of the re-projection error but only on the view we add
-				// We do this to be consistent with the other case, when matching the single ray with a point
+				// Compute the sum of the re-projection error for both views
+				// Since the threshold is divided by too later, we need to also divide the similarity by 2
+				// We do this to be consistent with the other case, when matching two views
 				dist = similarity(cameras[singleRayCameraIndex],
 				                  rays[singleRayCameraIndex][singleRayIndex],
-				                  points2D[singleRayCameraIndex][singleRayIndex],
+				                  points2d[singleRayCameraIndex][singleRayIndex],
 				                  currentCamera,
 				                  currentRays[j],
 				                  currentPoints2D[j],
-								  SimilarityStrategy::OnlyPoint1);
-			}
-			
-			if (dist < thresholdNoPair)
-			{
-				// The distance is the ratio between the point distance and the longest distance in the image
-				dist /= maximumDistancePixels;
+								  SimilarityStrategy::BothPoints) / 2.0;
 
-				// Make the distance integer
-				const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
-				cost(i, j) = -integerDist;
+
+				// Triangulate the point from two views using the pseudo intersection
+				glm::vec3 newTriangulatedPoint;
+				const auto pseudoIntersectionExists = raysPseudoIntersection(rays[singleRayCameraIndex][singleRayIndex],
+				                                                             currentRays[j],
+				                                                             newTriangulatedPoint);
+				// If the triangulated point exists, compute the deltaError
+				// If the triangulated point does not exists, the deltaError will be set to the maximum value
+				// because the similarity is equal to infinity
+				if (pseudoIntersectionExists)
+				{
+					// Copy the current set of rays and add the candidate set of rays
+					auto setOfRays = setsOfRays[i];
+					setOfRays.emplace_back(cameraIndex, j);
+
+					// Triangulate with this new set of rays
+					const auto newError = reprojectionErrorFromMultipleViews(cameras, points2d, setOfRays, newTriangulatedPoint);
+
+					// Compare to the 2D point j
+					// Compute the re-projection error of the 3D point on the camera
+					deltaError = static_cast<double>(newError);
+				}
+			}
+
+			// Since we look at the reprojection error of the 3D point on only one 2D point, the threshold is divided by 2
+			if (dist < static_cast<double>(thresholdNoPair) / 2.0)
+			{
+				realCost(i, j) = deltaError;
 			}
 			else
 			{
 				// if dist == std::numeric_limits<float>::max()
-				// or if above a threshold, we push the algorithm not to match the two points
-				cost(i, j) = -maximumSimilarity;
+				// or if above the threshold, we push the algorithm not to match the two points
+				realCost(i, j) = maximumDeltaError;
 			}
 		}
 
-		// Add dummy columns, filled with min - 1
+		// Add dummy columns
 		for (int j = costCols; j < costSize; j++)
 		{
-			cost(i, j) = -maximumSimilarity;
+			realCost(i, j) = maximumDeltaError;
+		}
+	}
+
+	// Convert the real matrix to a integer matrix
+	dlib::matrix<long> cost(costSize, costSize);
+	// Compute the maximum magnitude of the change in reprojection error
+	// Most likely maxMagnitudeCost = maximumDeltaError
+	const auto maxMagnitudeCost = std::max(std::abs(dlib::max(realCost)), std::abs(dlib::min(realCost)));
+	// Make sure that this distance is about 1G for the maximum distance in the image
+	constexpr long maximumSimilarity = 1000000000;
+	// Multiplier used to convert a floating point value to an integer value
+	const double realToLongMultiplier = static_cast<double>(maximumSimilarity) / maxMagnitudeCost;
+
+	for (int i = 0; i < costSize; i++)
+	{
+		for (int j = 0; j < costSize; j++)
+		{
+			const auto& deltaError = realCost(i, j);
+			// Convert the deltaError to integer
+			const auto integerDist = static_cast<long>(std::round(deltaError * realToLongMultiplier));
+			cost(i, j) = -integerDist;
 		}
 	}
 
@@ -636,7 +689,6 @@ std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>
 				}
 
 				// Match rays to subPoints and update setsOfRays with the rays in camera c
-				// TODO: Try to make it twice less than the value for for findSetsOfRays
 				setsOfRays = pointsRaysMatching(cameras, points2D, rays, subPoints, setsOfRays, c, thresholdNoPair);
 
 				// Re-triangulate the points with the new rays
