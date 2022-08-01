@@ -49,6 +49,21 @@ std::tuple<double, glm::dvec3> triangulatePointFromMultipleViews(
 );
 
 /**
+ * \brief Compute the reprojection error when triangulating a 3D point from multiple views
+ * \param cameras The list of cameras on which the point is projected
+ * \param points2d The 2D points projected from all views
+ * \param setOfRays Correspondences of the point in the 2D views
+ * \param point3d The 3D point that is supposed to be a triangulation of the 2D points
+ * \return The total reprojection error from all views
+ */
+double reprojectionErrorFromMultipleViews(
+	const std::vector<Camera>& cameras,
+	const std::vector<std::vector<glm::vec2>>& points2d,
+	const std::vector<std::pair<int, int>>& setOfRays,
+	const glm::vec3& point3d
+);
+
+/**
  * \brief Triangulate a point in 3D from multiple views
  * \param cameras The list of cameras on which the point is projected
  * \param points2d The 2D points projected from all views

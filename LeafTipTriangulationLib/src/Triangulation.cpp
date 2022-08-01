@@ -234,6 +234,27 @@ std::tuple<double, glm::dvec3> triangulatePointFromMultipleViews(
 	return { finalError, triangulatedPoint};
 }
 
+double reprojectionErrorFromMultipleViews(
+	const std::vector<Camera>& cameras,
+	const std::vector<std::vector<glm::vec2>>& points2d,
+	const std::vector<std::pair<int, int>>& setOfRays,
+	const glm::vec3& point3d)
+{
+	if (setOfRays.size() <= 1)
+	{
+		// Go on with the next point to triangulate
+		return 0.0;
+	}
+
+	// A point should at least have two projections to be triangulated
+	assert(setOfRays.size() >= 2);
+
+	const auto [currentProjectionMatrices, currentPoints2d] = getProjectionMatricesAndPoints(cameras, points2d, setOfRays);
+	const auto error = reprojectionErrorFromMultipleViews(currentProjectionMatrices, currentPoints2d, point3d);
+
+	return error;
+}
+
 std::tuple<float, glm::vec3> triangulatePointFromMultipleViews(
 	const std::vector<Camera>& cameras,
 	const std::vector<std::vector<glm::vec2>>& points2d,
@@ -266,26 +287,12 @@ float reprojectionErrorManyPointsFromMultipleViews(
 	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
 	const std::vector<glm::vec3>& points3d)
 {
-	double totalError = 0.f;
+	double totalError = 0.0;
 	
 	for (unsigned int i = 0; i < setsOfRays.size(); i++)
 	{
-		const auto& pointProjections = setsOfRays[i];
-
-		if (pointProjections.size() <= 1)
-		{
-			// Go on with the next point to triangulate
-			continue;
-		}
-
-		// A point should at least have two projections to be triangulated
-		assert(pointProjections.size() >= 2);
-
-		const auto [currentProjectionMatrices, currentPoints2d] = getProjectionMatricesAndPoints(cameras, points2d, pointProjections);
-		const auto error = reprojectionErrorFromMultipleViews(currentProjectionMatrices, currentPoints2d, points3d[i]);
-
 		// Sum up the re-projection errors
-		totalError += error;
+		totalError += reprojectionErrorFromMultipleViews(cameras, points2d, setsOfRays[i], points3d[i]);
 	}
 	
 	return static_cast<float>(totalError);
