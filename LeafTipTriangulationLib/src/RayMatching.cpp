@@ -400,7 +400,7 @@ std::vector<glm::vec3> pseudoIntersectionManyPointsFromTwoViews(
 std::vector<std::vector<std::pair<int, int>>> pointsRaysMatching(
 	const std::vector<Camera>& cameras,
 	const std::vector<std::vector<glm::vec2>>& points2d,
-	[[maybe_unused]] const std::vector<std::vector<Ray>>& rays, // TODO: remove the maybe_unused
+	const std::vector<std::vector<Ray>>& rays,
 	const std::vector<glm::vec3>& points3d,
 	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
 	int cameraIndex,
