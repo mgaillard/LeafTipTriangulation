@@ -218,7 +218,7 @@ struct AggregatedGroundTruthMatchingResult
  * \param radius The radius of the sphere
  * \return A vector of 3D points
  */
-std::vector<glm::vec3> generatePointsInSphere(int n, float radius);
+std::vector<glm::dvec3> generatePointsInSphere(int n, double radius);
 
 /**
  * \brief Generate cameras pointing to the origin on a sphere
@@ -226,16 +226,16 @@ std::vector<glm::vec3> generatePointsInSphere(int n, float radius);
  * \param radius Radius of the sphere
  * \return A vector of camera
  */
-std::vector<Camera> generateCamerasOnSphere(int n, float radius);
+std::vector<Camera> generateCamerasOnSphere(int n, double radius);
 
 /**
  * \brief Project 3D points on cameras. The viewport is 1000*1000 px.
- * \param points A list of 3D points
+ * \param points3d A list of 3D points
  * \param cameras A list of cameras
  * \return 2D points projected on cameras
  */
-std::vector<std::vector<glm::vec2>> projectPoints(const std::vector<glm::vec3>& points,
-												  const std::vector<Camera>& cameras);
+std::vector<std::vector<glm::dvec2>> projectPoints(const std::vector<glm::dvec3>& points3d,
+												   const std::vector<Camera>& cameras);
 
 /**
  * \brief Add gaussian noise to 2D points
@@ -244,9 +244,9 @@ std::vector<std::vector<glm::vec2>> projectPoints(const std::vector<glm::vec3>& 
  * \param noiseStd Standard deviation of the gaussian noise added to 2D points
  * \return The list of 2D points, with added noise
  */
-std::vector<std::vector<glm::vec2>> addNoise(const std::vector<std::vector<glm::vec2>>& points,
-	                                         const std::vector<Camera>& cameras,
-	                                         float noiseStd);
+std::vector<std::vector<glm::dvec2>> addNoise(const std::vector<std::vector<glm::dvec2>>& points,
+	                                          const std::vector<Camera>& cameras,
+	                                          double noiseStd);
 
 /**
  * \brief Randomly remove points from the list to simulation occlusion
@@ -255,9 +255,9 @@ std::vector<std::vector<glm::vec2>> addNoise(const std::vector<std::vector<glm::
  * \param verbose Whether to display information about the new point configuration or not
  * \return The list of 2D points minus some points that are removed and the set of ground truth correspondences
  */
-std::pair<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<std::pair<int, int>>>>
-removePoints(const std::vector<std::vector<glm::vec2>>& points,
-			 float probabilityKeep,
+std::pair<std::vector<std::vector<glm::dvec2>>, std::vector<std::vector<std::pair<int, int>>>>
+removePoints(const std::vector<std::vector<glm::dvec2>>& points,
+			 double probabilityKeep,
 	         bool verbose);
 
 /**
@@ -267,7 +267,7 @@ removePoints(const std::vector<std::vector<glm::vec2>>& points,
  * \param rays A list of Rays associated to 3D points
  * \return True if all 3D points are within 1e-3 of all their rays, false otherwise
  */
-bool checkUnProject(const std::vector<glm::vec3>& points,
+bool checkUnProject(const std::vector<glm::dvec3>& points,
 	                const std::vector<std::vector<Ray>>& rays);
 
 /**
@@ -285,10 +285,10 @@ bool checkUnProject(const std::vector<glm::vec3>& points,
  */
 GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::vec2>>& points2d,
-	const std::vector<glm::vec3>& points3d,
+	const std::vector<std::vector<glm::dvec2>>& points2d,
+	const std::vector<glm::dvec3>& points3d,
 	const std::vector<std::vector<std::pair<int, int>>>& trueCorrespondences,
-	const std::vector<glm::vec3>& triangulatedPoints3D,
+	const std::vector<glm::dvec3>& triangulatedPoints3D,
 	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays);
 
 /**

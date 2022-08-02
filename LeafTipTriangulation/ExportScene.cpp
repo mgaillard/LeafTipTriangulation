@@ -3,7 +3,7 @@
 #include "OBJWriter.h"
 
 bool exportSceneAsOBJ(
-	const std::vector<glm::vec3>& points,
+	const std::vector<glm::dvec3>& points,
 	const std::vector<std::vector<Ray>>& rays,
 	const std::string& filename)
 {
@@ -37,7 +37,7 @@ bool exportSceneAsOBJ(
 void exportSplitSceneAsOBJ(
 	const std::vector<std::vector<Ray>>& rays,
 	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
-	const std::vector<glm::vec3>& triangulatedPoints3D)
+	const std::vector<glm::dvec3>& triangulatedPoints3D)
 {
 	// Draw the scene in OBJ for Debugging
 	exportSceneAsOBJ(triangulatedPoints3D, {}, "points.obj");

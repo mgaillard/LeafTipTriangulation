@@ -14,7 +14,7 @@
  * \param filename The path to the output file
  * \return True if the file was successfully saved, false if an error occured
  */
-bool exportSceneAsOBJ(const std::vector<glm::vec3>& points,
+bool exportSceneAsOBJ(const std::vector<glm::dvec3>& points,
 	                  const std::vector<std::vector<Ray>>& rays,
 	                  const std::string& filename);
 
@@ -29,4 +29,4 @@ bool exportSceneAsOBJ(const std::vector<glm::vec3>& points,
  */
 void exportSplitSceneAsOBJ(const std::vector<std::vector<Ray>>& rays,
 	                       const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
-	                       const std::vector<glm::vec3>& triangulatedPoints3D);
+	                       const std::vector<glm::dvec3>& triangulatedPoints3D);

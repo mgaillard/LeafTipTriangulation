@@ -16,13 +16,13 @@
  * \param distCoeffs Distortion coefficients for the camera
  * \param rvecs Per-view rotation in Rodrigues angles 
  * \param tvecs Per-view translation
- * \param inputPoints2D Per-view 2D coordinates of the two points
+ * \param inputPoints2d Per-view 2D coordinates of the two points
  * \return The distance between the two points
  */
-float measureTwoPointsCharuco(int imageWidth,
-                              int imageHeight,
-                              const cv::Mat1d& cameraMatrix,
-                              const cv::Mat1d& distCoeffs,
-                              const std::vector<cv::Mat1d>& rvecs,
-                              const std::vector<cv::Mat1d>& tvecs,
-                              const std::vector<std::vector<glm::vec2>>& inputPoints2D);
+double measureTwoPointsCharuco(int imageWidth,
+                               int imageHeight,
+                               const cv::Mat1d& cameraMatrix,
+                               const cv::Mat1d& distCoeffs,
+                               const std::vector<cv::Mat1d>& rvecs,
+                               const std::vector<cv::Mat1d>& tvecs,
+                               const std::vector<std::vector<glm::dvec2>>& inputPoints2d);

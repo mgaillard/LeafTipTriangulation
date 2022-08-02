@@ -146,7 +146,7 @@ cv::Vec3d lookAtPoint(const cv::Mat1d& homography, const cv::Mat1d& cameraMatrix
 	};
 }
 
-std::tuple<glm::vec3, glm::vec3, glm::vec3> cameraEyeAtUpFromPose(
+std::tuple<glm::dvec3, glm::dvec3, glm::dvec3> cameraEyeAtUpFromPose(
 	const cv::Mat1d& cameraMatrix,
 	const cv::Mat1d& rvec,
 	const cv::Mat1d& tvec
@@ -156,7 +156,7 @@ std::tuple<glm::vec3, glm::vec3, glm::vec3> cameraEyeAtUpFromPose(
 	const auto pose = cameraPose(rvec, tvec);
 
 	// Find position of the camera in world coordinates
-	const glm::vec3 eye(
+	const glm::dvec3 eye(
 		pose.at<double>(0, 3),
 		pose.at<double>(1, 3),
 		pose.at<double>(2, 3)
@@ -174,42 +174,42 @@ std::tuple<glm::vec3, glm::vec3, glm::vec3> cameraEyeAtUpFromPose(
 	return std::make_tuple(eye, at, up);
 }
 
-float measureTwoPointsCharuco(
+double measureTwoPointsCharuco(
 	int imageWidth,
 	int imageHeight,
 	const cv::Mat1d& cameraMatrix,
 	const cv::Mat1d& distCoeffs,
 	const std::vector<cv::Mat1d>& rvecs,
 	const std::vector<cv::Mat1d>& tvecs,
-	const std::vector<std::vector<glm::vec2>>& inputPoints2D)
+	const std::vector<std::vector<glm::dvec2>>& inputPoints2d)
 {
-	assert(inputPoints2D.size() == tvecs.size());
-	assert(inputPoints2D.size() == rvecs.size());
+	assert(inputPoints2d.size() == tvecs.size());
+	assert(inputPoints2d.size() == rvecs.size());
 
-	const int nbImages = static_cast<int>(inputPoints2D.size());
+	const int nbImages = static_cast<int>(inputPoints2d.size());
 	const cv::Size imageSize(imageWidth, imageHeight);
 
 	// Undistort 2D points and change the frame of reference
 	// Copy points
-	auto points2D = inputPoints2D;
-	for (auto& cameraPoints2D : points2D)
+	auto points2d = inputPoints2d;
+	for (auto& cameraPoints2D : points2d)
 	{
-		for (auto& point2D : cameraPoints2D)
+		for (auto& point2d : cameraPoints2D)
 		{
 			// Distorted point
-			std::vector<cv::Point2d> inputDistortedPoints = { cv::Point2d(point2D.x, point2D.y) };
+			std::vector<cv::Point2d> inputDistortedPoints = { cv::Point2d(point2d.x, point2d.y) };
 			std::vector<cv::Point2d> outputUndistortedPoints;
 
 			cv::undistortPoints(inputDistortedPoints, outputUndistortedPoints, cameraMatrix, distCoeffs, cv::noArray(), cameraMatrix);
 
 			// Save undistorted point
-			point2D.x = static_cast<float>(outputUndistortedPoints.front().x);
-			point2D.y = static_cast<float>(imageHeight) - static_cast<float>(outputUndistortedPoints.front().y);
+			point2d.x = outputUndistortedPoints.front().x;
+			point2d.y = static_cast<double>(imageHeight) - outputUndistortedPoints.front().y;
 		}
 	}
 
 	// Compute aspect ratio from images
-	const auto aspectRatio = float(imageWidth) / float(imageHeight);
+	const auto aspectRatio = static_cast<double>(imageWidth) / imageHeight;
 
 	// For a Google Pixel 3, the sensor is 5.76 mm by 4.29 mm
 	const cv::Size2d sensorSize(5.76, 4.29);
@@ -219,22 +219,20 @@ float measureTwoPointsCharuco(
 	std::vector<Camera> cameras;
 	for (int i = 0; i < nbImages; i++)
 	{
-		glm::vec3 eye, at, up;
+		glm::dvec3 eye, at, up;
 		std::tie(eye, at, up) = cameraEyeAtUpFromPose(cameraMatrix, rvecs[i], tvecs[i]);
 
 		cameras.emplace_back(eye, at, up,
-			                 static_cast<float>(fovy),
-			                 static_cast<float>(aspectRatio),
-			                 glm::vec2(imageWidth, imageHeight));
+			                 fovy,
+			                 aspectRatio,
+			                 glm::dvec2(imageWidth, imageHeight));
 	}
 
 	// Compute rays in 3D from camera matrices and 2D points
-	const auto rays = computeRays(cameras, points2D);
+	const auto rays = computeRays(cameras, points2d);
 
 	// Matching and triangulation of points
-	std::vector<glm::vec3> triangulatedPoints3D;
-	std::vector<std::vector<std::pair<int, int>>> setsOfRays;
-	std::tie(triangulatedPoints3D, setsOfRays) = matchRaysAndTriangulate(cameras, points2D, rays);
+	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points2d, rays);
 
 	return glm::distance(triangulatedPoints3D[0], triangulatedPoints3D[1]);
 }

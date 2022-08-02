@@ -17,6 +17,7 @@
 #include "RayMatching.h"
 #include "Reconstruction.h"
 #include "SyntheticData.h"
+#include "Triangulation.h"
 
 namespace fs = std::filesystem;
 
@@ -27,10 +28,10 @@ struct Parameters
 	int numberPoints3D;
 	int numberCameras;
 	
-	float noiseStd;
-	float probabilityKeep;
+	double noiseStd;
+	double probabilityKeep;
 
-	float thresholdNoPair;
+	double thresholdNoPair;
 };
 
 GroundTruthMatchingResult testWithSyntheticData(const Parameters& parameters)
@@ -39,24 +40,24 @@ GroundTruthMatchingResult testWithSyntheticData(const Parameters& parameters)
 	srand(parameters.seed);
 
 	const bool verboseRemovePoints = false;
-	const float spherePointsRadius = 1.f;
-	const float sphereCamerasRadius = 3.f;
+	const double spherePointsRadius = 1.0;
+	const double sphereCamerasRadius = 3.0;
 	// TODO: give the threshold for not pairing a ray and a point as a parameter (and make it a function of the noise)
 
-	const auto points3D = generatePointsInSphere(parameters.numberPoints3D, spherePointsRadius);
+	const auto points3d = generatePointsInSphere(parameters.numberPoints3D, spherePointsRadius);
 	const auto cameras = generateCamerasOnSphere(parameters.numberCameras, sphereCamerasRadius);
-	const auto projectedPoints2D = projectPoints(points3D, cameras);
+	const auto projectedPoints2d = projectPoints(points3d, cameras);
 	
 	// Add noise and occlusion and shuffle points
-	const auto noisyPoints2D = addNoise(projectedPoints2D, cameras, parameters.noiseStd);
+	const auto noisyPoints2d = addNoise(projectedPoints2d, cameras, parameters.noiseStd);
 	// Check that the problem can be solved
 	// One point must be visible from at least two cameras
-	const auto [points2D, trueCorrespondences] = removePoints(noisyPoints2D, parameters.probabilityKeep, verboseRemovePoints);
+	const auto [points2d, trueCorrespondences] = removePoints(noisyPoints2d, parameters.probabilityKeep, verboseRemovePoints);
 
 	// TODO: maybe let the single ray points and check that they are not matched with something else
 	
 	// If too many points have been removed, cancel the reconstruction
-	if (points2D.empty() || trueCorrespondences.empty())
+	if (points2d.empty() || trueCorrespondences.empty())
 	{
 		// Return a negative number of point triangulated to say that it has been aborted
 		GroundTruthMatchingResult negativeResult;
@@ -64,13 +65,13 @@ GroundTruthMatchingResult testWithSyntheticData(const Parameters& parameters)
 		return negativeResult;
 	}
 
-	const auto rays = computeRays(cameras, points2D);
+	const auto rays = computeRays(cameras, points2d);
 	// Check projection of points on rays (only works with no occlusion)
 	// checkUnProject(points3D, rays);
 	
 	// Matching and triangulation of points
 	const auto startTime = std::chrono::steady_clock::now();
-	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points2D, rays, parameters.thresholdNoPair);
+	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points2d, rays, parameters.thresholdNoPair);
 	const auto endTime = std::chrono::steady_clock::now();
 
 	// Draw the scene in OBJ for Debugging
@@ -84,8 +85,8 @@ GroundTruthMatchingResult testWithSyntheticData(const Parameters& parameters)
 	sortSetsOfRays(setsOfRays);
 	// Match the two sets of points and check the distance
 	auto result = matchingTriangulatedPointsWithGroundTruth(cameras,
-	                                                        points2D,
-	                                                        points3D,
+	                                                        points2d,
+	                                                        points3d,
 	                                                        trueCorrespondences,
 	                                                        triangulatedPoints3D,
 	                                                        setsOfRays);
@@ -118,9 +119,9 @@ void testRuntimeWithMorePoints()
 
 	parameters.numberCameras = 3;
 	// No noise so that it is the worst case scenario for the number of points to match
-	parameters.noiseStd = 0.0f;
-	parameters.probabilityKeep = 1.0f;
-	parameters.thresholdNoPair = std::numeric_limits<float>::max();
+	parameters.noiseStd = 0.0;
+	parameters.probabilityKeep = 1.0;
+	parameters.thresholdNoPair = std::numeric_limits<double>::max();
 
 	for (const auto& testHyperParameter : testHyperParameters)
 	{
@@ -179,9 +180,9 @@ void testRuntimeWithMoreCameras()
 
 	parameters.numberPoints3D = 20;
 	// No noise so that it is the worst case scenario for the number of points to match
-	parameters.noiseStd = 0.0f;
-	parameters.probabilityKeep = 1.0f;
-	parameters.thresholdNoPair = std::numeric_limits<float>::max();
+	parameters.noiseStd = 0.0;
+	parameters.probabilityKeep = 1.0;
+	parameters.thresholdNoPair = std::numeric_limits<double>::max();
 
 	for (const auto& testHyperParameter : testHyperParameters)
 	{
@@ -214,7 +215,7 @@ void testRuntimeWithMoreCameras()
 	}
 }
 
-void testAccuracyWithMoreCameras(float noiseStd)
+void testAccuracyWithMoreCameras(double noiseStd)
 {
 	std::cout << "# Accuracy with varying number of cameras and noise " << noiseStd << std::endl;
 	
@@ -222,8 +223,8 @@ void testAccuracyWithMoreCameras(float noiseStd)
 	
 	parameters.numberPoints3D = 10;
 	parameters.noiseStd = noiseStd;
-	parameters.probabilityKeep = 1.0f;
-	parameters.thresholdNoPair = std::numeric_limits<float>::max();
+	parameters.probabilityKeep = 1.0;
+	parameters.thresholdNoPair = std::numeric_limits<double>::max();
 	
 	for (int numberCameras = 2; numberCameras <= 10; numberCameras++)
 	{
@@ -273,14 +274,14 @@ void testCorrespondenceWithMoreNoise()
 
 	parameters.numberPoints3D = 10;
 	parameters.numberCameras = 6;
-	parameters.probabilityKeep = 1.0f;
-	parameters.thresholdNoPair = std::numeric_limits<float>::max();
+	parameters.probabilityKeep = 1.0;
+	parameters.thresholdNoPair = std::numeric_limits<double>::max();
 
 	for (int noiseStdInt = 0; noiseStdInt <= 100; noiseStdInt += 5)
 	{
 		std::vector<GroundTruthMatchingResult> results;
 
-		parameters.noiseStd = float(noiseStdInt) / 10.f;
+		parameters.noiseStd = static_cast<double>(noiseStdInt) / 10.0;
 
 #pragma omp parallel for default(none) firstprivate(parameters) shared(results)
 		for (int s = 0; s < 10000; s++)
@@ -311,7 +312,7 @@ void testCorrespondenceWithMoreNoise()
 	}
 }
 
-void testCorrespondenceWithThreshold(float noiseStd)
+void testCorrespondenceWithThreshold(double noiseStd)
 {
 	std::cout << "# Correspondence precision/recall with varying threshold and noise " << noiseStd << std::endl;
 
@@ -320,13 +321,13 @@ void testCorrespondenceWithThreshold(float noiseStd)
 	parameters.numberPoints3D = 20;
 	parameters.numberCameras = 6;
 	parameters.noiseStd = noiseStd;
-	parameters.probabilityKeep = 0.5f;
+	parameters.probabilityKeep = 0.5;
 
 	for (int thresholdNoPairInt = 1; thresholdNoPairInt <= 40; thresholdNoPairInt++)
 	{
 		std::vector<GroundTruthMatchingResult> results;
 
-		parameters.thresholdNoPair = float(thresholdNoPairInt);
+		parameters.thresholdNoPair = static_cast<double>(thresholdNoPairInt);
 
 #pragma omp parallel for default(none) firstprivate(parameters) shared(results)
 		for (int s = 0; s < 10000; s++)
@@ -365,7 +366,7 @@ void runPlantPhenotypingExample2018(const std::string& folderCameras2018)
 	// X axis is from left to right
 	// Y axis is from bottom to top
 	// Plant: 4-9-18_Schnable_49-281-JS39-65_2018-04-11_12-09-35_9968800
-	const std::vector<std::vector<glm::vec2>> points2D = {
+	const std::vector<std::vector<glm::dvec2>> points2d = {
 		// Camera 0
 		{
 			{1009, 560},
@@ -458,9 +459,9 @@ void runPlantPhenotypingExample2018(const std::string& folderCameras2018)
 	}
 
 	// Compute rays in 3D from camera matrices and 2D points
-	const auto rays = computeRays(setup.cameras(), points2D);
+	const auto rays = computeRays(setup.cameras(), points2d);
 
-	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(setup.cameras(), points2D, rays);
+	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(setup.cameras(), points2d, rays);
 
 	// Export the scene
 	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
@@ -517,7 +518,7 @@ void runPlantPhenotypingExample2022(const std::string& folderCameras2022)
 	const auto points = plants.front().pointsFromViews(viewNames);
 	const auto cameras = setup.camerasFromViews(viewNames);
 	const auto rays = computeRays(cameras, points);
-	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays, 100.f);
+	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays, 100.0);
 
 	computeDistributionOfSimilarities("distribution_similarities.txt", cameras, points, rays, setsOfRays);
 
@@ -532,7 +533,7 @@ void runPlantPhenotypingSyntheticData(const fs::path& folder)
 	constexpr int numberPlants = 100;
 	constexpr int numberLeavesMin = 5;
 	constexpr int numberLeavesMax = 15;
-	constexpr float radius = 0.5f;
+	constexpr double radius = 0.5;
 
 	// Set the random seed for reproducibility
 	srand(seed);
@@ -541,7 +542,7 @@ void runPlantPhenotypingSyntheticData(const fs::path& folder)
 
 	const auto setup = loadPhenotypingSetup(folder);
 
-	std::vector<std::vector<glm::vec3>> points3d(numberPlants);
+	std::vector<std::vector<glm::dvec3>> points3d(numberPlants);
 	std::vector<PlantPhenotypePoints> plants;
 	plants.reserve(numberPlants);
 
@@ -666,7 +667,7 @@ void runPlantPhenotyping(const std::string& folder, const std::string& phenotype
 void runLeafCounting(
 	const std::string& folder,
 	const std::string& phenotype,
-	float thresholdNoPair,
+	double thresholdNoPair,
 	unsigned int seed,
 	double probabilityDiscard,
 	const std::string& outputFileNumberLeaves,
@@ -689,7 +690,7 @@ void runLeafCounting(
 		addPointsRandomly(setup, seed, -probabilityDiscard, plants);
 	}
 
-	if (thresholdNoPair < std::numeric_limits<float>::max())
+	if (thresholdNoPair < std::numeric_limits<double>::max())
 	{
 		spdlog::debug("Association threshold is {:.2f}", thresholdNoPair);
 	}
@@ -751,7 +752,7 @@ void runExportAnnotations(
 	translations.loadFromCsv(annotationFolderStr + "/calibration.csv");
 
 	// Triangulate plants for displaying the results reprojected with the annotations
-	std::vector<std::vector<std::vector<glm::vec2>>> triangulatedPoints(plants_calibrated.size());
+	std::vector<std::vector<std::vector<glm::dvec2>>> triangulatedPoints(plants_calibrated.size());
 	std::vector<std::vector<std::vector<int>>> triangulatedPointsMatches(plants_calibrated.size());
 	#pragma omp parallel for
 	for (int i = 0; i < static_cast<int>(plants_calibrated.size()); i++)
@@ -847,7 +848,7 @@ void runCrocodileMeasurement()
 {
 	// X axis is from left to right
 	// Y axis is from bottom to top
-	const std::vector<std::vector<glm::vec2>> points2D = {
+	const std::vector<std::vector<glm::dvec2>> points2d = {
 		// Camera 0
 		{
 			{1877, 1237},
@@ -914,7 +915,7 @@ void runCrocodileMeasurement()
 	                                                    distCoeffs,
 	                                                    rvecs,
 	                                                    tvecs,
-	                                                    points2D);
+	                                                    points2d);
 
 	spdlog::info("Length: {} m", pointsDistance);
 }
@@ -1035,10 +1036,10 @@ int main(int argc, char *argv[])
 		}
 
 		// If theta is zero, set to to infinity
-		float thresholdNoPair = std::stof(args[2]);
+		double thresholdNoPair = std::stod(args[2]);
 		if (thresholdNoPair <= 0.0)
 		{
-			thresholdNoPair = std::numeric_limits<float>::max();
+			thresholdNoPair = std::numeric_limits<double>::max();
 		}
 
 		// Counting leaves for a set of manually annotated plants

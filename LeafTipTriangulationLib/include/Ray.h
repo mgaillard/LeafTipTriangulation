@@ -10,21 +10,21 @@ class Ray
 {
 public:
 	// Origin of the ray
-	glm::vec3 origin;
+	glm::dvec3 origin;
 	// Direction of the ray (normalized vector)
-	glm::vec3 direction;
+	glm::dvec3 direction;
 
 	/**
 	 * \brief Construct a line ray
 	 * \param origin Origin of the ray
 	 * \param direction Direction of the ray (normalized vector)
 	 */
-	Ray(const glm::vec3& origin, const glm::vec3& direction) :
+	Ray(const glm::dvec3& origin, const glm::dvec3& direction) :
 		origin(origin),
 		direction(direction),
 		m_clampRay(false),
-		m_start(0.f),
-		m_end(1.f)
+		m_start(0.0),
+		m_end(1.0)
 	{
 		
 	}
@@ -36,7 +36,7 @@ public:
 	 * \param start Parametric coordinate of the start of the line segment
 	 * \param end Parametric coordinate of the end of the line segment
 	 */
-	Ray(const glm::vec3& origin, const glm::vec3& direction, float start, float end) :
+	Ray(const glm::dvec3& origin, const glm::dvec3& direction, double start, double end) :
 		origin(origin),
 		direction(direction),
 		m_clampRay(true),
@@ -46,7 +46,7 @@ public:
 
 	}
 
-	void clampRay(float start, float end)
+	void clampRay(double start, double end)
 	{
 		m_start = start;
 		m_end = end;
@@ -58,17 +58,17 @@ public:
 		return m_clampRay;
 	}
 
-	float start() const
+	double start() const
 	{
 		return m_start;
 	}
 
-	float end() const
+	double end() const
 	{
 		return m_end;
 	}
 
-	glm::vec3 at(float t) const
+	glm::dvec3 at(double t) const
 	{
 		if (m_clampRay)
 		{
@@ -82,9 +82,9 @@ private:
 	// Boolean to clamp the ray to a line segment instead of a line
 	bool m_clampRay;
 	// If clampRay is true, this is the starting parametric coordinate of the ray line segment
-	float m_start;
+	double m_start;
 	// If clampRay is false, this is the starting parametric coordinate of the ray line segment
-	float m_end;
+	double m_end;
 };
 
 /**
@@ -95,7 +95,7 @@ private:
  * \param c If the pseudo-intersection exists, this parameter is set with the result
  * \return True if the pseudo-intersection exist, false otherwise
  */
-bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c);
+bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::dvec3& c);
 
 /**
  * \brief Compute the distance from a 3D point to a ray in 3D space
@@ -103,4 +103,4 @@ bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c);
  * \param ray The ray in 3D space
  * \return The shortest distance from the point to the ray
  */
-float pointToRayDistance(const glm::vec3& point, const Ray& ray);
+double pointToRayDistance(const glm::dvec3& point, const Ray& ray);

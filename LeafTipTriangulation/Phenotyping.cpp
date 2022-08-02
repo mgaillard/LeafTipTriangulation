@@ -156,7 +156,7 @@ bool PlantPhenotypePoints::hasAllViews(const std::vector<std::string>& viewNames
 	return true;
 }
 
-void PlantPhenotypePoints::addPointsFromView(const std::string& viewName, const std::vector<glm::vec2>& points)
+void PlantPhenotypePoints::addPointsFromView(const std::string& viewName, const std::vector<glm::dvec2>& points)
 {
 	if (m_points.count(viewName) > 0)
 	{
@@ -170,7 +170,7 @@ void PlantPhenotypePoints::addPointsFromView(const std::string& viewName, const 
 	}	
 }
 
-void PlantPhenotypePoints::applyTranslationToView(const std::string& viewName, const glm::vec2& translation)
+void PlantPhenotypePoints::applyTranslationToView(const std::string& viewName, const glm::dvec2& translation)
 {
 	if (m_points.count(viewName) > 0)
 	{
@@ -199,7 +199,7 @@ void PlantPhenotypePoints::flipYAxis(double imageHeight)
 	{
 		for (auto& point : points.second)
 		{
-			point.y = static_cast<float>(imageHeight) - point.y;
+			point.y = imageHeight - point.y;
 		}
 	}
 }
@@ -241,7 +241,7 @@ std::string PlantPhenotypePoints::exportToCsv() const
 	return out.str();
 }
 
-std::vector<glm::vec2> PlantPhenotypePoints::pointsFromView(const std::string& viewName) const
+std::vector<glm::dvec2> PlantPhenotypePoints::pointsFromView(const std::string& viewName) const
 {
 	if (m_points.count(viewName) > 0)
 	{
@@ -252,9 +252,9 @@ std::vector<glm::vec2> PlantPhenotypePoints::pointsFromView(const std::string& v
 	return {};
 }
 
-std::vector<std::vector<glm::vec2>> PlantPhenotypePoints::pointsFromViews(const std::vector<std::string>& viewNames) const
+std::vector<std::vector<glm::dvec2>> PlantPhenotypePoints::pointsFromViews(const std::vector<std::string>& viewNames) const
 {
-	std::vector<std::vector<glm::vec2>> points;
+	std::vector<std::vector<glm::dvec2>> points;
 
 	points.reserve(viewNames.size());
 	for (const auto& viewName : viewNames)
@@ -304,7 +304,7 @@ void PlantImageTranslations::loadFromCsv(const std::string& filename)
 	}
 }
 
-glm::vec2 PlantImageTranslations::getTranslationForPlantAndView(
+glm::dvec2 PlantImageTranslations::getTranslationForPlantAndView(
 	const std::string& plantName,
 	const std::string& viewName) const
 {
@@ -338,7 +338,7 @@ void apply90DegreesRotationToPoints(
 	const RotationDirection& rotationDirection,
 	double imageWidth,
 	double imageHeight,
-	std::vector<glm::vec2>& points)
+	std::vector<glm::dvec2>& points)
 {
 	for (auto& point : points)
 	{
@@ -346,15 +346,15 @@ void apply90DegreesRotationToPoints(
 			|| rotationDirection == RotationDirection::ClockwiseWithCanvas)
 		{
 			// Inverse translate the points from the center of rotation
-			point.x -= static_cast<float>(imageHeight) / 2.f;
-			point.y -= static_cast<float>(imageWidth) / 2.f;
+			point.x -= imageHeight / 2.0;
+			point.y -= imageWidth / 2.0;
 		}
 		else if (rotationDirection == RotationDirection::CounterclockwiseWithoutCanvas
 			|| rotationDirection == RotationDirection::ClockwiseWithoutCanvas)
 		{
 			// Inverse translate the points from the center of rotation
-			point.x -= static_cast<float>(imageWidth) / 2.f;
-			point.y -= static_cast<float>(imageHeight) / 2.f;
+			point.x -= imageWidth / 2.0;
+			point.y -= imageHeight / 2.0;
 		}
 
 		if (rotationDirection == RotationDirection::CounterclockwiseWithCanvas
@@ -383,8 +383,8 @@ void apply90DegreesRotationToPoints(
 			//  - width/2 is added to the X axis
 			//  - height/2 is added to the Y axis
 			// We do this because the image is rotated, but the canvas stays the same
-			point.x += static_cast<float>(imageWidth) / 2.f;
-			point.y += static_cast<float>(imageHeight) / 2.f;
+			point.x += imageWidth / 2.0;
+			point.y += imageHeight / 2.0;
 		}
 	}
 }
@@ -531,8 +531,8 @@ PhenotypingSetup loadPhenotypingSetup(const fs::path& setupFolder)
 	const auto cameras = loadCamerasFromFiles(cameraFiles);
 
 	// Read the resolution from the first image
-	const auto imageWidth = static_cast<double>(cameras[0].viewport().z);
-	const auto imageHeight = static_cast<double>(cameras[0].viewport().w);
+	const auto imageWidth = cameras[0].viewport().z;
+	const auto imageHeight = cameras[0].viewport().w;
 
 	// Read the rotation direction for the top view
 	const auto configFile = setupFolder / "setup_config.txt";
@@ -583,7 +583,7 @@ std::vector<PlantPhenotypePoints> readPhenotypePointsFromCsv(const std::string& 
 				const std::string& plantView = matchesInLine[2];
 				const std::string& leafTipPoints = matchesInLine[3];
 				const std::string& junctionPoints = matchesInLine[4];
-				std::vector<glm::vec2> points;
+				std::vector<glm::dvec2> points;
 
 				// Based on which phenotype we want to read, read leaf tips or junctions
 				std::string pointsString = (type == PlantPhenotypePointType::LeafTip) ? leafTipPoints : junctionPoints;
@@ -780,18 +780,18 @@ void clampRaysWithPhenotypingSetup(
 		{
 			for (auto& ray : rays[c])
 			{
-				ray.clampRay(static_cast<float>(setup.distanceToPlant() - setup.radiusPlant()),
-				             static_cast<float>(setup.distanceToPlant() + setup.radiusPlant()));
+				ray.clampRay(setup.distanceToPlant() - setup.radiusPlant(),
+				             setup.distanceToPlant() + setup.radiusPlant());
 			}
 		}
 	}
 }
 
-std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>>
+std::tuple<std::vector<glm::dvec3>, std::vector<std::vector<std::pair<int, int>>>>
 triangulatePhenotypePoints(
 	const PhenotypingSetup& setup,
 	const PlantPhenotypePoints& plantPoints,
-	float thresholdNoPair)
+	double thresholdNoPair)
 {
 	// Get the list of views from which the plant was annotated, order does matter
 	const auto viewNames = plantPoints.getAllViews();
@@ -813,14 +813,14 @@ triangulatePhenotypePoints(
 	return { triangulatedPoints3D, setsOfRays };
 }
 
-std::tuple<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<int>>>
+std::tuple<std::vector<std::vector<glm::dvec2>>, std::vector<std::vector<int>>>
 projectPhenotypePointsAndRetainMatches(
 	const PhenotypingSetup& setup,
 	const PlantPhenotypePoints& plantPoints,
-	const std::vector<glm::vec3>& triangulatedPoints3D,
+	const std::vector<glm::dvec3>& triangulatedPoints3D,
 	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
 {
-	std::vector<std::vector<glm::vec2>> triangulatedPoints;
+	std::vector<std::vector<glm::dvec2>> triangulatedPoints;
 	std::vector<std::vector<int>> triangulatedPointsMatches;
 
 	// Re-project 3D triangulated points on views
@@ -830,12 +830,12 @@ projectPhenotypePointsAndRetainMatches(
 	{
 		const auto& camera = cameras[c];
 		// Project 3D triangulated points 
-		std::vector<glm::vec2> viewTriangulatedPoints;
+		std::vector<glm::dvec2> viewTriangulatedPoints;
 		viewTriangulatedPoints.reserve(triangulatedPoints3D.size());
 		for (const auto& point : triangulatedPoints3D)
 		{
 			const auto point2D = camera.project(point);
-			// point2D is a vec3 but adding to the vector of glm::vec2 removes the Z coordinate
+			// point2D is a dvec3 but adding to the vector of glm::dvec2 removes the Z coordinate
 			viewTriangulatedPoints.emplace_back(point2D);
 		}
 		// Add the projected points to the list of all projected points
@@ -870,7 +870,7 @@ void applyInverseTranslationsOnPhenotypePoints(
 	const PlantImageTranslations& translations,
 	const std::string& plantName,
 	const std::vector<std::string>& viewNames,
-	std::vector<std::vector<glm::vec2>>& plantPoints)
+	std::vector<std::vector<glm::dvec2>>& plantPoints)
 {
 	for (unsigned int v = 0; v < viewNames.size(); v++)
 	{
@@ -888,7 +888,7 @@ void applyInverseTranslationsOnPhenotypePoints(
 
 bool drawPointsInImage(const std::string& filename,
                        const std::string& backgroundImage,
-                       const std::vector<glm::vec2>& points)
+                       const std::vector<glm::dvec2>& points)
 {
 	auto image = cv::imread(backgroundImage);
 
@@ -905,7 +905,7 @@ bool drawPointsInImage(const std::string& filename,
 	for (const auto& point : points)
 	{
 		cv::circle(image,
-		           cv::Point2f(point.x, static_cast<float>(image.rows) - point.y),
+		           cv::Point2d(point.x, static_cast<double>(image.rows) - point.y),
 		           radius,
 		           cv::Scalar(255, 0, 0),
 		           thickness);
@@ -917,8 +917,8 @@ bool drawPointsInImage(const std::string& filename,
 bool drawPointsInImageWithMatches(
 	const std::string& filename,
 	const std::string& backgroundImage,
-	const std::vector<glm::vec2>& annotationPoints,
-	const std::vector<glm::vec2>& projectionPoints,
+	const std::vector<glm::dvec2>& annotationPoints,
+	const std::vector<glm::dvec2>& projectionPoints,
 	const std::vector<int>& projectionMatches)
 {
 	auto image = cv::imread(backgroundImage);
@@ -936,7 +936,7 @@ bool drawPointsInImageWithMatches(
 	for (const auto& point : annotationPoints)
 	{
 		cv::circle(image,
-		           cv::Point2f(point.x, static_cast<float>(image.rows) - point.y),
+		           cv::Point2d(point.x, static_cast<double>(image.rows) - point.y),
 		           radius,
 		           cv::Scalar(0, 0, 255),
 		           thickness);
@@ -945,7 +945,7 @@ bool drawPointsInImageWithMatches(
 	for (const auto& point : projectionPoints)
 	{
 		cv::circle(image,
-		           cv::Point2f(point.x, static_cast<float>(image.rows) - point.y),
+		           cv::Point2d(point.x, static_cast<double>(image.rows) - point.y),
 		           radius,
 		           cv::Scalar(255, 0, 0),
 		           thickness);
@@ -959,8 +959,8 @@ bool drawPointsInImageWithMatches(
 
 		if (indexMatch >= 0 && indexMatch < static_cast<int>(annotationPoints.size()))
 		{
-			cv::Point2f pt1(projectionPoints[i].x, static_cast<float>(image.rows) - projectionPoints[i].y);
-			cv::Point2f pt2(annotationPoints[indexMatch].x, static_cast<float>(image.rows) - annotationPoints[indexMatch].y);
+			cv::Point2d pt1(projectionPoints[i].x, static_cast<double>(image.rows) - projectionPoints[i].y);
+			cv::Point2d pt2(annotationPoints[indexMatch].x, static_cast<double>(image.rows) - annotationPoints[indexMatch].y);
 
 			cv::line(image, pt1, pt2, cv::Scalar(255, 0, 0), thickness);
 		}
@@ -1049,7 +1049,7 @@ bool exportNumberLeavesToCsv(const std::string& filename, const std::vector<std:
 bool exportPositionLeavesToTxt(
 	const std::string& filename,
 	const std::vector<PlantPhenotypePoints>& plants,
-	const std::vector<std::vector<glm::vec3>>& points3d)
+	const std::vector<std::vector<glm::dvec3>>& points3d)
 {
 	assert(plants.size() == points3d.size());
 
@@ -1061,7 +1061,7 @@ bool exportPositionLeavesToTxt(
 	}
 
 	// Use full precision when writing floats
-	file << std::setprecision(std::numeric_limits<float>::digits10 + 1);
+	file << std::setprecision(std::numeric_limits<double>::digits10 + 1);
 
 	for (unsigned int i = 0; i < plants.size(); i++)
 	{

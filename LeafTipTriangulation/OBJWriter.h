@@ -15,13 +15,13 @@ public:
 	 * \brief Return the vertices of the OBJ object
 	 * \return The vertices of the OBJ object
 	 */
-	const std::vector<glm::vec3>& vertices() const;
+	const std::vector<glm::dvec3>& vertices() const;
 
 	/**
 	 * \brief Return the normals of the OBJ object
 	 * \return The normals of the OBJ object
 	 */
-	const std::vector<glm::vec3>& normals() const;
+	const std::vector<glm::dvec3>& normals() const;
 
 	/**
 	 * \brief Return the lines of the OBJ object
@@ -51,13 +51,13 @@ public:
 	 * \brief Set the vertices
 	 * \param vertices The new vertices
 	 */
-	void setVertices(std::vector<glm::vec3> vertices);
+	void setVertices(std::vector<glm::dvec3> vertices);
 
 	/**
 	 * \brief Set the normals
 	 * \param normals The new normals
 	 */
-	void setNormals(std::vector<glm::vec3> normals);
+	void setNormals(std::vector<glm::dvec3> normals);
 
 	/**
 	 * \brief Set the lines
@@ -76,28 +76,28 @@ public:
 	 * \param vertex 3D coordinates of the vertex
 	 * \return The index of the vertex in the list of vertices, or -1
 	 */
-	int findVertex(const glm::vec3& vertex) const;
+	int findVertex(const glm::dvec3& vertex) const;
 
 	/**
 	 * \brief Add a vertex and return its position. If the vertex is already existing, simply return its index.
 	 * \param vertex 3D coordinates of the vertex
 	 * \return The index of the vertex in the list of vertices
 	 */
-	int addVertexSafe(const glm::vec3& vertex);
+	int addVertexSafe(const glm::dvec3& vertex);
 
 	/**
 	 * \brief Add a vertex and return its position. Does not ensure that there are no doubles
 	 * \param vertex 3D coordinates of the vertex
 	 * \return The index of the vertex in the list of vertices
 	 */
-	int addVertex(const glm::vec3& vertex);
+	int addVertex(const glm::dvec3& vertex);
 
 	/**
 	 * \brief Add a normal and return its position. Does not ensure that there are no doubles
 	 * \param normal 3D coordinates of the normal vector
 	 * \return The index of the normal in the list of normals
 	 */
-	int addNormal(const glm::vec3& normal);
+	int addNormal(const glm::dvec3& normal);
 
 	/**
 	 * \brief Add a line between two vertices per index
@@ -111,7 +111,7 @@ public:
 	 * \param a The first vertex
 	 * \param b The second vertex
 	 */
-	void addLine(const glm::vec3& a, const glm::vec3& b);
+	void addLine(const glm::dvec3& a, const glm::dvec3& b);
 
 	/**
 	 * \brief Add a face from 3 vertices per index
@@ -127,12 +127,12 @@ public:
 	 * \param b The second vertex
 	 * \param c The third vertex
 	 */
-	void addFace(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c);
+	void addFace(const glm::dvec3& a, const glm::dvec3& b, const glm::dvec3& c);
 
 private:
-	std::vector<glm::vec3> m_vertices;
+	std::vector<glm::dvec3> m_vertices;
 
-	std::vector<glm::vec3> m_normals;
+	std::vector<glm::dvec3> m_normals;
 
 	std::vector<std::pair<int, int>> m_lines;
 

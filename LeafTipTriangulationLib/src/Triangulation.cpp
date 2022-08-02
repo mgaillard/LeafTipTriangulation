@@ -35,7 +35,7 @@ glm::dvec3 parametersToGlmVec3(const parameterVector& parameters)
 std::tuple<std::vector<glm::dmat4>, std::vector<glm::dvec2>>
 getProjectionMatricesAndPoints(
 	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::vec2>>& points2d,
+	const std::vector<std::vector<glm::dvec2>>& points2d,
 	const std::vector<std::pair<int, int>>& setOfRays
 )
 {
@@ -236,9 +236,9 @@ std::tuple<double, glm::dvec3> triangulatePointFromMultipleViews(
 
 double reprojectionErrorFromMultipleViews(
 	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::vec2>>& points2d,
+	const std::vector<std::vector<glm::dvec2>>& points2d,
 	const std::vector<std::pair<int, int>>& setOfRays,
-	const glm::vec3& point3d)
+	const glm::dvec3& point3d)
 {
 	if (setOfRays.size() <= 1)
 	{
@@ -255,9 +255,9 @@ double reprojectionErrorFromMultipleViews(
 	return error;
 }
 
-std::tuple<float, glm::vec3> triangulatePointFromMultipleViews(
+std::tuple<double, glm::dvec3> triangulatePointFromMultipleViews(
 	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::vec2>>& points2d,
+	const std::vector<std::vector<glm::dvec2>>& points2d,
 	const std::vector<std::pair<int, int>>& setOfRays)
 {
 	if (setOfRays.size() <= 1)
@@ -265,11 +265,11 @@ std::tuple<float, glm::vec3> triangulatePointFromMultipleViews(
 		// It's impossible to triangulate a point with only one projection
 		// Use an infinity point instead
 		return {
-			std::numeric_limits<float>::max(),
+			std::numeric_limits<double>::max(),
 			{
-				std::numeric_limits<float>::max(),
-				std::numeric_limits<float>::max(),
-				std::numeric_limits<float>::max()
+				std::numeric_limits<double>::max(),
+				std::numeric_limits<double>::max(),
+				std::numeric_limits<double>::max()
 			}
 		};
 	}
@@ -281,11 +281,11 @@ std::tuple<float, glm::vec3> triangulatePointFromMultipleViews(
 	return triangulatePointFromMultipleViews(currentProjectionMatrices, currentPoints2d);
 }
 
-float reprojectionErrorManyPointsFromMultipleViews(
+double reprojectionErrorManyPointsFromMultipleViews(
 	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::vec2>>& points2d,
+	const std::vector<std::vector<glm::dvec2>>& points2d,
 	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
-	const std::vector<glm::vec3>& points3d)
+	const std::vector<glm::dvec3>& points3d)
 {
 	double totalError = 0.0;
 	
@@ -295,24 +295,24 @@ float reprojectionErrorManyPointsFromMultipleViews(
 		totalError += reprojectionErrorFromMultipleViews(cameras, points2d, setsOfRays[i], points3d[i]);
 	}
 	
-	return static_cast<float>(totalError);
+	return totalError;
 }
 
-std::tuple<float, std::vector<glm::vec3>> triangulateManyPointsFromMultipleViews(
+std::tuple<double, std::vector<glm::dvec3>> triangulateManyPointsFromMultipleViews(
 	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::vec2>>& points2d,
+	const std::vector<std::vector<glm::dvec2>>& points2d,
 	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
 {
-	float totalError = 0.f;
+	double totalError = 0.0;
 
-	std::vector<glm::vec3> points3d;
+	std::vector<glm::dvec3> points3d;
 
 	points3d.reserve(setsOfRays.size());
 	for (const auto& setOfRays : setsOfRays)
 	{
 		const auto [error, point3d] = triangulatePointFromMultipleViews(cameras, points2d, setOfRays);
 
-		if (error < std::numeric_limits<float>::max())
+		if (error < std::numeric_limits<double>::max())
 		{
 			// Sum up the re-projection errors if the point could be triangulated
 			totalError += error;

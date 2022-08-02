@@ -3,12 +3,12 @@
 #include <algorithm>
 #include <fstream>
 
-const std::vector<glm::vec3>& OBJWriter::vertices() const
+const std::vector<glm::dvec3>& OBJWriter::vertices() const
 {
     return m_vertices;
 }
 
-const std::vector<glm::vec3>& OBJWriter::normals() const
+const std::vector<glm::dvec3>& OBJWriter::normals() const
 {
     return m_normals;
 }
@@ -62,8 +62,8 @@ bool OBJWriter::save(const std::string& filename) const
         {
             // Face with normals
             file << "f " << std::get<0>(face) + 1 << "//" << std::get<0>(face) + 1 << " "
-                << std::get<1>(face) + 1 << "//" << std::get<1>(face) + 1 << " "
-                << std::get<2>(face) + 1 << "//" << std::get<2>(face) + 1 << "\n";
+	            << std::get<1>(face) + 1 << "//" << std::get<1>(face) + 1 << " "
+	            << std::get<2>(face) + 1 << "//" << std::get<2>(face) + 1 << "\n";
         }
     }
 
@@ -79,12 +79,12 @@ void OBJWriter::clear()
     m_faces.clear();
 }
 
-void OBJWriter::setVertices(std::vector<glm::vec3> vertices)
+void OBJWriter::setVertices(std::vector<glm::dvec3> vertices)
 {
     m_vertices = std::move(vertices);
 }
 
-void OBJWriter::setNormals(std::vector<glm::vec3> normals)
+void OBJWriter::setNormals(std::vector<glm::dvec3> normals)
 {
     m_normals = std::move(normals);
 }
@@ -99,7 +99,7 @@ void OBJWriter::setFaces(std::vector<std::tuple<int, int, int>> faces)
     m_faces = std::move(faces);
 }
 
-int OBJWriter::findVertex(const glm::vec3& vertex) const
+int OBJWriter::findVertex(const glm::dvec3& vertex) const
 {
     const auto it = std::find(m_vertices.begin(), m_vertices.end(), vertex);
 
@@ -111,7 +111,7 @@ int OBJWriter::findVertex(const glm::vec3& vertex) const
     return -1;
 }
 
-int OBJWriter::addVertexSafe(const glm::vec3& vertex)
+int OBJWriter::addVertexSafe(const glm::dvec3& vertex)
 {
     const auto index = findVertex(vertex);
 
@@ -123,14 +123,14 @@ int OBJWriter::addVertexSafe(const glm::vec3& vertex)
     return addVertex(vertex);
 }
 
-int OBJWriter::addVertex(const glm::vec3& vertex)
+int OBJWriter::addVertex(const glm::dvec3& vertex)
 {
     m_vertices.push_back(vertex);
 
     return static_cast<int>(m_vertices.size()) - 1;
 }
 
-int OBJWriter::addNormal(const glm::vec3& normal)
+int OBJWriter::addNormal(const glm::dvec3& normal)
 {
     m_normals.push_back(normal);
 
@@ -145,7 +145,7 @@ void OBJWriter::addLine(int a, int b)
     m_lines.emplace_back(a, b);
 }
 
-void OBJWriter::addLine(const glm::vec3& a, const glm::vec3& b)
+void OBJWriter::addLine(const glm::dvec3& a, const glm::dvec3& b)
 {
     const auto ia = addVertex(a);
     const auto ib = addVertex(b);
@@ -162,7 +162,7 @@ void OBJWriter::addFace(int a, int b, int c)
     m_faces.emplace_back(a, b, c);
 }
 
-void OBJWriter::addFace(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c)
+void OBJWriter::addFace(const glm::dvec3& a, const glm::dvec3& b, const glm::dvec3& c)
 {
     const auto ia = addVertex(a);
     const auto ib = addVertex(b);

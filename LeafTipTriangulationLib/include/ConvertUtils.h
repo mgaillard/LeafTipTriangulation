@@ -7,20 +7,6 @@
 #include <utils/warnon.h>
 
 /**
- * \brief Convert a 2D glm vector to OpenCV vector
- * \param v A glm::vec2 vector
- * \return An OpenCV vector
- */
-cv::Vec2f convertToOpenCV(const glm::vec2& v);
-
-/**
- * \brief Convert a 3D glm vector to OpenCV vector
- * \param v A glm::vec3 vector
- * \return An OpenCV vector
- */
-cv::Vec3f convertToOpenCV(const glm::vec3& v);
-
-/**
  * \brief Convert a 3D OpenCV vector to glm vector
  * \param v A cv::Vec3f vector
  * \return A glm vector
@@ -32,7 +18,7 @@ glm::vec3 convertToGlm(const cv::Vec3f& v);
  * \param v A cv::Vec3d vector
  * \return A glm vector
  */
-glm::vec3 convertToGlm(const cv::Vec3d& v);
+glm::dvec3 convertToGlm(const cv::Vec3d& v);
 
 /**
  * \brief Convert a 4D OpenCV vector to glm vector

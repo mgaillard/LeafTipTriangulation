@@ -138,14 +138,14 @@ public:
 	 * \param viewName The name of the view
 	 * \param points The list of 2D points seen from this view
 	 */
-	void addPointsFromView(const std::string& viewName, const std::vector<glm::vec2>& points);
+	void addPointsFromView(const std::string& viewName, const std::vector<glm::dvec2>& points);
 
 	/**
 	 * \brief Apply a translation to all points from a view
 	 * \param viewName The name of the view
 	 * \param translation The 2D translation to apply
 	 */
-	void applyTranslationToView(const std::string& viewName, const glm::vec2& translation);
+	void applyTranslationToView(const std::string& viewName, const glm::dvec2& translation);
 	
 	/**
 	 * \brief Apply a 90 degrees rotation to all points from a view
@@ -261,14 +261,14 @@ public:
 	 * \param viewName The list of the view, for example: {SV_0, SV_36, SV_72}
 	 * \return A list of 2D points
 	 */
-	std::vector<glm::vec2> pointsFromView(const std::string& viewName) const;
+	std::vector<glm::dvec2> pointsFromView(const std::string& viewName) const;
 
 	/**
 	 * \brief Return a list of lists of points ordered by view
 	 * \param viewNames The list of views where points are required, for example: {SV_0, SV_36, SV_72}
 	 * \return A list of lists of 2D points
 	 */
-	[[nodiscard]] std::vector<std::vector<glm::vec2>> pointsFromViews(const std::vector<std::string>& viewNames) const;
+	[[nodiscard]] std::vector<std::vector<glm::dvec2>> pointsFromViews(const std::vector<std::string>& viewNames) const;
 
 private:
 
@@ -276,7 +276,7 @@ private:
 
 	// For each view, a list of 2D points corresponding to leaf tips
 	// Views can be named: SV_0, SV_36, SV_72, ..., TV_90
-	std::unordered_map<std::string, std::vector<glm::vec2>> m_points;
+	std::unordered_map<std::string, std::vector<glm::dvec2>> m_points;
 
 };
 
@@ -299,7 +299,7 @@ public:
 	 * \param viewName The name of the view
 	 * \return The translation to apply to the view of the plant
 	 */
-	glm::vec2 getTranslationForPlantAndView(const std::string& plantName, const std::string& viewName) const;
+	glm::dvec2 getTranslationForPlantAndView(const std::string& plantName, const std::string& viewName) const;
 
 	/**
 	 * \brief Apply the translations used for calibration of views to a list of plants
@@ -312,7 +312,7 @@ private:
 	{
 		std::string plantName;
 		std::string viewName;
-		glm::vec2 translation;
+		glm::dvec2 translation;
 
 		ViewTranslation(std::string plantName, std::string viewName, double x, double y) :
 			plantName(std::move(plantName)),
@@ -336,7 +336,7 @@ private:
 void apply90DegreesRotationToPoints(const RotationDirection& rotationDirection,
                                     double imageWidth,
                                     double imageHeight,
-                                    std::vector<glm::vec2>& points);
+                                    std::vector<glm::dvec2>& points);
 
 /**
  * \brief Load the rotation direction for the top view, distance to plant, and 
@@ -459,10 +459,10 @@ void clampRaysWithPhenotypingSetup(const PhenotypingSetup& setup,
  * \param thresholdNoPair Threshold in px above which two rays/points can't be paired together
  * \return A list of 3D points that correspond to the phenotype points and the correspondences
  */
-std::tuple<std::vector<glm::vec3>, std::vector<std::vector<std::pair<int, int>>>>
+std::tuple<std::vector<glm::dvec3>, std::vector<std::vector<std::pair<int, int>>>>
 triangulatePhenotypePoints(const PhenotypingSetup& setup,
                            const PlantPhenotypePoints& plantPoints,
-                           float thresholdNoPair = std::numeric_limits<float>::max());
+                           double thresholdNoPair = std::numeric_limits<double>::max());
 
 /**
  * \brief Find the 3D position of phenotype points in a plant and retain matches between 3D points and 2D points
@@ -472,10 +472,10 @@ triangulatePhenotypePoints(const PhenotypingSetup& setup,
  * \param setsOfRays A list of correspondences that correspond to 2D points in the plant
  * \return A list of 3D points that correspond to the phenotype points and the correspondences
  */
-std::tuple<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<int>>>
+std::tuple<std::vector<std::vector<glm::dvec2>>, std::vector<std::vector<int>>>
 projectPhenotypePointsAndRetainMatches(const PhenotypingSetup& setup,
                                        const PlantPhenotypePoints& plantPoints,
-                                       const std::vector<glm::vec3>& triangulatedPoints3D,
+                                       const std::vector<glm::dvec3>& triangulatedPoints3D,
                                        const std::vector<std::vector<std::pair<int, int>>>& setsOfRays);
 
 /**
@@ -488,7 +488,7 @@ projectPhenotypePointsAndRetainMatches(const PhenotypingSetup& setup,
 void applyInverseTranslationsOnPhenotypePoints(const PlantImageTranslations& translations,
                                                const std::string& plantName,
                                                const std::vector<std::string>& viewNames,
-                                               std::vector<std::vector<glm::vec2>>& plantPoints);
+                                               std::vector<std::vector<glm::dvec2>>& plantPoints);
 
 /**
  * \brief Draw a list of points in 2D image
@@ -499,7 +499,7 @@ void applyInverseTranslationsOnPhenotypePoints(const PlantImageTranslations& tra
  */
 bool drawPointsInImage(const std::string& filename,
 					   const std::string& backgroundImage,
-                       const std::vector<glm::vec2>& points);
+                       const std::vector<glm::dvec2>& points);
 
 /**
  * \brief Draw a list of points with their matches in a 2D image
@@ -513,8 +513,8 @@ bool drawPointsInImage(const std::string& filename,
  */
 bool drawPointsInImageWithMatches(const std::string& filename,
                                   const std::string& backgroundImage,
-                                  const std::vector<glm::vec2>& annotationPoints,
-                                  const std::vector<glm::vec2>& projectionPoints,
+                                  const std::vector<glm::dvec2>& annotationPoints,
+                                  const std::vector<glm::dvec2>& projectionPoints,
 	                              const std::vector<int>& projectionMatches);
 
 /**
@@ -554,4 +554,4 @@ bool exportNumberLeavesToCsv(const std::string& filename,
  */
 bool exportPositionLeavesToTxt(const std::string& filename,
 	                           const std::vector<PlantPhenotypePoints>& plants,
-	                           const std::vector<std::vector<glm::vec3>>& points3d);
+	                           const std::vector<std::vector<glm::dvec3>>& points3d);

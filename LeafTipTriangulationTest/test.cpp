@@ -10,7 +10,7 @@ struct RayTestData
 	Ray ray0;
 	Ray ray1;
 	bool success;
-	glm::vec3 intersection;
+	glm::dvec3 intersection;
 };
 
 /**
@@ -22,7 +22,7 @@ struct RayTestData
  * \param cameras A set of cameras
  * \param point A 3D point
  */
-void testTriangulationOnePoint(const std::vector<Camera>& cameras, const glm::vec3& point)
+void testTriangulationOnePoint(const std::vector<Camera>& cameras, const glm::dvec3& point)
 {
 	// Matrices to project a 3D point to 2D point in viewport coordinates
 	std::vector<glm::dmat4> projectionMatrices;
@@ -65,9 +65,9 @@ std::vector<Camera> generateCamerasAroundOrigin(int nbCameras)
 		const auto angle = 2 * constants::pi * (static_cast<double>(i) / static_cast<double>(nbCameras));
 
 		cameras.emplace_back(
-			glm::vec3(2.0 * std::cos(angle), 2.0 * std::sin(angle), 0.0),
-			glm::vec3(0.0, 0.0, 0.0),
-			glm::vec3(0.0, 0.0, 1.0)
+			glm::dvec3(2.0 * std::cos(angle), 2.0 * std::sin(angle), 0.0),
+			glm::dvec3(0.0, 0.0, 0.0),
+			glm::dvec3(0.0, 0.0, 1.0)
 		);
 	}
 
@@ -78,14 +78,14 @@ TEST_CASE("Triangulation of one point from 2 views", "[triangulation]")
 {
 	// Define two cameras
 	const Camera camera1(
-		glm::vec3(0.0, 2.0, 0.0),
-		glm::vec3(0.0, 0.0, 0.0),
-		glm::vec3(0.0, 0.0, 1.0));
+		glm::dvec3(0.0, 2.0, 0.0),
+		glm::dvec3(0.0, 0.0, 0.0),
+		glm::dvec3(0.0, 0.0, 1.0));
 
 	const Camera camera2(
-		glm::vec3(2.0, 0.0, 0.0),
-		glm::vec3(0.0, 0.0, 0.0),
-		glm::vec3(0.0, 0.0, 1.0));
+		glm::dvec3(2.0, 0.0, 0.0),
+		glm::dvec3(0.0, 0.0, 0.0),
+		glm::dvec3(0.0, 0.0, 1.0));
 
 	const std::vector<Camera> cameras = {
 		camera1,
@@ -93,11 +93,11 @@ TEST_CASE("Triangulation of one point from 2 views", "[triangulation]")
 	};
 
 	// Test the triangulation with several points
-	testTriangulationOnePoint(cameras, glm::vec3(0.1, -0.2, 0.15));
-	testTriangulationOnePoint(cameras, glm::vec3(0.298, -0.767, -0.881));
-	testTriangulationOnePoint(cameras, glm::vec3(0.154, 0.715, -0.733));
-	testTriangulationOnePoint(cameras, glm::vec3(0.339, 0.957, -0.331));
-	testTriangulationOnePoint(cameras, glm::vec3(-0.346, 0.887, -0.869));
+	testTriangulationOnePoint(cameras, glm::dvec3(0.1, -0.2, 0.15));
+	testTriangulationOnePoint(cameras, glm::dvec3(0.298, -0.767, -0.881));
+	testTriangulationOnePoint(cameras, glm::dvec3(0.154, 0.715, -0.733));
+	testTriangulationOnePoint(cameras, glm::dvec3(0.339, 0.957, -0.331));
+	testTriangulationOnePoint(cameras, glm::dvec3(-0.346, 0.887, -0.869));
 }
 
 TEST_CASE("Triangulation of one point from multiple views", "[triangulation]")
@@ -107,11 +107,11 @@ TEST_CASE("Triangulation of one point from multiple views", "[triangulation]")
 	const auto cameras = generateCamerasAroundOrigin(nbCameras);
 
 	// Test the triangulation with several points
-	testTriangulationOnePoint(cameras, glm::vec3(0.1, -0.2, 0.15));
-	testTriangulationOnePoint(cameras, glm::vec3(0.298, -0.767, -0.881));
-	testTriangulationOnePoint(cameras, glm::vec3(0.154, 0.715, -0.733));
-	testTriangulationOnePoint(cameras, glm::vec3(0.339, 0.957, -0.331));
-	testTriangulationOnePoint(cameras, glm::vec3(-0.346, 0.887, -0.869));
+	testTriangulationOnePoint(cameras, glm::dvec3(0.1, -0.2, 0.15));
+	testTriangulationOnePoint(cameras, glm::dvec3(0.298, -0.767, -0.881));
+	testTriangulationOnePoint(cameras, glm::dvec3(0.154, 0.715, -0.733));
+	testTriangulationOnePoint(cameras, glm::dvec3(0.339, 0.957, -0.331));
+	testTriangulationOnePoint(cameras, glm::dvec3(-0.346, 0.887, -0.869));
 }
 
 TEST_CASE("Triangulation of many points from multiple views", "[triangulation]")
@@ -121,31 +121,31 @@ TEST_CASE("Triangulation of many points from multiple views", "[triangulation]")
 	const auto cameras = generateCamerasAroundOrigin(nbCameras);
 
 	// Some 3D points that will be triangulated (randomly generated)
-	const std::vector<glm::vec3> points3d = {
-		glm::vec3(0.401, 0.075, -0.28),
-		glm::vec3(0.095, 0.275, 0.687),
-		glm::vec3(-0.739, 0.592, -0.952),
-		glm::vec3(-0.89, 0.265, 0.336),
-		glm::vec3(0.933, 0.107, 0.822),
-		glm::vec3(-0.828, -0.315, 0.782),
-		glm::vec3(-0.941, -0.587, -0.63),
-		glm::vec3(-0.425, 0.698, -0.346),
-		glm::vec3(0.415, -0.715, 0.12),
-		glm::vec3(-0.237, 0.476, 0.935),
-		glm::vec3(0.764, -0.107, 0.714),
-		glm::vec3(0.017, 0.346, -0.991),
-		glm::vec3(0.839, -0.932, -0.45),
-		glm::vec3(-0.36, 0.813, -0.975),
-		glm::vec3(-0.344, 0.228, 0.314),
-		glm::vec3(0.286, 0.881, -0.261),
-		glm::vec3(-0.027, -0.432, -0.678),
-		glm::vec3(0.264, -0.023, 0.775),
-		glm::vec3(0.408, -0.905, -0.018),
-		glm::vec3(-0.009, -0.938, 0.223)
+	const std::vector<glm::dvec3> points3d = {
+		{0.401, 0.075, -0.28},
+		{0.095, 0.275, 0.687},
+		{-0.739, 0.592, -0.952},
+		{-0.89, 0.265, 0.336},
+		{0.933, 0.107, 0.822},
+		{-0.828, -0.315, 0.782},
+		{-0.941, -0.587, -0.63},
+		{-0.425, 0.698, -0.346},
+		{0.415, -0.715, 0.12},
+		{-0.237, 0.476, 0.935},
+		{0.764, -0.107, 0.714},
+		{0.017, 0.346, -0.991},
+		{0.839, -0.932, -0.45},
+		{-0.36, 0.813, -0.975},
+		{-0.344, 0.228, 0.314},
+		{0.286, 0.881, -0.261},
+		{-0.027, -0.432, -0.678},
+		{0.264, -0.023, 0.775},
+		{0.408, -0.905, -0.018},
+		{-0.009, -0.938, 0.223},
 	};
 
 	// For each camera, a list of 2D points seen from it
-	std::vector<std::vector<glm::vec2>> points2d(cameras.size());
+	std::vector<std::vector<glm::dvec2>> points2d(cameras.size());
 	// For each 3D point, the list of cameras and points seeing it
 	std::vector<std::vector<std::pair<int, int>>> correspondences(points3d.size());
 
@@ -191,7 +191,7 @@ TEST_CASE("Rays pseudo intersections parallel (lines)", "[rays]")
 	// Rays that are parallel
 	const Ray parallelR1{{0.0, 0.0, 0.0}, {0.0, 0.0, 1.0}};
 	const Ray parallelR2{ {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0} };
-	glm::vec3 intersection;
+	glm::dvec3 intersection;
 
 	const auto success = raysPseudoIntersection(parallelR1, parallelR2, intersection);
 	REQUIRE_FALSE(success);
@@ -232,7 +232,7 @@ TEST_CASE("Rays pseudo intersections parallel (line segments)", "[rays]")
 
 	for (const auto& test : tests)
 	{
-		glm::vec3 intersection;
+		glm::dvec3 intersection;
 		bool success;
 		// Run the test one way
 		success = raysPseudoIntersection(test.ray0, test.ray1, intersection);
@@ -268,7 +268,7 @@ TEST_CASE("Rays pseudo intersections parallel (mixed line and line segments)", "
 	// Rays that are parallel
 	const Ray parallelR1{ {0.0, 0.0, 0.0}, {0.0, 0.0, 1.0} };
 	const Ray parallelR2{ {1.0, 0.0, 0.0}, {0.0, 0.0, 1.0}, 0.0, 1.0 };
-	glm::vec3 intersection;
+	glm::dvec3 intersection;
 
 	const auto success = raysPseudoIntersection(parallelR1, parallelR2, intersection);
 	REQUIRE_FALSE(success);
@@ -279,7 +279,7 @@ TEST_CASE("Rays pseudo intersections (lines)", "[rays]")
 	// Very simple hard coded test
 	const Ray r1{ {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0} };
 	const Ray r2{ {1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0} };
-	glm::vec3 intersection;
+	glm::dvec3 intersection;
 	bool success;
 
 	success = raysPseudoIntersection(r1, r2, intersection);
@@ -297,7 +297,7 @@ TEST_CASE("Rays pseudo intersections (lines)", "[rays]")
 		{ {0.808, 0.951, 0.391}, {0.111, 0.798, 0.592} }
 	} };
 
-	const std::array<std::array<glm::vec3, 4>, 4> intersections = { {
+	const std::array<std::array<glm::dvec3, 4>, 4> intersections = { {
 		{{
 			{ 0.0, 0.0, 0.0},
 			{ 0.07263205945491791, -0.1626813411712646, 0.08639559149742126 },
@@ -413,7 +413,7 @@ TEST_CASE("Rays pseudo intersections (line segments)", "[rays]")
 	for (const auto& test: tests)
 	{
 		// Run the test
-		glm::vec3 intersection;
+		glm::dvec3 intersection;
 		const auto success = raysPseudoIntersection(test.ray0, test.ray1, intersection);
 
 		REQUIRE(success == test.success);
@@ -436,7 +436,7 @@ TEST_CASE("Rays pseudo intersections (mixed line and line segments)", "[rays]")
 	const Ray r2{ {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, 0.0, 2.0 };
 	// Line segment ray (finite)
 	const Ray r3{ {1.0, 1.0, 1.0}, {-1.0, 0.0, 0.0}, 0.0, 2.0 };
-	glm::vec3 intersection;
+	glm::dvec3 intersection;
 	bool success;
 
 	success = raysPseudoIntersection(r1, r2, intersection);
@@ -468,22 +468,22 @@ TEST_CASE("Benchmark triangulation of one point", "[triangulation][benchmark]")
 	
 	BENCHMARK("Number of cameras: 2")
 	{
-		testTriangulationOnePoint(cameras2, glm::vec3(0.1, -0.2, 0.15));
+		testTriangulationOnePoint(cameras2, glm::dvec3(0.1, -0.2, 0.15));
 	};
 	
 	BENCHMARK("Number of cameras: 3")
 	{
-		testTriangulationOnePoint(cameras3, glm::vec3(0.1, -0.2, 0.15));
+		testTriangulationOnePoint(cameras3, glm::dvec3(0.1, -0.2, 0.15));
 	};
 	
 	BENCHMARK("Number of cameras: 6")
 	{
-		testTriangulationOnePoint(cameras6, glm::vec3(0.1, -0.2, 0.15));
+		testTriangulationOnePoint(cameras6, glm::dvec3(0.1, -0.2, 0.15));
 	};
 
 	BENCHMARK("Number of cameras: 12")
 	{
-		testTriangulationOnePoint(cameras, glm::vec3(0.1, -0.2, 0.15));
+		testTriangulationOnePoint(cameras, glm::dvec3(0.1, -0.2, 0.15));
 	};
 }
 #endif

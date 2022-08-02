@@ -351,15 +351,15 @@ bool lineSegmentsPseudoIntersection(
 // Public functions
 // ------------------------------------------
 
-bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
+bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::dvec3& c)
 {
 	// If rays are lines
 	if (!ray0.isClamped() && !ray1.isClamped())
 	{
-		const glm::dvec3 a0 = ray0.origin;
-		const glm::dvec3 b0 = ray0.origin + ray0.direction;
-		const glm::dvec3 a1 = ray1.origin;
-		const glm::dvec3 b1 = ray1.origin + ray1.direction;
+		const auto a0 = ray0.origin;
+		const auto b0 = ray0.origin + ray0.direction;
+		const auto a1 = ray1.origin;
+		const auto b1 = ray1.origin + ray1.direction;
 		
 		glm::dvec3 pseudoIntersection;
 		const auto success = linesPseudoIntersection(a0, b0, a1, b1, pseudoIntersection);
@@ -374,10 +374,10 @@ bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
 	// If rays are line segments
 	else if (ray0.isClamped() && ray1.isClamped())
 	{
-		const glm::dvec3 a0 = ray0.at(ray0.start());
-		const glm::dvec3 b0 = ray0.at(ray0.end());
-		const glm::dvec3 a1 = ray1.at(ray1.start());
-		const glm::dvec3 b1 = ray1.at(ray1.end());
+		const auto a0 = ray0.at(ray0.start());
+		const auto b0 = ray0.at(ray0.end());
+		const auto a1 = ray1.at(ray1.start());
+		const auto b1 = ray1.at(ray1.end());
 
 		glm::dvec3 pseudoIntersection;
 		const auto success = lineSegmentsPseudoIntersection(a0, b0, a1, b1, pseudoIntersection);
@@ -392,10 +392,10 @@ bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
 	// If the two rays are mixed: line and line segment
 	else if (ray0.isClamped() && !ray1.isClamped())
 	{
-		const glm::dvec3 lineSegmentA = ray0.at(ray0.start());
-		const glm::dvec3 lineSegmentB = ray0.at(ray0.end());
-		const glm::dvec3 lineA = ray1.origin;
-		const glm::dvec3 lineB = ray1.origin + ray1.direction;
+		const auto lineSegmentA = ray0.at(ray0.start());
+		const auto lineSegmentB = ray0.at(ray0.end());
+		const auto lineA = ray1.origin;
+		const auto lineB = ray1.origin + ray1.direction;
 
 		glm::dvec3 pseudoIntersection;
 		const auto success = lineAndLineSegmentPseudoIntersection(lineA, lineB, lineSegmentA, lineSegmentB, pseudoIntersection);
@@ -409,10 +409,10 @@ bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
 	}
 	else if (!ray0.isClamped() && ray1.isClamped())
 	{
-		const glm::dvec3 lineA = ray0.origin;
-		const glm::dvec3 lineB = ray0.origin + ray0.direction;
-		const glm::dvec3 lineSegmentA = ray1.at(ray1.start());
-		const glm::dvec3 lineSegmentB = ray1.at(ray1.end());
+		const auto lineA = ray0.origin;
+		const auto lineB = ray0.origin + ray0.direction;
+		const auto lineSegmentA = ray1.at(ray1.start());
+		const auto lineSegmentB = ray1.at(ray1.end());
 
 		glm::dvec3 pseudoIntersection;
 		const auto success = lineAndLineSegmentPseudoIntersection(lineA, lineB, lineSegmentA, lineSegmentB, pseudoIntersection);
@@ -428,26 +428,26 @@ bool raysPseudoIntersection(const Ray& ray0, const Ray& ray1, glm::vec3& c)
 	return false;
 }
 
-float pointToRayDistance(const glm::vec3& point, const Ray& ray)
+double pointToRayDistance(const glm::dvec3& point, const Ray& ray)
 {
 	double dist = 0.0;
 
 	// If the ray is a line
 	if (!ray.isClamped())
 	{
-		const glm::dvec3 lineA = ray.origin;
-		const glm::dvec3 lineB = ray.origin + ray.direction;
+		const auto lineA = ray.origin;
+		const auto lineB = ray.origin + ray.direction;
 		glm::dvec3 c;
 		dist = distToLine(point, lineA, lineB, c);
 	}
 	// If the ray is a line segment
 	else
 	{
-		const glm::dvec3 lineSegmentA = ray.at(ray.start());
-		const glm::dvec3 lineSegmentB = ray.at(ray.end());
+		const auto lineSegmentA = ray.at(ray.start());
+		const auto lineSegmentB = ray.at(ray.end());
 		glm::dvec3 c;
 		dist = distToLineSegment(point, lineSegmentA, lineSegmentB, c);
 	}
 
-	return static_cast<float>(dist);
+	return dist;
 }

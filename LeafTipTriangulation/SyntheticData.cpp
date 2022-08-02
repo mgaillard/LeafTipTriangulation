@@ -12,20 +12,20 @@
 
 #include "Triangulation.h"
 
-std::vector<glm::vec3> generatePointsInSphere(int n, float radius)
+std::vector<glm::dvec3> generatePointsInSphere(int n, double radius)
 {
-	std::vector<glm::vec3> points3D;
+	std::vector<glm::dvec3> points3d;
 
-	points3D.reserve(n);
+	points3d.reserve(n);
 	for (int i = 0; i < n; i++)
 	{
-		points3D.push_back(glm::ballRand(radius));
+		points3d.push_back(glm::ballRand(radius));
 	}
 
-	return points3D;
+	return points3d;
 }
 
-std::vector<Camera> generateCamerasOnSphere(int n, float radius)
+std::vector<Camera> generateCamerasOnSphere(int n, double radius)
 {
 	std::vector<Camera> cameras;
 
@@ -36,53 +36,53 @@ std::vector<Camera> generateCamerasOnSphere(int n, float radius)
 		const auto eye = glm::sphericalRand(radius);
 
 		// Generate the up vector (unit vector around the eye, orthogonal to atToEye)
-		glm::vec3 up;
+		glm::dvec3 up;
 		do
 		{
-			up = glm::cross(glm::sphericalRand(1.f), eye);
-		} while (glm::length(up) <= 0.f);
+			up = glm::cross(glm::sphericalRand(1.0), eye);
+		} while (glm::length(up) <= 0.0);
 		up = glm::normalize(up);
 
-		cameras.push_back(Camera(eye, glm::vec3(0.f, 0.f, 0.f), up));
+		cameras.emplace_back(eye, glm::dvec3(0.f, 0.f, 0.f), up);
 	}
 
 	return cameras;
 }
 
-std::vector<std::vector<glm::vec2>> projectPoints(
-	const std::vector<glm::vec3>& points,
+std::vector<std::vector<glm::dvec2>> projectPoints(
+	const std::vector<glm::dvec3>& points3d,
 	const std::vector<Camera>& cameras
 )
 {
-	std::vector<std::vector<glm::vec2>> projected(cameras.size());
+	std::vector<std::vector<glm::dvec2>> projected(cameras.size());
 
 	for (unsigned int c = 0; c < cameras.size(); c++)
 	{
-		for (const auto& point : points)
+		for (const auto& point : points3d)
 		{
-			const auto point2D = cameras[c].project(point);
+			const auto point2d = cameras[c].project(point);
 
 			// Check depth: the point must be visible from the camera and not behind it
-			assert(point2D.z > 0.f);
+			assert(point2d.z > 0.0);
 
-			projected[c].emplace_back(point2D);
+			projected[c].emplace_back(point2d);
 		}
 	}
 
 	return projected;
 }
 
-std::vector<std::vector<glm::vec2>> addNoise(
-	const std::vector<std::vector<glm::vec2>>& points,
+std::vector<std::vector<glm::dvec2>> addNoise(
+	const std::vector<std::vector<glm::dvec2>>& points,
 	const std::vector<Camera>& cameras,
-	float noiseStd)
+	double noiseStd)
 {
-	std::vector<std::vector<glm::vec2>> newPoints;
+	std::vector<std::vector<glm::dvec2>> newPoints;
 
 	newPoints.reserve(points.size());
 	for (unsigned int i = 0; i < points.size(); i++)
 	{
-		std::vector<glm::vec2> newCameraPoints;
+		std::vector<glm::dvec2> newCameraPoints;
 
 		newCameraPoints.reserve(points[i].size());
 		for (const auto& point : points[i])
@@ -91,8 +91,8 @@ std::vector<std::vector<glm::vec2>> addNoise(
 			const auto& view = cameras[i].viewport();
 
 			// 2D point + noise
-			const auto x = glm::clamp(point.x + glm::gaussRand(0.f, noiseStd), view.x, view.z);
-			const auto y = glm::clamp(point.y + glm::gaussRand(0.f, noiseStd), view.y, view.w);
+			const auto x = glm::clamp(point.x + glm::gaussRand(0.0, noiseStd), view.x, view.z);
+			const auto y = glm::clamp(point.y + glm::gaussRand(0.0, noiseStd), view.y, view.w);
 
 			newCameraPoints.emplace_back(x, y);
 		}
@@ -103,9 +103,9 @@ std::vector<std::vector<glm::vec2>> addNoise(
 	return newPoints;
 }
 
-std::pair<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<std::pair<int, int>>>> removePoints(
-	const std::vector<std::vector<glm::vec2>>& points,
-	float probabilityKeep,
+std::pair<std::vector<std::vector<glm::dvec2>>, std::vector<std::vector<std::pair<int, int>>>> removePoints(
+	const std::vector<std::vector<glm::dvec2>>& points,
+	double probabilityKeep,
 	bool verbose)
 {
 	assert(!points.empty());
@@ -118,21 +118,21 @@ std::pair<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<std::pair
 	std::vector<std::vector<std::pair<int, int>>> correspondences(points.front().size());
 
 	// New array of camera points
-	std::vector<std::vector<glm::vec2>> newPoints;
+	std::vector<std::vector<glm::dvec2>> newPoints;
 
 	newPoints.reserve(points.size());
 	for (unsigned int c = 0; c < points.size(); c++)
 	{
 		const auto& cameraPoints = points[c];
 		
-		std::vector<glm::vec2> newCameraPoints;
+		std::vector<glm::dvec2> newCameraPoints;
 
 		newCameraPoints.reserve(cameraPoints.size());
 		for (unsigned int i = 0; i < cameraPoints.size(); i++)
 		{
 			const auto& point = cameraPoints[i];
 			
-			if (glm::linearRand(0.f, 1.f) <= probabilityKeep)
+			if (glm::linearRand(0.0, 1.0) <= probabilityKeep)
 			{
 				newCameraPoints.push_back(point);
 				visibility[i]++;
@@ -185,7 +185,7 @@ std::pair<std::vector<std::vector<glm::vec2>>, std::vector<std::vector<std::pair
 }
 
 bool checkUnProject(
-	const std::vector<glm::vec3>& points,
+	const std::vector<glm::dvec3>& points,
 	const std::vector<std::vector<Ray>>& rays)
 {
 	for (unsigned int i = 0; i < points.size(); i++)
@@ -193,8 +193,8 @@ bool checkUnProject(
 		for (unsigned int c = 0; c < rays.size(); c++)
 		{
 			const auto closestPoint = glm::closestPointOnLine(points[i],
-				rays[c][i].origin,
-				rays[c][i].at(10.f));
+			                                                  rays[c][i].origin,
+			                                                  rays[c][i].at(10.0));
 
 			if (glm::distance(points[i], closestPoint) >= 1e-3)
 			{
@@ -209,14 +209,14 @@ bool checkUnProject(
 
 GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::vec2>>& points2d,
-	const std::vector<glm::vec3>& points3d,
+	const std::vector<std::vector<glm::dvec2>>& points2d,
+	const std::vector<glm::dvec3>& points3d,
 	const std::vector<std::vector<std::pair<int, int>>>& trueCorrespondences,
-	const std::vector<glm::vec3>& triangulatedPoints3D,
+	const std::vector<glm::dvec3>& triangulatedPoints3D,
 	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
 {
 	// Multiplier used to convert a floating point value to an integer value
-	const float realToLongMultiplier = 1000.f;
+	const double realToLongMultiplier = 1000.0;
 
 	// TODO: better matching and see if it changes results in stats
 
@@ -225,7 +225,7 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 	const int costSize = std::max(costRows, costCols);
 
 	dlib::matrix<long> cost(costSize, costSize);
-	dlib::matrix<float> realCost(costSize, costSize);
+	dlib::matrix<double> realCost(costSize, costSize);
 	
 	for (int i = 0; i < costSize; i++)
 	{
@@ -241,7 +241,7 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 			}
 			else
 			{
-				realCost(i, j) = 0.f;
+				realCost(i, j) = 0.0;
 				// TODO: replace with a better constant
 				cost(i, j) = -1000000;
 			}
@@ -438,22 +438,22 @@ AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTru
 	// Compute mean of parameters
 	aggregation.nbRuns = nbRuns;
 	std::tie(aggregation.meanRuntime, aggregation.stdRuntime) = computeMeanAndStd(runtimes);
-	aggregation.nbPointsTriangulated = double(aggregationTotal.nbPointsTriangulated) / double(nbRuns);
-	aggregation.nbPointsMissed = double(aggregationTotal.nbPointsMissed) / double(nbRuns);
-	aggregation.nbPointsFalsePositive = double(aggregationTotal.nbPointsFalsePositive) / double(nbRuns);
-	aggregation.nbPointsSuccessful = double(aggregationTotal.nbPointsSuccessful) / double(nbRuns);
-	aggregation.nbRightPointsCorrespondence = double(aggregationTotal.nbRightPointsCorrespondence) / double(nbRuns);
-	aggregation.nbWrongPointsCorrespondence = double(aggregationTotal.nbWrongPointsCorrespondence) / double(nbRuns);
+	aggregation.nbPointsTriangulated = static_cast<double>(aggregationTotal.nbPointsTriangulated) / static_cast<double>(nbRuns);
+	aggregation.nbPointsMissed = static_cast<double>(aggregationTotal.nbPointsMissed) / static_cast<double>(nbRuns);
+	aggregation.nbPointsFalsePositive = static_cast<double>(aggregationTotal.nbPointsFalsePositive) / static_cast<double>(nbRuns);
+	aggregation.nbPointsSuccessful = static_cast<double>(aggregationTotal.nbPointsSuccessful) / static_cast<double>(nbRuns);
+	aggregation.nbRightPointsCorrespondence = static_cast<double>(aggregationTotal.nbRightPointsCorrespondence) / static_cast<double>(nbRuns);
+	aggregation.nbWrongPointsCorrespondence = static_cast<double>(aggregationTotal.nbWrongPointsCorrespondence) / static_cast<double>(nbRuns);
 
-	aggregation.precisionCorrespondence = double(aggregationTotal.truePositiveCorrespondence)
-	                                    / double(aggregationTotal.truePositiveCorrespondence + aggregationTotal.falsePositiveCorrespondence);
-	aggregation.recallCorrespondence = double(aggregationTotal.truePositiveCorrespondence)
-	                                 / double(aggregationTotal.truePositiveCorrespondence + aggregationTotal.falseNegativeCorrespondence);
-	aggregation.fMeasureCorrespondence = 2.f * (aggregation.precisionCorrespondence * aggregation.recallCorrespondence)
+	aggregation.precisionCorrespondence = static_cast<double>(aggregationTotal.truePositiveCorrespondence)
+	                                    / static_cast<double>(aggregationTotal.truePositiveCorrespondence + aggregationTotal.falsePositiveCorrespondence);
+	aggregation.recallCorrespondence = static_cast<double>(aggregationTotal.truePositiveCorrespondence)
+	                                 / static_cast<double>(aggregationTotal.truePositiveCorrespondence + aggregationTotal.falseNegativeCorrespondence);
+	aggregation.fMeasureCorrespondence = 2.0 * (aggregation.precisionCorrespondence * aggregation.recallCorrespondence)
 	                                         / (aggregation.precisionCorrespondence + aggregation.recallCorrespondence);
 
-	aggregation.averageDifferenceInReprojectionError = totalAverageDifferenceInReprojectionError / double(nbRuns);
-	aggregation.proportionOfBetterReprojectionError = double(totalProportionOfBetterReprojectionError) / double(nbRuns);
+	aggregation.averageDifferenceInReprojectionError = totalAverageDifferenceInReprojectionError / static_cast<double>(nbRuns);
+	aggregation.proportionOfBetterReprojectionError = static_cast<double>(totalProportionOfBetterReprojectionError) / static_cast<double>(nbRuns);
 
 	// Sort distances
 	std::sort(aggregationTotal.distances.begin(), aggregationTotal.distances.end());
@@ -518,8 +518,8 @@ void checkCorrespondenceSetsOfRays(const std::vector<std::vector<std::pair<int, 
 	const auto totalCorrespondences = nbWrongCorrespondences + nbRightCorrespondences;
 	const auto totalPoints = setsOfRays.size();
 	
-	const auto rateWrongCorrespondences = float(nbWrongCorrespondences) / float(totalCorrespondences);
-	const auto rateWrongPoints = float(nbWrongPoints) / float(totalPoints);
+	const auto rateWrongCorrespondences = static_cast<double>(nbWrongCorrespondences) / static_cast<double>(totalCorrespondences);
+	const auto rateWrongPoints = static_cast<double>(nbWrongPoints) / static_cast<double>(totalPoints);
 
 	std::cout << "Number of incorrectly/correctly matched points : "
 	          << nbWrongPoints << " / " << nbRightPoints << "\n"

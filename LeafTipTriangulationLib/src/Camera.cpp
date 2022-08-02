@@ -7,77 +7,77 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <utils/warnon.h>
 
-Camera::Camera(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up):
+Camera::Camera(const glm::dvec3& eye, const glm::dvec3& at, const glm::dvec3& up):
 	m_eye(eye),
 	m_at(at),
 	m_up(up),
 	m_matV(glm::lookAt(eye, at, up)), // Generate the view matrix
-	m_matP(glm::perspective(45.f, 1.f, 0.1f, 10.f)), // Generate the projection matrix
+	m_matP(glm::perspective(45.0, 1.0, 0.1, 10.0)), // Generate the projection matrix
 	m_mat(m_matP * m_matV),
-	m_viewport(0, 0, 1000, 1000)
+	m_viewport(0.0, 0.0, 1000.0, 1000.0)
 {
 	
 }
 
-Camera::Camera(const glm::vec3& eye,
-	           const glm::vec3& at,
-	           const glm::vec3& up,
-	           float fovy,
-	           float aspectRatio,
-	           const glm::vec2& viewportSize) :
+Camera::Camera(const glm::dvec3& eye,
+               const glm::dvec3& at,
+               const glm::dvec3& up,
+               double fovy,
+               double aspectRatio,
+               const glm::dvec2& viewportSize) :
 	m_eye(eye),
 	m_at(at),
 	m_up(up),
 	m_matV(glm::lookAt(eye, at, up)), // Generate the view matrix
-	m_matP(glm::perspective(fovy, aspectRatio, 0.001f, 10.f)), // Generate the projection matrix
+	m_matP(glm::perspective(fovy, aspectRatio, 0.001, 10.0)), // Generate the projection matrix
 	m_mat(m_matP * m_matV),
-	m_viewport(0, 0, viewportSize.x, viewportSize.y)
+	m_viewport(0.0, 0.0, viewportSize.x, viewportSize.y)
 {
 	
 }
 
-Camera::Camera(const glm::vec3& eye,
-               const glm::vec3& at,
-               const glm::vec3& up,
-               const glm::mat4& matV,
-               const glm::mat4& matP,
-               const glm::vec2& viewportSize) :
+Camera::Camera(const glm::dvec3& eye,
+               const glm::dvec3& at,
+               const glm::dvec3& up,
+               const glm::dmat4& matV,
+               const glm::dmat4& matP,
+               const glm::dvec2& viewportSize) :
 	m_eye(eye),
 	m_at(at),
 	m_up(up),
 	m_matV(matV),
 	m_matP(matP),
 	m_mat(m_matP * m_matV),
-	m_viewport(0, 0, viewportSize.x, viewportSize.y)
+	m_viewport(0.0, 0.0, viewportSize.x, viewportSize.y)
 {
 }
 
-glm::vec3 Camera::project(const glm::vec3& point) const
+glm::dvec3 Camera::project(const glm::dvec3& point) const
 {
 	return glm::projectNO(point,
-	                      glm::identity<glm::mat4>(),
+	                      glm::identity<glm::dmat4>(),
 	                      m_mat,
 	                      m_viewport);
 }
 
-glm::vec3 Camera::unProject(const glm::vec3& point) const
+glm::dvec3 Camera::unProject(const glm::dvec3& point) const
 {
 	return glm::unProjectNO(point,
-	                        glm::identity<glm::mat4>(),
+	                        glm::identity<glm::dmat4>(),
 	                        m_mat,
 	                        m_viewport);
 }
 
-glm::vec2 Camera::windowToViewport(const glm::vec2& point) const
+glm::dvec2 Camera::windowToViewport(const glm::dvec2& point) const
 {
 	// Remap the viewport coordinates in pixels to [-1, 1]
 	return {
-		-1.f + 2.0f * ((point.x - m_viewport[0]) / (m_viewport[2] - m_viewport[0])),
-		-1.f + 2.0f * ((point.y - m_viewport[1]) / (m_viewport[3] - m_viewport[1])),
+		-1.0 + 2.0 * ((point.x - m_viewport[0]) / (m_viewport[2] - m_viewport[0])),
+		-1.0 + 2.0 * ((point.y - m_viewport[1]) / (m_viewport[3] - m_viewport[1])),
 	};
 }
 
-float computeMaximumCameraResolution(const Camera& camera)
+double computeMaximumCameraResolution(const Camera& camera)
 {
 	return std::max(
 		camera.viewport().z - camera.viewport().x,
@@ -85,9 +85,9 @@ float computeMaximumCameraResolution(const Camera& camera)
 	);
 }
 
-float computeMaximumCameraResolution(const std::vector<Camera>& cameras)
+double computeMaximumCameraResolution(const std::vector<Camera>& cameras)
 {
-	float maximumResolution = 0;
+	double maximumResolution = 0.0;
 
 	for (const auto& camera : cameras)
 	{
@@ -113,10 +113,10 @@ std::vector<Camera> loadCamerasFromFiles(const std::vector<std::string>& files)
 		if (file.is_open())
 		{
 			int imageWidth, imageHeight;
-			glm::vec3 eye, at, up;
+			glm::dvec3 eye, at, up;
 			// These are not used by our camera model, but are still part of the file
 			double fovy, aspectRatio, nearPlane, farPlane;
-			glm::mat4 matV, matP;
+			glm::dmat4 matV, matP;
 
 			file >> imageWidth >> imageHeight;
 
@@ -141,7 +141,7 @@ std::vector<Camera> loadCamerasFromFiles(const std::vector<std::string>& files)
 
 			file.close();
 
-			cameras.emplace_back(eye, at, up, matV, matP, glm::vec2(imageWidth, imageHeight));
+			cameras.emplace_back(eye, at, up, matV, matP, glm::dvec2(imageWidth, imageHeight));
 		}
 		else
 		{
@@ -154,7 +154,7 @@ std::vector<Camera> loadCamerasFromFiles(const std::vector<std::string>& files)
 
 std::vector<std::vector<Ray>> computeRays(
 	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::vec2>>& points
+	const std::vector<std::vector<glm::dvec2>>& points
 )
 {
 	std::vector<std::vector<Ray>> rays(cameras.size());
@@ -163,9 +163,9 @@ std::vector<std::vector<Ray>> computeRays(
 	{
 		for (const auto& point : points[c])
 		{
-			const glm::vec3 points3D(point.x, point.y, 1.f);
+			const glm::dvec3 points3d(point.x, point.y, 1.f);
 
-			const auto unProjected = cameras[c].unProject(points3D);
+			const auto unProjected = cameras[c].unProject(points3d);
 
 			const auto origin = cameras[c].eye();
 			const auto direction = glm::normalize(unProjected - origin);
