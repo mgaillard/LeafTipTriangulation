@@ -326,7 +326,7 @@ def main() -> int:
     args = parser.parse_args()
 
     directories = ['sorghum_2018', 'sorghum_2022', 'sorghum_2022_synthetic']
-    thetas = [0, 250, 500, 750, 1000]
+    thetas = [0, 400, 1000, 1500, 2000]
     probabilities = [-0.10, -0.08, -0.06, -0.04, -0.02, 0.0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50]
     seeds = [14117, 4173, 6468, 306, 2456]
 
