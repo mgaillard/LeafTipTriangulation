@@ -197,13 +197,13 @@ double similarity(
     }
 
     // Compute the re-projection of q on the two views
-    const glm::dvec3 q0 = camera0.project(q);
-    const glm::dvec3 q1 = camera1.project(q);
+    const auto q0 = camera0.project(q);
+    const auto q1 = camera1.project(q);
 
     // Failure case 2: the pseudo-intersection is on the negative side of one of the rays
     const std::array<glm::dvec3, 2> dirQ = {
-        glm::normalize(q - glm::dvec3(ray0.origin)),
-        glm::normalize(q - glm::dvec3(ray1.origin))
+        glm::normalize(q - ray0.origin),
+        glm::normalize(q - ray1.origin)
     };
     const auto dotProduct0 = glm::dot(u[0], dirQ[0]);
     const auto dotProduct1 = glm::dot(u[1], dirQ[1]);
