@@ -11,6 +11,7 @@ set(HEADER_FILES
     include/Ray.h
     include/RayMatching.h
     include/Triangulation.h
+    include/Types.h
 )
 
 set(SRC_FILES

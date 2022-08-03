@@ -8,6 +8,7 @@
 
 #include "Camera.h"
 #include "Ray.h"
+#include "Types.h"
 
 struct GroundTruthMatchingResult
 {
@@ -218,7 +219,7 @@ struct AggregatedGroundTruthMatchingResult
  * \param radius The radius of the sphere
  * \return A vector of 3D points
  */
-std::vector<glm::dvec3> generatePointsInSphere(int n, double radius);
+SetOfVec3 generatePointsInSphere(int n, double radius);
 
 /**
  * \brief Generate cameras pointing to the origin on a sphere
@@ -234,7 +235,7 @@ std::vector<Camera> generateCamerasOnSphere(int n, double radius);
  * \param cameras A list of cameras
  * \return 2D points projected on cameras
  */
-std::vector<std::vector<glm::dvec2>> projectPoints(const std::vector<glm::dvec3>& points3d,
+SetsOfVec2 projectPoints(const SetOfVec3& points3d,
 												   const std::vector<Camera>& cameras);
 
 /**
@@ -244,7 +245,7 @@ std::vector<std::vector<glm::dvec2>> projectPoints(const std::vector<glm::dvec3>
  * \param noiseStd Standard deviation of the gaussian noise added to 2D points
  * \return The list of 2D points, with added noise
  */
-std::vector<std::vector<glm::dvec2>> addNoise(const std::vector<std::vector<glm::dvec2>>& points,
+SetsOfVec2 addNoise(const SetsOfVec2& points,
 	                                          const std::vector<Camera>& cameras,
 	                                          double noiseStd);
 
@@ -255,8 +256,8 @@ std::vector<std::vector<glm::dvec2>> addNoise(const std::vector<std::vector<glm:
  * \param verbose Whether to display information about the new point configuration or not
  * \return The list of 2D points minus some points that are removed and the set of ground truth correspondences
  */
-std::pair<std::vector<std::vector<glm::dvec2>>, std::vector<std::vector<std::pair<int, int>>>>
-removePoints(const std::vector<std::vector<glm::dvec2>>& points,
+std::pair<SetsOfVec2, SetsOfCorrespondences>
+removePoints(const SetsOfVec2& points,
 			 double probabilityKeep,
 	         bool verbose);
 
@@ -267,8 +268,8 @@ removePoints(const std::vector<std::vector<glm::dvec2>>& points,
  * \param rays A list of Rays associated to 3D points
  * \return True if all 3D points are within 1e-3 of all their rays, false otherwise
  */
-bool checkUnProject(const std::vector<glm::dvec3>& points,
-	                const std::vector<std::vector<Ray>>& rays);
+bool checkUnProject(const SetOfVec3& points,
+	                const SetsOfRays& rays);
 
 /**
  * \brief Return the cost of matching triangulated 3D points to ground truth 3D points.
@@ -280,16 +281,16 @@ bool checkUnProject(const std::vector<glm::dvec3>& points,
  * \param points3d The list of true 3D points
  * \param trueCorrespondences The list of true correspondences
  * \param triangulatedPoints3D A list of triangulated 3D points
- * \param setsOfRays The list of correspondences for the triangulation
+ * \param setsOfCorrespondences The list of correspondences for the triangulation
  * \return A struct that stores statistics
  */
 GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::dvec2>>& points2d,
-	const std::vector<glm::dvec3>& points3d,
-	const std::vector<std::vector<std::pair<int, int>>>& trueCorrespondences,
-	const std::vector<glm::dvec3>& triangulatedPoints3D,
-	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays);
+	const SetsOfVec2& points2d,
+	const SetOfVec3& points3d,
+	const SetsOfCorrespondences& trueCorrespondences,
+	const SetOfVec3& triangulatedPoints3D,
+	const SetsOfCorrespondences& setsOfCorrespondences);
 
 /**
  * \brief Aggregate and compute statistics on a list of results
@@ -300,6 +301,6 @@ AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTru
 
 /**
  * \brief Check the correspondence of rays to make sure the matching is perfect
- * \param setsOfRays The matching of rays that best triangulates 2D points projected by cameras
+ * \param setsOfCorrespondences The matching of rays that best triangulates 2D points projected by cameras
  */
-void checkCorrespondenceSetsOfRays(const std::vector<std::vector<std::pair<int, int>>>& setsOfRays);
+void checkCorrespondenceSetsOfCorrespondences(const SetsOfCorrespondences& setsOfCorrespondences);

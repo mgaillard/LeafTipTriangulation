@@ -181,7 +181,7 @@ double measureTwoPointsCharuco(
 	const cv::Mat1d& distCoeffs,
 	const std::vector<cv::Mat1d>& rvecs,
 	const std::vector<cv::Mat1d>& tvecs,
-	const std::vector<std::vector<glm::dvec2>>& inputPoints2d)
+	const SetsOfVec2& inputPoints2d)
 {
 	assert(inputPoints2d.size() == tvecs.size());
 	assert(inputPoints2d.size() == rvecs.size());
@@ -232,7 +232,7 @@ double measureTwoPointsCharuco(
 	const auto rays = computeRays(cameras, points2d);
 
 	// Matching and triangulation of points
-	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points2d, rays);
+	const auto [triangulatedPoints3D, setsOfCorrespondences] = matchRaysAndTriangulate(cameras, points2d, rays);
 
 	return glm::distance(triangulatedPoints3D[0], triangulatedPoints3D[1]);
 }

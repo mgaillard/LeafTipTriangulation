@@ -3,8 +3,8 @@
 #include "OBJWriter.h"
 
 bool exportSceneAsOBJ(
-	const std::vector<glm::dvec3>& points,
-	const std::vector<std::vector<Ray>>& rays,
+	const SetOfVec3& points,
+	const SetsOfRays& rays,
 	const std::string& filename)
 {
 	OBJWriter objWriter;
@@ -35,9 +35,9 @@ bool exportSceneAsOBJ(
 }
 
 void exportSplitSceneAsOBJ(
-	const std::vector<std::vector<Ray>>& rays,
-	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
-	const std::vector<glm::dvec3>& triangulatedPoints3D)
+	const SetsOfRays& rays,
+	const SetsOfCorrespondences& setsOfCorrespondences,
+	const SetOfVec3& triangulatedPoints3D)
 {
 	// Draw the scene in OBJ for Debugging
 	exportSceneAsOBJ(triangulatedPoints3D, {}, "points.obj");
@@ -47,10 +47,10 @@ void exportSplitSceneAsOBJ(
 		exportSceneAsOBJ({}, { rays[i] }, "camera_" + std::to_string(i) + ".obj");
 	}
 	// Draw rays from each point separately
-	for (unsigned int i = 0; i < setsOfRays.size(); i++)
+	for (unsigned int i = 0; i < setsOfCorrespondences.size(); i++)
 	{
 		std::vector<Ray> raysToDisplay;
-		for (const auto& pointRays : setsOfRays[i])
+		for (const auto& pointRays : setsOfCorrespondences[i])
 		{
 			// Camera
 			const auto& c = pointRays.first;

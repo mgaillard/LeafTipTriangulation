@@ -156,7 +156,7 @@ bool PlantPhenotypePoints::hasAllViews(const std::vector<std::string>& viewNames
 	return true;
 }
 
-void PlantPhenotypePoints::addPointsFromView(const std::string& viewName, const std::vector<glm::dvec2>& points)
+void PlantPhenotypePoints::addPointsFromView(const std::string& viewName, const SetOfVec2& points)
 {
 	if (m_points.count(viewName) > 0)
 	{
@@ -241,7 +241,7 @@ std::string PlantPhenotypePoints::exportToCsv() const
 	return out.str();
 }
 
-std::vector<glm::dvec2> PlantPhenotypePoints::pointsFromView(const std::string& viewName) const
+SetOfVec2 PlantPhenotypePoints::pointsFromView(const std::string& viewName) const
 {
 	if (m_points.count(viewName) > 0)
 	{
@@ -252,9 +252,9 @@ std::vector<glm::dvec2> PlantPhenotypePoints::pointsFromView(const std::string& 
 	return {};
 }
 
-std::vector<std::vector<glm::dvec2>> PlantPhenotypePoints::pointsFromViews(const std::vector<std::string>& viewNames) const
+SetsOfVec2 PlantPhenotypePoints::pointsFromViews(const std::vector<std::string>& viewNames) const
 {
-	std::vector<std::vector<glm::dvec2>> points;
+	SetsOfVec2 points;
 
 	points.reserve(viewNames.size());
 	for (const auto& viewName : viewNames)
@@ -338,7 +338,7 @@ void apply90DegreesRotationToPoints(
 	const RotationDirection& rotationDirection,
 	double imageWidth,
 	double imageHeight,
-	std::vector<glm::dvec2>& points)
+	SetOfVec2& points)
 {
 	for (auto& point : points)
 	{
@@ -583,7 +583,7 @@ std::vector<PlantPhenotypePoints> readPhenotypePointsFromCsv(const std::string& 
 				const std::string& plantView = matchesInLine[2];
 				const std::string& leafTipPoints = matchesInLine[3];
 				const std::string& junctionPoints = matchesInLine[4];
-				std::vector<glm::dvec2> points;
+				SetOfVec2 points;
 
 				// Based on which phenotype we want to read, read leaf tips or junctions
 				std::string pointsString = (type == PlantPhenotypePointType::LeafTip) ? leafTipPoints : junctionPoints;
@@ -771,7 +771,7 @@ void addPointsRandomly(const PhenotypingSetup& setup,
 void clampRaysWithPhenotypingSetup(
 	const PhenotypingSetup& setup,
 	const std::vector<std::string>& viewNames,
-	std::vector<std::vector<Ray>>& rays)
+	SetsOfRays& rays)
 {
 	for (unsigned int c = 0; c < viewNames.size(); c++)
 	{
@@ -787,7 +787,7 @@ void clampRaysWithPhenotypingSetup(
 	}
 }
 
-std::tuple<std::vector<glm::dvec3>, std::vector<std::vector<std::pair<int, int>>>>
+std::tuple<SetOfVec3, SetsOfCorrespondences>
 triangulatePhenotypePoints(
 	const PhenotypingSetup& setup,
 	const PlantPhenotypePoints& plantPoints,
@@ -804,23 +804,23 @@ triangulatePhenotypePoints(
 	// Clamp all rays according to the phenotyping setup
 	clampRaysWithPhenotypingSetup(setup, viewNames, rays);
 	// Triangulate the 3D points
-	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays, thresholdNoPair);
+	auto [triangulatedPoints3D, setsOfCorrespondences] = matchRaysAndTriangulate(cameras, points, rays, thresholdNoPair);
 	// If some of the points are triangulated with only one ray, we remove them because it's probably a failed match
-	removePointsFromSingleRays(triangulatedPoints3D, setsOfRays);
+	removePointsFromSingleRays(triangulatedPoints3D, setsOfCorrespondences);
 	// Sort the set of rays to make it uniquely identifiable even if it has been permuted
-	sortSetsOfRays(setsOfRays);
+	sortSetsOfCorrespondences(setsOfCorrespondences);
 
-	return { triangulatedPoints3D, setsOfRays };
+	return { triangulatedPoints3D, setsOfCorrespondences };
 }
 
-std::tuple<std::vector<std::vector<glm::dvec2>>, std::vector<std::vector<int>>>
+std::tuple<SetsOfVec2, std::vector<std::vector<int>>>
 projectPhenotypePointsAndRetainMatches(
 	const PhenotypingSetup& setup,
 	const PlantPhenotypePoints& plantPoints,
-	const std::vector<glm::dvec3>& triangulatedPoints3D,
-	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
+	const SetOfVec3& triangulatedPoints3D,
+	const SetsOfCorrespondences& setsOfCorrespondences)
 {
-	std::vector<std::vector<glm::dvec2>> triangulatedPoints;
+	SetsOfVec2 triangulatedPoints;
 	std::vector<std::vector<int>> triangulatedPointsMatches;
 
 	// Re-project 3D triangulated points on views
@@ -830,7 +830,7 @@ projectPhenotypePointsAndRetainMatches(
 	{
 		const auto& camera = cameras[c];
 		// Project 3D triangulated points 
-		std::vector<glm::dvec2> viewTriangulatedPoints;
+		SetOfVec2 viewTriangulatedPoints;
 		viewTriangulatedPoints.reserve(triangulatedPoints3D.size());
 		for (const auto& point : triangulatedPoints3D)
 		{
@@ -843,13 +843,13 @@ projectPhenotypePointsAndRetainMatches(
 
 		// List matches between points
 		std::vector<int> viewTriangulatedPointsMatches;
-		viewTriangulatedPointsMatches.reserve(setsOfRays.size());
-		for (const auto& setOfRays : setsOfRays)
+		viewTriangulatedPointsMatches.reserve(setsOfCorrespondences.size());
+		for (const auto& setOfCorrespondences : setsOfCorrespondences)
 		{
 			// Look for the annotated point in the current view that corresponds to the current triangulated point
 			int annotatedPointIndex = -1;
-			// setOfRays is a list of (cameraIndex, pointIndex) for a triangulated point
-			for (const auto& [cameraIndex, pointIndex] : setOfRays)
+			// setOfCorrespondences is a list of (cameraIndex, pointIndex) for a triangulated point
+			for (const auto& [cameraIndex, pointIndex] : setOfCorrespondences)
 			{
 				if (cameraIndex == c)
 				{
@@ -870,7 +870,7 @@ void applyInverseTranslationsOnPhenotypePoints(
 	const PlantImageTranslations& translations,
 	const std::string& plantName,
 	const std::vector<std::string>& viewNames,
-	std::vector<std::vector<glm::dvec2>>& plantPoints)
+	SetsOfVec2& plantPoints)
 {
 	for (unsigned int v = 0; v < viewNames.size(); v++)
 	{
@@ -888,7 +888,7 @@ void applyInverseTranslationsOnPhenotypePoints(
 
 bool drawPointsInImage(const std::string& filename,
                        const std::string& backgroundImage,
-                       const std::vector<glm::dvec2>& points)
+                       const SetOfVec2& points)
 {
 	auto image = cv::imread(backgroundImage);
 
@@ -917,8 +917,8 @@ bool drawPointsInImage(const std::string& filename,
 bool drawPointsInImageWithMatches(
 	const std::string& filename,
 	const std::string& backgroundImage,
-	const std::vector<glm::dvec2>& annotationPoints,
-	const std::vector<glm::dvec2>& projectionPoints,
+	const SetOfVec2& annotationPoints,
+	const SetOfVec2& projectionPoints,
 	const std::vector<int>& projectionMatches)
 {
 	auto image = cv::imread(backgroundImage);
@@ -1049,7 +1049,7 @@ bool exportNumberLeavesToCsv(const std::string& filename, const std::vector<std:
 bool exportPositionLeavesToTxt(
 	const std::string& filename,
 	const std::vector<PlantPhenotypePoints>& plants,
-	const std::vector<std::vector<glm::dvec3>>& points3d)
+	const SetsOfVec3& points3d)
 {
 	assert(plants.size() == points3d.size());
 

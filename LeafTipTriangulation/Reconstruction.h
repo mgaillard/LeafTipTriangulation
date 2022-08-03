@@ -8,6 +8,8 @@
 #include <opencv2/core/core.hpp>
 #include <utils/warnon.h>
 
+#include "Types.h"
+
 /**
  * \brief Measure the length between two points triangulated without correspondences
  * \param imageWidth Resolution of width of images
@@ -25,4 +27,4 @@ double measureTwoPointsCharuco(int imageWidth,
                                const cv::Mat1d& distCoeffs,
                                const std::vector<cv::Mat1d>& rvecs,
                                const std::vector<cv::Mat1d>& tvecs,
-                               const std::vector<std::vector<glm::dvec2>>& inputPoints2d);
+                               const SetsOfVec2& inputPoints2d);

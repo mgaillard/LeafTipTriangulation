@@ -12,9 +12,9 @@
 
 #include "Triangulation.h"
 
-std::vector<glm::dvec3> generatePointsInSphere(int n, double radius)
+SetOfVec3 generatePointsInSphere(int n, double radius)
 {
-	std::vector<glm::dvec3> points3d;
+	SetOfVec3 points3d;
 
 	points3d.reserve(n);
 	for (int i = 0; i < n; i++)
@@ -49,12 +49,12 @@ std::vector<Camera> generateCamerasOnSphere(int n, double radius)
 	return cameras;
 }
 
-std::vector<std::vector<glm::dvec2>> projectPoints(
-	const std::vector<glm::dvec3>& points3d,
+SetsOfVec2 projectPoints(
+	const SetOfVec3& points3d,
 	const std::vector<Camera>& cameras
 )
 {
-	std::vector<std::vector<glm::dvec2>> projected(cameras.size());
+	SetsOfVec2 projected(cameras.size());
 
 	for (unsigned int c = 0; c < cameras.size(); c++)
 	{
@@ -72,17 +72,17 @@ std::vector<std::vector<glm::dvec2>> projectPoints(
 	return projected;
 }
 
-std::vector<std::vector<glm::dvec2>> addNoise(
-	const std::vector<std::vector<glm::dvec2>>& points,
+SetsOfVec2 addNoise(
+	const SetsOfVec2& points,
 	const std::vector<Camera>& cameras,
 	double noiseStd)
 {
-	std::vector<std::vector<glm::dvec2>> newPoints;
+	SetsOfVec2 newPoints;
 
 	newPoints.reserve(points.size());
 	for (unsigned int i = 0; i < points.size(); i++)
 	{
-		std::vector<glm::dvec2> newCameraPoints;
+		SetOfVec2 newCameraPoints;
 
 		newCameraPoints.reserve(points[i].size());
 		for (const auto& point : points[i])
@@ -103,8 +103,8 @@ std::vector<std::vector<glm::dvec2>> addNoise(
 	return newPoints;
 }
 
-std::pair<std::vector<std::vector<glm::dvec2>>, std::vector<std::vector<std::pair<int, int>>>> removePoints(
-	const std::vector<std::vector<glm::dvec2>>& points,
+std::pair<SetsOfVec2, SetsOfCorrespondences> removePoints(
+	const SetsOfVec2& points,
 	double probabilityKeep,
 	bool verbose)
 {
@@ -115,17 +115,17 @@ std::pair<std::vector<std::vector<glm::dvec2>>, std::vector<std::vector<std::pai
 	std::vector<int> visibility(points.front().size(), 0);
 
 	// For each point retain the ground-truth correspondence
-	std::vector<std::vector<std::pair<int, int>>> correspondences(points.front().size());
+	SetsOfCorrespondences correspondences(points.front().size());
 
 	// New array of camera points
-	std::vector<std::vector<glm::dvec2>> newPoints;
+	SetsOfVec2 newPoints;
 
 	newPoints.reserve(points.size());
 	for (unsigned int c = 0; c < points.size(); c++)
 	{
 		const auto& cameraPoints = points[c];
 		
-		std::vector<glm::dvec2> newCameraPoints;
+		SetOfVec2 newCameraPoints;
 
 		newCameraPoints.reserve(cameraPoints.size());
 		for (unsigned int i = 0; i < cameraPoints.size(); i++)
@@ -185,8 +185,8 @@ std::pair<std::vector<std::vector<glm::dvec2>>, std::vector<std::vector<std::pai
 }
 
 bool checkUnProject(
-	const std::vector<glm::dvec3>& points,
-	const std::vector<std::vector<Ray>>& rays)
+	const SetOfVec3& points,
+	const SetsOfRays& rays)
 {
 	for (unsigned int i = 0; i < points.size(); i++)
 	{
@@ -209,11 +209,11 @@ bool checkUnProject(
 
 GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::dvec2>>& points2d,
-	const std::vector<glm::dvec3>& points3d,
-	const std::vector<std::vector<std::pair<int, int>>>& trueCorrespondences,
-	const std::vector<glm::dvec3>& triangulatedPoints3D,
-	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
+	const SetsOfVec2& points2d,
+	const SetOfVec3& points3d,
+	const SetsOfCorrespondences& trueCorrespondences,
+	const SetOfVec3& triangulatedPoints3D,
+	const SetsOfCorrespondences& setsOfCorrespondences)
 {
 	// Multiplier used to convert a floating point value to an integer value
 	const double realToLongMultiplier = 1000.0;
@@ -264,7 +264,7 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 	// This happens when the noise added to the 3D points changes what corresponds to the optimum set of correspondences
 	// In this case, the algorithm finds "better correspondences" even if they are not the true correspondences
 	result.trueReprojectionError = reprojectionErrorManyPointsFromMultipleViews(cameras, points2d, trueCorrespondences, points3d);
-	result.measuredReprojectionError = reprojectionErrorManyPointsFromMultipleViews(cameras, points2d, setsOfRays, triangulatedPoints3D);
+	result.measuredReprojectionError = reprojectionErrorManyPointsFromMultipleViews(cameras, points2d, setsOfCorrespondences, triangulatedPoints3D);
 
 	for (int i = 0; i < costRows; i++)
 	{
@@ -286,8 +286,8 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 				result.distances.push_back(dist);
 
 				// Compare the correspondences
-				// from trueCorrespondences[groundTruthIndex] with setsOfRays[triangulatedIndex]
-				if (trueCorrespondences[groundTruthIndex] == setsOfRays[triangulatedIndex])
+				// from trueCorrespondences[groundTruthIndex] with setsOfCorrespondences[triangulatedIndex]
+				if (trueCorrespondences[groundTruthIndex] == setsOfCorrespondences[triangulatedIndex])
 				{
 					result.nbRightPointsCorrespondence++;
 				}
@@ -296,12 +296,12 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 					result.nbWrongPointsCorrespondence++;
 				}
 
-				// For each correspondence in setsOfRays[triangulatedIndex]
-				for (const auto& setOfRays : setsOfRays[triangulatedIndex])
+				// For each correspondence in setsOfCorrespondences[triangulatedIndex]
+				for (const auto& setOfCorrespondences : setsOfCorrespondences[triangulatedIndex])
 				{
 					const auto it = std::find(trueCorrespondences[groundTruthIndex].begin(),
 						trueCorrespondences[groundTruthIndex].end(),
-						setOfRays);
+						setOfCorrespondences);
 
 					if (it != trueCorrespondences[groundTruthIndex].end())
 					{
@@ -318,11 +318,11 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 				// For each correspondence in trueCorrespondences[groundTruthIndex]
 				for (const auto& trueCorrespondence : trueCorrespondences[groundTruthIndex])
 				{
-					const auto it = std::find(setsOfRays[triangulatedIndex].begin(),
-						setsOfRays[triangulatedIndex].end(),
+					const auto it = std::find(setsOfCorrespondences[triangulatedIndex].begin(),
+						setsOfCorrespondences[triangulatedIndex].end(),
 						trueCorrespondence);
 
-					if (it == setsOfRays[triangulatedIndex].end())
+					if (it == setsOfCorrespondences[triangulatedIndex].end())
 					{
 						// If it is not present in the computed correspondence => false negative
 						result.falseNegativeCorrespondence++;
@@ -350,7 +350,7 @@ GroundTruthMatchingResult matchingTriangulatedPointsWithGroundTruth(
 				// The true point does not have an equivalent triangulated
 				// For each correspondence in trueCorrespondences[groundTruthIndex]
 				// If it is not present in the ground truth => false positive
-				result.falsePositiveCorrespondence += static_cast<int>(setsOfRays[triangulatedIndex].size());
+				result.falsePositiveCorrespondence += static_cast<int>(setsOfCorrespondences[triangulatedIndex].size());
 			}
 			else
 			{
@@ -471,7 +471,7 @@ AggregatedGroundTruthMatchingResult aggregateResults(const std::vector<GroundTru
 	return aggregation;
 }
 
-void checkCorrespondenceSetsOfRays(const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
+void checkCorrespondenceSetsOfCorrespondences(const SetsOfCorrespondences& setsOfCorrespondences)
 {
 	int nbRightCorrespondences = 0;
 	int nbWrongCorrespondences = 0;
@@ -480,13 +480,13 @@ void checkCorrespondenceSetsOfRays(const std::vector<std::vector<std::pair<int, 
 	int nbWrongPoints = 0;
 	
 	// If rays have been generated, all rays of a point are associated to the same point on all cameras
-	for (unsigned int i = 0; i < setsOfRays.size(); i++)
+	for (unsigned int i = 0; i < setsOfCorrespondences.size(); i++)
 	{
-		const auto& setOfRays = setsOfRays[i];
+		const auto& setOfCorrespondences = setsOfCorrespondences[i];
 
 		bool pointIsCorrect = true;
 
-		for (const auto& ray : setOfRays)
+		for (const auto& ray : setOfCorrespondences)
 		{
 			const auto& pointIndex = ray.second;
 
@@ -516,7 +516,7 @@ void checkCorrespondenceSetsOfRays(const std::vector<std::vector<std::pair<int, 
 
 	// Compute rates of errors
 	const auto totalCorrespondences = nbWrongCorrespondences + nbRightCorrespondences;
-	const auto totalPoints = setsOfRays.size();
+	const auto totalPoints = setsOfCorrespondences.size();
 	
 	const auto rateWrongCorrespondences = static_cast<double>(nbWrongCorrespondences) / static_cast<double>(totalCorrespondences);
 	const auto rateWrongPoints = static_cast<double>(nbWrongPoints) / static_cast<double>(totalPoints);

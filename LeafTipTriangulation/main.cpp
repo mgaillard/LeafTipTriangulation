@@ -71,25 +71,25 @@ GroundTruthMatchingResult testWithSyntheticData(const Parameters& parameters)
 	
 	// Matching and triangulation of points
 	const auto startTime = std::chrono::steady_clock::now();
-	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points2d, rays, parameters.thresholdNoPair);
+	auto [triangulatedPoints3D, setsOfCorrespondences] = matchRaysAndTriangulate(cameras, points2d, rays, parameters.thresholdNoPair);
 	const auto endTime = std::chrono::steady_clock::now();
 
 	// Draw the scene in OBJ for Debugging
 	// exportSceneAsOBJ(points3D, rays, "scene.obj");
-	// exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
+	// exportSplitSceneAsOBJ(rays, setsOfCorrespondences, triangulatedPoints3D);
 
 	// If some of the points are triangulated with only one ray, we remove them because it's probably a failed match
-	removePointsFromSingleRays(triangulatedPoints3D, setsOfRays);
+	removePointsFromSingleRays(triangulatedPoints3D, setsOfCorrespondences);
 
 	// Sort the set of rays to make it uniquely identifiable even if it has been permuted
-	sortSetsOfRays(setsOfRays);
+	sortSetsOfCorrespondences(setsOfCorrespondences);
 	// Match the two sets of points and check the distance
 	auto result = matchingTriangulatedPointsWithGroundTruth(cameras,
 	                                                        points2d,
 	                                                        points3d,
 	                                                        trueCorrespondences,
 	                                                        triangulatedPoints3D,
-	                                                        setsOfRays);
+	                                                        setsOfCorrespondences);
 	// Update run time
 	result.runtime = std::chrono::duration<double, std::milli>(endTime - startTime).count();
 	
@@ -366,7 +366,7 @@ void runPlantPhenotypingExample2018(const std::string& folderCameras2018)
 	// X axis is from left to right
 	// Y axis is from bottom to top
 	// Plant: 4-9-18_Schnable_49-281-JS39-65_2018-04-11_12-09-35_9968800
-	const std::vector<std::vector<glm::dvec2>> points2d = {
+	const SetsOfVec2 points2d = {
 		// Camera 0
 		{
 			{1009, 560},
@@ -461,10 +461,10 @@ void runPlantPhenotypingExample2018(const std::string& folderCameras2018)
 	// Compute rays in 3D from camera matrices and 2D points
 	const auto rays = computeRays(setup.cameras(), points2d);
 
-	auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(setup.cameras(), points2d, rays);
+	auto [triangulatedPoints3D, setsOfCorrespondences] = matchRaysAndTriangulate(setup.cameras(), points2d, rays);
 
 	// Export the scene
-	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
+	exportSplitSceneAsOBJ(rays, setsOfCorrespondences, triangulatedPoints3D);
 }
 
 void runPlantPhenotypingExample2022(const std::string& folderCameras2022)
@@ -518,13 +518,13 @@ void runPlantPhenotypingExample2022(const std::string& folderCameras2022)
 	const auto points = plants.front().pointsFromViews(viewNames);
 	const auto cameras = setup.camerasFromViews(viewNames);
 	const auto rays = computeRays(cameras, points);
-	const auto [triangulatedPoints3D, setsOfRays] = matchRaysAndTriangulate(cameras, points, rays, 100.0);
+	const auto [triangulatedPoints3D, setsOfCorrespondences] = matchRaysAndTriangulate(cameras, points, rays, 100.0);
 
-	computeDistributionOfSimilarities("distribution_similarities.txt", cameras, points, rays, setsOfRays);
+	computeDistributionOfSimilarities("distribution_similarities.txt", cameras, points, rays, setsOfCorrespondences);
 
 	// Export the scene
 	spdlog::debug("Found {} leaves", triangulatedPoints3D.size());
-	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
+	exportSplitSceneAsOBJ(rays, setsOfCorrespondences, triangulatedPoints3D);
 }
 
 void runPlantPhenotypingSyntheticData(const fs::path& folder)
@@ -542,7 +542,7 @@ void runPlantPhenotypingSyntheticData(const fs::path& folder)
 
 	const auto setup = loadPhenotypingSetup(folder);
 
-	std::vector<std::vector<glm::dvec3>> points3d(numberPlants);
+	SetsOfVec3 points3d(numberPlants);
 	std::vector<PlantPhenotypePoints> plants;
 	plants.reserve(numberPlants);
 
@@ -648,7 +648,7 @@ void runPlantPhenotyping(const std::string& folder, const std::string& phenotype
 
 	spdlog::info("Triangulating leaves of plant {}", plantName);
 
-	const auto [triangulatedPoints3D, setsOfRays] = triangulatePhenotypePoints(setup, plants.front(), 1500.0);
+	const auto [triangulatedPoints3D, setsOfCorrespondences] = triangulatePhenotypePoints(setup, plants.front(), 1500.0);
 
 	// Export the scene
 	// Re-compute the rays because it is needed for exporting some of the information
@@ -658,10 +658,10 @@ void runPlantPhenotyping(const std::string& folder, const std::string& phenotype
 	auto rays = computeRays(cameras, points);
 	clampRaysWithPhenotypingSetup(setup, viewNames, rays);
 	spdlog::debug("Found {} leaves", triangulatedPoints3D.size());
-	exportSplitSceneAsOBJ(rays, setsOfRays, triangulatedPoints3D);
+	exportSplitSceneAsOBJ(rays, setsOfCorrespondences, triangulatedPoints3D);
 
 	// Compute and save the distribution of similarities
-	computeDistributionOfSimilarities("distribution_similarities.txt", cameras, points, rays, setsOfRays);
+	computeDistributionOfSimilarities("distribution_similarities.txt", cameras, points, rays, setsOfCorrespondences);
 }
 
 void runLeafCounting(
@@ -700,7 +700,7 @@ void runLeafCounting(
 	#pragma omp parallel for
 	for (int i = 0; i < static_cast<int>(plants.size()); i++)
 	{
-		const auto [triangulatedPoints3D, setsOfRays] = triangulatePhenotypePoints(setup, plants[i], thresholdNoPair);
+		const auto [triangulatedPoints3D, setsOfCorrespondences] = triangulatePhenotypePoints(setup, plants[i], thresholdNoPair);
 		numberLeafTips[i].first = plants[i].plantName();
 		numberLeafTips[i].second = static_cast<int>(triangulatedPoints3D.size());
 	}
@@ -752,18 +752,18 @@ void runExportAnnotations(
 	translations.loadFromCsv(annotationFolderStr + "/calibration.csv");
 
 	// Triangulate plants for displaying the results reprojected with the annotations
-	std::vector<std::vector<std::vector<glm::dvec2>>> triangulatedPoints(plants_calibrated.size());
+	std::vector<SetsOfVec2> triangulatedPoints(plants_calibrated.size());
 	std::vector<std::vector<std::vector<int>>> triangulatedPointsMatches(plants_calibrated.size());
 	#pragma omp parallel for
 	for (int i = 0; i < static_cast<int>(plants_calibrated.size()); i++)
 	{
 		// Triangulate points of the plant
-		const auto [triangulatedPoints3D, setsOfRays] = triangulatePhenotypePoints(setup, plants_calibrated[i]);
+		const auto [triangulatedPoints3D, setsOfCorrespondences] = triangulatePhenotypePoints(setup, plants_calibrated[i]);
 		// Re-project points of the plant on views, and retain correspondences with 2D to draw matches in views
 		auto [plantPoints, plantMatches] = projectPhenotypePointsAndRetainMatches(setup,
 			                                                                      plants_calibrated[i],
 			                                                                      triangulatedPoints3D,
-			                                                                      setsOfRays);
+			                                                                      setsOfCorrespondences);
 
 		// Apply the inverse translation that was applied during imaged based calibration to projected points
 		applyInverseTranslationsOnPhenotypePoints(translations,
@@ -848,7 +848,7 @@ void runCrocodileMeasurement()
 {
 	// X axis is from left to right
 	// Y axis is from bottom to top
-	const std::vector<std::vector<glm::dvec2>> points2d = {
+	const SetsOfVec2 points2d = {
 		// Camera 0
 		{
 			{1877, 1237},

@@ -26,7 +26,7 @@ void testTriangulationOnePoint(const std::vector<Camera>& cameras, const glm::dv
 {
 	// Matrices to project a 3D point to 2D point in viewport coordinates
 	std::vector<glm::dmat4> projectionMatrices;
-	std::vector<glm::dvec2> points2d;
+	SetOfVec2 points2d;
 
 	for (const auto& camera : cameras)
 	{
@@ -121,7 +121,7 @@ TEST_CASE("Triangulation of many points from multiple views", "[triangulation]")
 	const auto cameras = generateCamerasAroundOrigin(nbCameras);
 
 	// Some 3D points that will be triangulated (randomly generated)
-	const std::vector<glm::dvec3> points3d = {
+	const SetOfVec3 points3d = {
 		{0.401, 0.075, -0.28},
 		{0.095, 0.275, 0.687},
 		{-0.739, 0.592, -0.952},
@@ -145,9 +145,9 @@ TEST_CASE("Triangulation of many points from multiple views", "[triangulation]")
 	};
 
 	// For each camera, a list of 2D points seen from it
-	std::vector<std::vector<glm::dvec2>> points2d(cameras.size());
+	SetsOfVec2 points2d(cameras.size());
 	// For each 3D point, the list of cameras and points seeing it
-	std::vector<std::vector<std::pair<int, int>>> correspondences(points3d.size());
+	SetsOfCorrespondences correspondences(points3d.size());
 
 	// Project 3D points and keep track of correspondences
 	for (int c = 0; c < static_cast<int>(cameras.size()); c++)

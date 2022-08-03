@@ -15,52 +15,52 @@ using parameterVector = dlib::matrix<double, 3, 1>;
 
 parameterVector glmVec3ToParameters(const glm::dvec3& vector)
 {
-	parameterVector x;
-	x(0) = vector.x;
-	x(1) = vector.y;
-	x(2) = vector.z;
+    parameterVector x;
+    x(0) = vector.x;
+    x(1) = vector.y;
+    x(2) = vector.z;
 
-	return x;
+    return x;
 }
 
 glm::dvec3 parametersToGlmVec3(const parameterVector& parameters)
 {
-	return {
-		parameters(0),
-		parameters(1),
-		parameters(2)
-	};
+    return {
+        parameters(0),
+        parameters(1),
+        parameters(2)
+    };
 }
 
-std::tuple<std::vector<glm::dmat4>, std::vector<glm::dvec2>>
+std::tuple<std::vector<glm::dmat4>, SetOfVec2>
 getProjectionMatricesAndPoints(
-	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::dvec2>>& points2d,
-	const std::vector<std::pair<int, int>>& setOfRays
+    const std::vector<Camera>& cameras,
+    const SetsOfVec2& points2d,
+    const SetOfCorrespondences& setOfCorrespondences
 )
 {
-	std::vector<glm::dmat4> currentProjectionMatrices;
-	std::vector<glm::dvec2> currentPoints2d;
+    std::vector<glm::dmat4> currentProjectionMatrices;
+    SetOfVec2 currentPoints2d;
 
-	currentProjectionMatrices.reserve(setOfRays.size());
-	currentPoints2d.reserve(setOfRays.size());
+    currentProjectionMatrices.reserve(setOfCorrespondences.size());
+    currentPoints2d.reserve(setOfCorrespondences.size());
 
-	for (const auto& pointProjection : setOfRays)
-	{
-		const auto& cameraIndex = pointProjection.first;
-		const auto& pointIndex = pointProjection.second;
+    for (const auto& pointProjection : setOfCorrespondences)
+    {
+        const auto& cameraIndex = pointProjection.first;
+        const auto& pointIndex = pointProjection.second;
 
-		const auto& camera = cameras[cameraIndex];
-		// Camera matrix from 3D to viewport coordinates
-		const auto& projectionMatrix = camera.mat();
-		// 2D point in viewport coordinates
-		const auto point2d = camera.windowToViewport(points2d[cameraIndex][pointIndex]);
+        const auto& camera = cameras[cameraIndex];
+        // Camera matrix from 3D to viewport coordinates
+        const auto& projectionMatrix = camera.mat();
+        // 2D point in viewport coordinates
+        const auto point2d = camera.windowToViewport(points2d[cameraIndex][pointIndex]);
 
-		currentProjectionMatrices.emplace_back(projectionMatrix);
-		currentPoints2d.emplace_back(point2d);
-	}
+        currentProjectionMatrices.emplace_back(projectionMatrix);
+        currentPoints2d.emplace_back(point2d);
+    }
 
-	return { currentProjectionMatrices, currentPoints2d };
+    return { currentProjectionMatrices, currentPoints2d };
 }
 
 /**
@@ -70,29 +70,29 @@ getProjectionMatricesAndPoints(
  * \return The reprojection error of the 3D point on the given 2D view
  */
 double triangulationBundleAdjustmentResidual(
-	const std::pair<glm::dmat4, glm::dvec2>& data,
-	const parameterVector& parameters)
+    const std::pair<glm::dmat4, glm::dvec2>& data,
+    const parameterVector& parameters)
 {
-	// Get points from data
-	const auto& projectionMatrix = data.first;
-	const auto& trueProjectedPoint = data.second;
+    // Get points from data
+    const auto& projectionMatrix = data.first;
+    const auto& trueProjectedPoint = data.second;
 
-	// Reconstruct the vector with the parameters
-	const auto point = parametersToGlmVec3(parameters);
-	const glm::dvec4 homogeneousPoint(point[0], point[1], point[2], 1.0);
+    // Reconstruct the vector with the parameters
+    const auto point = parametersToGlmVec3(parameters);
+    const glm::dvec4 homogeneousPoint(point[0], point[1], point[2], 1.0);
 
-	const auto projectedPoint = projectPoint(projectionMatrix, homogeneousPoint);
+    const auto projectedPoint = projectPoint(projectionMatrix, homogeneousPoint);
 
-	// Squared distance
-	const auto error = glm::distance(projectedPoint, trueProjectedPoint);
+    // Squared distance
+    const auto error = glm::distance(projectedPoint, trueProjectedPoint);
 
-	if (std::isnan(error))
-	{
-		spdlog::error("nan value found during optimization");
-		std::cout << trans(parameters) << "\n" << std::endl;
-	}
+    if (std::isnan(error))
+    {
+        spdlog::error("nan value found during optimization");
+        std::cout << trans(parameters) << "\n" << std::endl;
+    }
 
-	return error;
+    return error;
 }
 
 /**
@@ -105,222 +105,222 @@ double triangulationBundleAdjustmentResidual(
  * \return The final reprojection error
  */
 double triangulationBundleAdjustment(
-	const std::vector<glm::dmat4>& projectionMatrices,
-	const std::vector<glm::dvec2>& points2d,
-	glm::dvec3& pointToAdjust
+    const std::vector<glm::dmat4>& projectionMatrices,
+    const SetOfVec2& points2d,
+    glm::dvec3& pointToAdjust
 )
 {
-	assert(projectionMatrices.size() == points2d.size());
+    assert(projectionMatrices.size() == points2d.size());
 
-	std::vector<std::pair<glm::dmat4, glm::dvec2>> data;
-	data.reserve(projectionMatrices.size() + points2d.size());
-	for (unsigned int i = 0; i < projectionMatrices.size(); i++)
-	{
-		data.emplace_back(projectionMatrices[i], points2d[i]);
-	}
+    std::vector<std::pair<glm::dmat4, glm::dvec2>> data;
+    data.reserve(projectionMatrices.size() + points2d.size());
+    for (unsigned int i = 0; i < projectionMatrices.size(); i++)
+    {
+        data.emplace_back(projectionMatrices[i], points2d[i]);
+    }
 
-	auto x = glmVec3ToParameters(pointToAdjust);
+    auto x = glmVec3ToParameters(pointToAdjust);
 
-	// Optimization
-	const auto finalCost = dlib::solve_least_squares(dlib::objective_delta_stop_strategy(1e-8),
-	                                                 triangulationBundleAdjustmentResidual,
-	                                                 derivative(triangulationBundleAdjustmentResidual, 1e-6),
-	                                                 data,
-	                                                 x);
+    // Optimization
+    const auto finalCost = dlib::solve_least_squares(dlib::objective_delta_stop_strategy(1e-8),
+                                                     triangulationBundleAdjustmentResidual,
+                                                     derivative(triangulationBundleAdjustmentResidual, 1e-6),
+                                                     data,
+                                                     x);
 
-	// Override the initial guess with the adjusted point
-	pointToAdjust = parametersToGlmVec3(x);
+    // Override the initial guess with the adjusted point
+    pointToAdjust = parametersToGlmVec3(x);
 
-	return finalCost;
+    return finalCost;
 }
 
 // ------------------------ Public functions ------------------------
 
 glm::dvec2 projectPoint(const glm::dmat4x3& projectionMatrix, const glm::dvec4& point)
 {
-	const auto result = projectionMatrix * point;
+    const auto result = projectionMatrix * point;
 
-	return {
-		result[0] / result[2],
-		result[1] / result[2]
-	};
+    return {
+        result[0] / result[2],
+        result[1] / result[2]
+    };
 }
 
 glm::dvec2 projectPoint(const glm::dmat4& projectionMatrix, const glm::dvec4& point)
 {
-	const auto result = projectionMatrix * point;
+    const auto result = projectionMatrix * point;
 
-	return {
-		result[0] / result[3],
-		result[1] / result[3]
-	};
+    return {
+        result[0] / result[3],
+        result[1] / result[3]
+    };
 }
 
 double reprojectionErrorFromMultipleViews(
-	const std::vector<glm::dmat4>& projectionMatrices,
-	const std::vector<glm::dvec2>& points2d,
-	const glm::dvec3& point3d)
+    const std::vector<glm::dmat4>& projectionMatrices,
+    const SetOfVec2& points2d,
+    const glm::dvec3& point3d)
 {
-	assert(projectionMatrices.size() == points2d.size());
+    assert(projectionMatrices.size() == points2d.size());
 
-	const auto x = glmVec3ToParameters(point3d);
-	
-	double finalCost = 0.0;
-	for (unsigned int i = 0; i < projectionMatrices.size(); i++)
-	{
-		// Reprojection error of the point3d with the point2d
-		const auto dist = triangulationBundleAdjustmentResidual({ projectionMatrices[i], points2d[i] }, x);
-		// Squared distance to compute the non-linear least square objective function
-		finalCost += dist * dist;
-	}
+    const auto x = glmVec3ToParameters(point3d);
+    
+    double finalCost = 0.0;
+    for (unsigned int i = 0; i < projectionMatrices.size(); i++)
+    {
+        // Reprojection error of the point3d with the point2d
+        const auto dist = triangulationBundleAdjustmentResidual({ projectionMatrices[i], points2d[i] }, x);
+        // Squared distance to compute the non-linear least square objective function
+        finalCost += dist * dist;
+    }
 
-	return finalCost / 2.0;
+    return finalCost / 2.0;
 }
 
 std::tuple<double, glm::dvec3> triangulatePointFromMultipleViews(
-	const std::vector<glm::dmat4>& projectionMatrices,
-	const std::vector<glm::dvec2>& points2d)
+    const std::vector<glm::dmat4>& projectionMatrices,
+    const SetOfVec2& points2d)
 {
-	assert(projectionMatrices.size() == points2d.size());
+    assert(projectionMatrices.size() == points2d.size());
 
-	const auto numberViews = static_cast<int>(projectionMatrices.size());
+    const auto numberViews = static_cast<int>(projectionMatrices.size());
 
-	// For the linear system Ax=b to solve
-	cv::Mat1d A(3 * numberViews, 3 + numberViews, 0.0);
-	cv::Mat1d b(3 * numberViews, 1, 0.0);
-	for (int v = 0; v < numberViews; v++)
-	{
-		// Copy the 3x3 rotation matrix from this view, to the left of the matrix A
+    // For the linear system Ax=b to solve
+    cv::Mat1d A(3 * numberViews, 3 + numberViews, 0.0);
+    cv::Mat1d b(3 * numberViews, 1, 0.0);
+    for (int v = 0; v < numberViews; v++)
+    {
+        // Copy the 3x3 rotation matrix from this view, to the left of the matrix A
 
-		// First row of the 3x3 rotation matrix
-		A.at<double>(3 * v, 0) = projectionMatrices[v][0][0];
-		A.at<double>(3 * v, 1) = projectionMatrices[v][1][0];
-		A.at<double>(3 * v, 2) = projectionMatrices[v][2][0];
+        // First row of the 3x3 rotation matrix
+        A.at<double>(3 * v, 0) = projectionMatrices[v][0][0];
+        A.at<double>(3 * v, 1) = projectionMatrices[v][1][0];
+        A.at<double>(3 * v, 2) = projectionMatrices[v][2][0];
 
-		// Second row of the 3x3 rotation matrix
-		A.at<double>(3 * v + 1, 0) = projectionMatrices[v][0][1];
-		A.at<double>(3 * v + 1, 1) = projectionMatrices[v][1][1];
-		A.at<double>(3 * v + 1, 2) = projectionMatrices[v][2][1];
+        // Second row of the 3x3 rotation matrix
+        A.at<double>(3 * v + 1, 0) = projectionMatrices[v][0][1];
+        A.at<double>(3 * v + 1, 1) = projectionMatrices[v][1][1];
+        A.at<double>(3 * v + 1, 2) = projectionMatrices[v][2][1];
 
-		// The third row is the fourth row in the projection matrix,
-		// because we ignore its third row since it corresponds to the Z coordinate.
-		A.at<double>(3 * v + 2, 0) = projectionMatrices[v][0][3];
-		A.at<double>(3 * v + 2, 1) = projectionMatrices[v][1][3];
-		A.at<double>(3 * v + 2, 2) = projectionMatrices[v][2][3];
+        // The third row is the fourth row in the projection matrix,
+        // because we ignore its third row since it corresponds to the Z coordinate.
+        A.at<double>(3 * v + 2, 0) = projectionMatrices[v][0][3];
+        A.at<double>(3 * v + 2, 1) = projectionMatrices[v][1][3];
+        A.at<double>(3 * v + 2, 2) = projectionMatrices[v][2][3];
 
-		// Copy the coordinates of the corresponding point in the matrix A
-		A.at<double>(3 * v, 3 + v) = -points2d[v].x;
-		A.at<double>(3 * v + 1, 3 + v) = -points2d[v].y;
-		A.at<double>(3 * v + 2, 3 + v) = -1.0;
+        // Copy the coordinates of the corresponding point in the matrix A
+        A.at<double>(3 * v, 3 + v) = -points2d[v].x;
+        A.at<double>(3 * v + 1, 3 + v) = -points2d[v].y;
+        A.at<double>(3 * v + 2, 3 + v) = -1.0;
 
-		b.at<double>(3 * v) = -projectionMatrices[v][3][0];
-		b.at<double>(3 * v + 1) = -projectionMatrices[v][3][1];
-		b.at<double>(3 * v + 2) = -projectionMatrices[v][3][3];
-	}
+        b.at<double>(3 * v) = -projectionMatrices[v][3][0];
+        b.at<double>(3 * v + 1) = -projectionMatrices[v][3][1];
+        b.at<double>(3 * v + 2) = -projectionMatrices[v][3][3];
+    }
 
-	// Solve for linear least squares
-	cv::Mat1d x;
-	cv::solve(A, b, x, cv::DECOMP_SVD);
+    // Solve for linear least squares
+    cv::Mat1d x;
+    cv::solve(A, b, x, cv::DECOMP_SVD);
 
-	glm::dvec3 triangulatedPoint(
-		x.at<double>(0),
-		x.at<double>(1),
-		x.at<double>(2)
-	);
-	
-	// Non-linear optimization to refine the result
-	const auto finalError = triangulationBundleAdjustment(projectionMatrices, points2d, triangulatedPoint);
+    glm::dvec3 triangulatedPoint(
+        x.at<double>(0),
+        x.at<double>(1),
+        x.at<double>(2)
+    );
+    
+    // Non-linear optimization to refine the result
+    const auto finalError = triangulationBundleAdjustment(projectionMatrices, points2d, triangulatedPoint);
 
-	return { finalError, triangulatedPoint};
+    return { finalError, triangulatedPoint};
 }
 
 double reprojectionErrorFromMultipleViews(
-	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::dvec2>>& points2d,
-	const std::vector<std::pair<int, int>>& setOfRays,
-	const glm::dvec3& point3d)
+    const std::vector<Camera>& cameras,
+    const SetsOfVec2& points2d,
+    const SetOfCorrespondences& setOfCorrespondences,
+    const glm::dvec3& point3d)
 {
-	if (setOfRays.size() <= 1)
-	{
-		// Go on with the next point to triangulate
-		return 0.0;
-	}
+    if (setOfCorrespondences.size() <= 1)
+    {
+        // Go on with the next point to triangulate
+        return 0.0;
+    }
 
-	// A point should at least have two projections to be triangulated
-	assert(setOfRays.size() >= 2);
+    // A point should at least have two projections to be triangulated
+    assert(setOfCorrespondences.size() >= 2);
 
-	const auto [currentProjectionMatrices, currentPoints2d] = getProjectionMatricesAndPoints(cameras, points2d, setOfRays);
-	const auto error = reprojectionErrorFromMultipleViews(currentProjectionMatrices, currentPoints2d, point3d);
+    const auto [currentProjectionMatrices, currentPoints2d] = getProjectionMatricesAndPoints(cameras, points2d, setOfCorrespondences);
+    const auto error = reprojectionErrorFromMultipleViews(currentProjectionMatrices, currentPoints2d, point3d);
 
-	return error;
+    return error;
 }
 
 std::tuple<double, glm::dvec3> triangulatePointFromMultipleViews(
-	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::dvec2>>& points2d,
-	const std::vector<std::pair<int, int>>& setOfRays)
+    const std::vector<Camera>& cameras,
+    const SetsOfVec2& points2d,
+    const SetOfCorrespondences& setOfCorrespondences)
 {
-	if (setOfRays.size() <= 1)
-	{
-		// It's impossible to triangulate a point with only one projection
-		// Use an infinity point instead
-		return {
-			std::numeric_limits<double>::max(),
-			{
-				std::numeric_limits<double>::max(),
-				std::numeric_limits<double>::max(),
-				std::numeric_limits<double>::max()
-			}
-		};
-	}
+    if (setOfCorrespondences.size() <= 1)
+    {
+        // It's impossible to triangulate a point with only one projection
+        // Use an infinity point instead
+        return {
+            std::numeric_limits<double>::max(),
+            {
+                std::numeric_limits<double>::max(),
+                std::numeric_limits<double>::max(),
+                std::numeric_limits<double>::max()
+            }
+        };
+    }
 
-	// A point should at least have two projections to be triangulated
-	assert(setOfRays.size() >= 2);
+    // A point should at least have two projections to be triangulated
+    assert(setOfCorrespondences.size() >= 2);
 
-	const auto [currentProjectionMatrices, currentPoints2d] = getProjectionMatricesAndPoints(cameras, points2d, setOfRays);
-	return triangulatePointFromMultipleViews(currentProjectionMatrices, currentPoints2d);
+    const auto [currentProjectionMatrices, currentPoints2d] = getProjectionMatricesAndPoints(cameras, points2d, setOfCorrespondences);
+    return triangulatePointFromMultipleViews(currentProjectionMatrices, currentPoints2d);
 }
 
 double reprojectionErrorManyPointsFromMultipleViews(
-	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::dvec2>>& points2d,
-	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays,
-	const std::vector<glm::dvec3>& points3d)
+    const std::vector<Camera>& cameras,
+    const SetsOfVec2& points2d,
+    const SetsOfCorrespondences& setsOfCorrespondences,
+    const SetOfVec3& points3d)
 {
-	double totalError = 0.0;
-	
-	for (unsigned int i = 0; i < setsOfRays.size(); i++)
-	{
-		// Sum up the re-projection errors
-		totalError += reprojectionErrorFromMultipleViews(cameras, points2d, setsOfRays[i], points3d[i]);
-	}
-	
-	return totalError;
+    double totalError = 0.0;
+    
+    for (unsigned int i = 0; i < setsOfCorrespondences.size(); i++)
+    {
+        // Sum up the re-projection errors
+        totalError += reprojectionErrorFromMultipleViews(cameras, points2d, setsOfCorrespondences[i], points3d[i]);
+    }
+    
+    return totalError;
 }
 
-std::tuple<double, std::vector<glm::dvec3>> triangulateManyPointsFromMultipleViews(
-	const std::vector<Camera>& cameras,
-	const std::vector<std::vector<glm::dvec2>>& points2d,
-	const std::vector<std::vector<std::pair<int, int>>>& setsOfRays)
+std::tuple<double, SetOfVec3> triangulateManyPointsFromMultipleViews(
+    const std::vector<Camera>& cameras,
+    const SetsOfVec2& points2d,
+    const SetsOfCorrespondences& setsOfCorrespondences)
 {
-	double totalError = 0.0;
+    double totalError = 0.0;
 
-	std::vector<glm::dvec3> points3d;
+    SetOfVec3 points3d;
 
-	points3d.reserve(setsOfRays.size());
-	for (const auto& setOfRays : setsOfRays)
-	{
-		const auto [error, point3d] = triangulatePointFromMultipleViews(cameras, points2d, setOfRays);
+    points3d.reserve(setsOfCorrespondences.size());
+    for (const auto& setOfCorrespondences : setsOfCorrespondences)
+    {
+        const auto [error, point3d] = triangulatePointFromMultipleViews(cameras, points2d, setOfCorrespondences);
 
-		if (error < std::numeric_limits<double>::max())
-		{
-			// Sum up the re-projection errors if the point could be triangulated
-			totalError += error;
-		}
+        if (error < std::numeric_limits<double>::max())
+        {
+            // Sum up the re-projection errors if the point could be triangulated
+            totalError += error;
+        }
 
-		// Add the point to the list of all points
-		points3d.push_back(point3d);
-	}
+        // Add the point to the list of all points
+        points3d.push_back(point3d);
+    }
 
-	return { totalError, points3d };
+    return { totalError, points3d };
 }

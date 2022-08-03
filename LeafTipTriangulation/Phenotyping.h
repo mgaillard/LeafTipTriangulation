@@ -11,6 +11,7 @@
 #include <utils/warnon.h>
 
 #include "Camera.h"
+#include "Types.h"
 
 // ---------- Global constants for view names ----------
 const std::string ViewSv0 = "SV_0";
@@ -138,7 +139,7 @@ public:
 	 * \param viewName The name of the view
 	 * \param points The list of 2D points seen from this view
 	 */
-	void addPointsFromView(const std::string& viewName, const std::vector<glm::dvec2>& points);
+	void addPointsFromView(const std::string& viewName, const SetOfVec2& points);
 
 	/**
 	 * \brief Apply a translation to all points from a view
@@ -261,14 +262,14 @@ public:
 	 * \param viewName The list of the view, for example: {SV_0, SV_36, SV_72}
 	 * \return A list of 2D points
 	 */
-	std::vector<glm::dvec2> pointsFromView(const std::string& viewName) const;
+	SetOfVec2 pointsFromView(const std::string& viewName) const;
 
 	/**
 	 * \brief Return a list of lists of points ordered by view
 	 * \param viewNames The list of views where points are required, for example: {SV_0, SV_36, SV_72}
 	 * \return A list of lists of 2D points
 	 */
-	[[nodiscard]] std::vector<std::vector<glm::dvec2>> pointsFromViews(const std::vector<std::string>& viewNames) const;
+	[[nodiscard]] SetsOfVec2 pointsFromViews(const std::vector<std::string>& viewNames) const;
 
 private:
 
@@ -276,7 +277,7 @@ private:
 
 	// For each view, a list of 2D points corresponding to leaf tips
 	// Views can be named: SV_0, SV_36, SV_72, ..., TV_90
-	std::unordered_map<std::string, std::vector<glm::dvec2>> m_points;
+	std::unordered_map<std::string, SetOfVec2> m_points;
 
 };
 
@@ -336,7 +337,7 @@ private:
 void apply90DegreesRotationToPoints(const RotationDirection& rotationDirection,
                                     double imageWidth,
                                     double imageHeight,
-                                    std::vector<glm::dvec2>& points);
+                                    SetOfVec2& points);
 
 /**
  * \brief Load the rotation direction for the top view, distance to plant, and 
@@ -450,7 +451,7 @@ void addPointsRandomly(const PhenotypingSetup& setup,
  */
 void clampRaysWithPhenotypingSetup(const PhenotypingSetup& setup,
                                    const std::vector<std::string>& viewNames,
-                                   std::vector<std::vector<Ray>>& rays);
+                                   SetsOfRays& rays);
 
 /**
  * \brief Find the 3D position of phenotype points in a plant
@@ -459,7 +460,7 @@ void clampRaysWithPhenotypingSetup(const PhenotypingSetup& setup,
  * \param thresholdNoPair Threshold in px above which two rays/points can't be paired together
  * \return A list of 3D points that correspond to the phenotype points and the correspondences
  */
-std::tuple<std::vector<glm::dvec3>, std::vector<std::vector<std::pair<int, int>>>>
+std::tuple<SetOfVec3, SetsOfCorrespondences>
 triangulatePhenotypePoints(const PhenotypingSetup& setup,
                            const PlantPhenotypePoints& plantPoints,
                            double thresholdNoPair = std::numeric_limits<double>::max());
@@ -469,14 +470,14 @@ triangulatePhenotypePoints(const PhenotypingSetup& setup,
  * \param setup The phenotyping setup used to image the plant
  * \param plantPoints The phenotype points of the plant
  * \param triangulatedPoints3D A list of 3D points triangulated that correspond to 2D points in the plant
- * \param setsOfRays A list of correspondences that correspond to 2D points in the plant
+ * \param setsOfCorrespondences A list of correspondences that correspond to 2D points in the plant
  * \return A list of 3D points that correspond to the phenotype points and the correspondences
  */
-std::tuple<std::vector<std::vector<glm::dvec2>>, std::vector<std::vector<int>>>
+std::tuple<SetsOfVec2, std::vector<std::vector<int>>>
 projectPhenotypePointsAndRetainMatches(const PhenotypingSetup& setup,
                                        const PlantPhenotypePoints& plantPoints,
-                                       const std::vector<glm::dvec3>& triangulatedPoints3D,
-                                       const std::vector<std::vector<std::pair<int, int>>>& setsOfRays);
+                                       const SetOfVec3& triangulatedPoints3D,
+                                       const SetsOfCorrespondences& setsOfCorrespondences);
 
 /**
  * \brief Apply the inverse of image calibration translations to a set of projected points 
@@ -488,7 +489,7 @@ projectPhenotypePointsAndRetainMatches(const PhenotypingSetup& setup,
 void applyInverseTranslationsOnPhenotypePoints(const PlantImageTranslations& translations,
                                                const std::string& plantName,
                                                const std::vector<std::string>& viewNames,
-                                               std::vector<std::vector<glm::dvec2>>& plantPoints);
+                                               SetsOfVec2& plantPoints);
 
 /**
  * \brief Draw a list of points in 2D image
@@ -499,7 +500,7 @@ void applyInverseTranslationsOnPhenotypePoints(const PlantImageTranslations& tra
  */
 bool drawPointsInImage(const std::string& filename,
 					   const std::string& backgroundImage,
-                       const std::vector<glm::dvec2>& points);
+                       const SetOfVec2& points);
 
 /**
  * \brief Draw a list of points with their matches in a 2D image
@@ -513,8 +514,8 @@ bool drawPointsInImage(const std::string& filename,
  */
 bool drawPointsInImageWithMatches(const std::string& filename,
                                   const std::string& backgroundImage,
-                                  const std::vector<glm::dvec2>& annotationPoints,
-                                  const std::vector<glm::dvec2>& projectionPoints,
+                                  const SetOfVec2& annotationPoints,
+                                  const SetOfVec2& projectionPoints,
 	                              const std::vector<int>& projectionMatches);
 
 /**
@@ -554,4 +555,4 @@ bool exportNumberLeavesToCsv(const std::string& filename,
  */
 bool exportPositionLeavesToTxt(const std::string& filename,
 	                           const std::vector<PlantPhenotypePoints>& plants,
-	                           const std::vector<std::vector<glm::dvec3>>& points3d);
+	                           const SetsOfVec3& points3d);
