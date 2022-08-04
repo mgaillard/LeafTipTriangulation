@@ -2,6 +2,7 @@
 
 #include "Constants.h"
 #include "Camera.h"
+#include "RayMatching.h"
 #include "Triangulation.h"
 
 // Hold the test data for rays
@@ -452,6 +453,70 @@ TEST_CASE("Rays pseudo intersections (mixed line and line segments)", "[rays]")
 	REQUIRE(intersection.x == Approx(0.0));
 	REQUIRE(intersection.y == Approx(1.0));
 	REQUIRE(intersection.z == Approx(0.5));
+}
+
+TEST_CASE("Synthetic correspondences and triangulation", "[matching]")
+{
+	// Theta is below infinity because of occlusion
+	constexpr auto thresholdNoPair = 10.0;
+
+	// Set of 3D points
+	SetOfVec3 points3d = {
+		{0.1955208854628527, -0.3959428088871763, -0.4536766647670168},
+        {-0.5210455893121944, -0.2425671656015757, -0.4153808768617439},
+        {-0.2926311469396591, 0.2583353402813848, 0.6285163518979531},
+        {-0.0736642511310921, 0.4235421933461356, -0.1918052968091487},
+        {0.6914348096522496, -0.566123151049709, -0.1536715593662218},
+        {-0.1946240416650709, 0.241046138168171, 0.6567333312578323},
+        {-0.5915356832789114, 0.3945257224955063, 0.272183979313839},
+        {0.1026050706061545, 0.01173039038577328, 0.9689271669571178}
+	};
+
+	// Set of cameras
+	constexpr double radius = 3.0;
+	constexpr auto pi2 = constants::pi / 2.0;
+	constexpr glm::dvec3 at(0.0, 0.0, 0.0);
+	constexpr glm::dvec3 up(0.0, 0.0, 1.0);
+	const std::vector<Camera> cameras = {
+		{{radius * std::cos(0.00 * pi2), radius * std::sin(0.00 * pi2), 0.0}, at, up},
+		{{radius * std::cos(0.25 * pi2), radius * std::sin(0.25 * pi2), 0.0}, at, up},
+		{{radius * std::cos(0.50 * pi2), radius * std::sin(0.50 * pi2), 0.0}, at, up},
+		{{radius * std::cos(0.75 * pi2), radius * std::sin(0.75 * pi2), 0.0}, at, up},
+		{{radius * std::cos(1.00 * pi2), radius * std::sin(1.00 * pi2), 0.0}, at, up}
+	};
+
+	// Project 3D points on 2D views
+	SetsOfVec2 points2d = projectPoints(points3d, cameras);
+
+	// Add occlusion in a deterministic way
+	for (unsigned int i = 0; i < points2d.size(); i++)
+	{
+		// Remove point i from view i
+		points2d[i].erase(points2d[i].begin() + i);
+	}
+
+	// Compute rays from 2D points
+	const auto rays = computeRays(cameras, points2d);
+
+	// Find the solution to the problem
+	auto [triangulatedPoints3d, setsOfCorrespondences] = matchRaysAndTriangulate(cameras, points2d, rays, thresholdNoPair);
+
+	// Check the output
+	REQUIRE(points3d.size() == triangulatedPoints3d.size());
+
+	// Check that triangulated points have the same positions as ground-truth points
+	// To be more consistent, sort points according to their coordinates (non exact matching, but works with small errors)
+	const auto sortPointsPredicate = [](const glm::dvec3& a, const glm::dvec3& b) {
+		return std::tie(a.x, a.y, a.z) < std::tie(b.x, b.y, b.z);
+	};
+	std::sort(points3d.begin(), points3d.end(), sortPointsPredicate);
+	std::sort(triangulatedPoints3d.begin(), triangulatedPoints3d.end(), sortPointsPredicate);
+    for (unsigned int i = 0; i < points3d.size(); i++)
+	{
+		REQUIRE(triangulatedPoints3d[i].x == Approx(points3d[i].x));
+		REQUIRE(triangulatedPoints3d[i].y == Approx(points3d[i].y));
+		REQUIRE(triangulatedPoints3d[i].z == Approx(points3d[i].z));
+	}
 }
 
 #ifdef CATCH_CONFIG_ENABLE_BENCHMARKING

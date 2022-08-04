@@ -152,6 +152,26 @@ std::vector<Camera> loadCamerasFromFiles(const std::vector<std::string>& files)
     return cameras;
 }
 
+SetsOfVec2 projectPoints(const SetOfVec3& points3d, const std::vector<Camera>& cameras)
+{
+    SetsOfVec2 projected(cameras.size());
+
+    for (unsigned int c = 0; c < cameras.size(); c++)
+    {
+        for (const auto& point : points3d)
+        {
+            const auto point2d = cameras[c].project(point);
+
+            // Check depth: the point must be visible from the camera and not behind it
+            assert(point2d.z > 0.0);
+
+            projected[c].emplace_back(point2d);
+        }
+    }
+
+    return projected;
+}
+
 SetsOfRays computeRays(
     const std::vector<Camera>& cameras,
     const SetsOfVec2& points

@@ -230,15 +230,6 @@ SetOfVec3 generatePointsInSphere(int n, double radius);
 std::vector<Camera> generateCamerasOnSphere(int n, double radius);
 
 /**
- * \brief Project 3D points on cameras. The viewport is 1000*1000 px.
- * \param points3d A list of 3D points
- * \param cameras A list of cameras
- * \return 2D points projected on cameras
- */
-SetsOfVec2 projectPoints(const SetOfVec3& points3d,
-												   const std::vector<Camera>& cameras);
-
-/**
  * \brief Add gaussian noise to 2D points
  * \param points A list of 2D points
  * \param cameras The list of cameras projecting the two points
