@@ -16,15 +16,19 @@ include(spdlog)
 include(glm)
 include(dlib)
 include(opencv)
+include(pybind11)
 
 # Dependencies for tests
 include(catch2)
 include(CTest)
 
+# Lib Python is required for the Python module
+find_package(Python COMPONENTS Interpreter Development REQUIRED)
 
 add_subdirectory(LeafTipTriangulationLib)
 add_subdirectory(LeafTipTriangulation)
 add_subdirectory(LeafTipTriangulationTest)
+add_subdirectory(LeafTipTriangulationPython)
 
 # Set the project as startup project in Visual Studio
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT LeafTipTriangulation)

@@ -247,7 +247,7 @@ SetsOfCorrespondences findSetsOfCorrespondences(
     double thresholdNoPair)
 {
     // Compute an upper bound on the maximum distance between two pixel with the camera
-    const auto maximumDistancePixels = computeMaximumCameraResolution(cameras) * std::sqrt(2.f);
+    const auto maximumDistancePixels = computeMaximumCameraResolution(cameras) * std::sqrt(2.0);
     // Make sure that this distance is about 1G for the maximum distance in the image
     constexpr long maximumSimilarity = 1000000000;
 

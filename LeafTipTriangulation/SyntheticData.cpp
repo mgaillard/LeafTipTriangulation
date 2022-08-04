@@ -43,7 +43,7 @@ std::vector<Camera> generateCamerasOnSphere(int n, double radius)
 		} while (glm::length(up) <= 0.0);
 		up = glm::normalize(up);
 
-		cameras.emplace_back(eye, glm::dvec3(0.f, 0.f, 0.f), up);
+		cameras.emplace_back(eye, glm::dvec3(0.0, 0.0, 0.0), up);
 	}
 
 	return cameras;
@@ -86,7 +86,7 @@ std::pair<SetsOfVec2, SetsOfCorrespondences> removePoints(
 	bool verbose)
 {
 	assert(!points.empty());
-	assert(probabilityKeep >= 0.f && probabilityKeep <= 1.f);
+	assert(probabilityKeep >= 0.0 && probabilityKeep <= 1.0);
 
 	// Number of cameras on which each point is visible
 	std::vector<int> visibility(points.front().size(), 0);
@@ -500,8 +500,8 @@ void checkCorrespondenceSetsOfCorrespondences(const SetsOfCorrespondences& setsO
 
 	std::cout << "Number of incorrectly/correctly matched points : "
 	          << nbWrongPoints << " / " << nbRightPoints << "\n"
-			  << "Rate of incorrectly matched points : " << 100.f * rateWrongPoints << " %\n"
+			  << "Rate of incorrectly matched points : " << 100.0 * rateWrongPoints << " %\n"
 			  << "Number of incorrect/correct correspondences : "
 	          << nbWrongCorrespondences << " / " << nbRightCorrespondences << "\n"
-			  << "Rate of incorrect correspondences : " << 100.f * rateWrongCorrespondences << " %" << std::endl;
+			  << "Rate of incorrect correspondences : " << 100.0 * rateWrongCorrespondences << " %" << std::endl;
 }

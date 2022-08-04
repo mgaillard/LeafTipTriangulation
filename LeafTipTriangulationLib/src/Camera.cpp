@@ -177,13 +177,15 @@ SetsOfRays computeRays(
     const SetsOfVec2& points
 )
 {
+    assert(points.size() == cameras.size());
+
     SetsOfRays rays(cameras.size());
 
     for (unsigned int c = 0; c < cameras.size(); c++)
     {
         for (const auto& point : points[c])
         {
-            const glm::dvec3 points3d(point.x, point.y, 1.f);
+            const glm::dvec3 points3d(point.x, point.y, 1.0);
 
             const auto unProjected = cameras[c].unProject(points3d);
 

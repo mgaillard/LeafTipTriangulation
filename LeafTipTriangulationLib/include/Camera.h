@@ -85,7 +85,7 @@ std::vector<Camera> loadCamerasFromFiles(const std::vector<std::string>& files);
  * \return 2D points projected on cameras
  */
 SetsOfVec2 projectPoints(const SetOfVec3& points3d,
-						 const std::vector<Camera>& cameras);
+                         const std::vector<Camera>& cameras);
 
 /**
  * \brief Compute rays going from camera to the 3D space
@@ -94,4 +94,4 @@ SetsOfVec2 projectPoints(const SetOfVec3& points3d,
  * \return A list of rays from cameras
  */
 SetsOfRays computeRays(const std::vector<Camera>& cameras,
-                                          const SetsOfVec2& points);
+                       const SetsOfVec2& points);

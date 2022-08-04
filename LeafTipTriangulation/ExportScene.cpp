@@ -26,7 +26,7 @@ bool exportSceneAsOBJ(
 			}
 			else
 			{
-				objWriter.addLine(ray.origin, ray.at(6.f));
+				objWriter.addLine(ray.origin, ray.at(6.0));
 			}
 		}
 	}
