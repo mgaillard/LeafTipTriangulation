@@ -90,10 +90,10 @@ for i in range(len(points3d)):
 See example Python files in folder `LeafTipTriangulationPython` for more python examples.
 
 ## Author
-Mathieu Gaillard
-[CGVLAB](https://www.cs.purdue.edu/cgvlab/www/)
-Department of Computer Science
-Purdue University
+Mathieu Gaillard  
+[CGVLAB](https://www.cs.purdue.edu/cgvlab/www/)  
+Department of Computer Science  
+Purdue University  
 
 ## License
 See the LICENSE file.
