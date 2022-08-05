@@ -101,6 +101,21 @@ SetsOfVec2 convertNumpyToGlmSetsOfVec2(const std::vector<std::vector<py::array_t
     return points2d;
 }
 
+std::vector<std::vector<py::array_t<double>>> convertGlmToNumpySetsOfVec2(const SetsOfVec2& points2d)
+{
+    std::vector<std::vector<py::array_t<double>>> result(points2d.size());
+
+    for (unsigned int i = 0; i < points2d.size(); i++)
+    {
+        for (unsigned int j = 0; j < points2d[i].size(); j++)
+        {
+            result[i].push_back(convertGlmToNumpyVec2(points2d[i][j]));
+        }
+    }
+
+    return result;
+}
+
 std::vector<py::array_t<double>> convertNumpyToGlmSetOfVec3(const SetOfVec3& points3d)
 {
     std::vector<py::array_t<double>> result;
@@ -111,6 +126,38 @@ std::vector<py::array_t<double>> convertNumpyToGlmSetOfVec3(const SetOfVec3& poi
     }
 
     return result;
+}
+
+cv::Mat1d convertNumpyToOpenCvMat(const py::array_t<double>& input)
+{
+    const auto buf = input.request();
+
+    if (buf.ndim != 2)
+    {
+        throw std::runtime_error("Number of dimensions must be 2");
+    }
+
+    if (buf.shape[0] < 1 || buf.shape[1] < 1)
+    {
+        throw std::runtime_error("The shape ");
+    }
+
+    const auto rows = static_cast<int>(buf.shape[0]);
+    const auto cols = static_cast<int>(buf.shape[1]);
+
+    const auto* ptr = static_cast<const double*>(buf.ptr);
+    cv::Mat1d matrix(rows, cols);
+
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            const auto index = j + cols * i;
+            matrix.at<double>(i, j) = ptr[index];
+        }
+    }
+
+    return matrix;
 }
 
 PYBIND11_MODULE(LeafTipTriangulationPython, m)
@@ -172,6 +219,23 @@ PYBIND11_MODULE(LeafTipTriangulationPython, m)
 
     // Load cameras from a file
     m.def("loadCamerasFromFiles", &loadCamerasFromFiles);
+
+    m.def("undistortAndFlipYAxis", [](const py::array_t<double>& cameraMatrixArray,
+                                             const py::array_t<double>& distCoeffsArray,
+                                             int imageHeight,
+                                             const std::vector<std::vector<py::array_t<double>>>& points2dArray)
+                                           -> std::vector<std::vector<py::array_t<double>>>
+    {
+        const auto cameraMatrix = convertNumpyToOpenCvMat(cameraMatrixArray);
+        const auto distCoeffs = convertNumpyToOpenCvMat(distCoeffsArray);
+        const auto points2d = convertNumpyToGlmSetsOfVec2(points2dArray);
+
+        const auto outputPoints2d = undistortAndFlipYAxis(cameraMatrix, distCoeffs, imageHeight, points2d);
+
+        return convertGlmToNumpySetsOfVec2(outputPoints2d);
+    });
+
+    // TODO: generateCamerasFromOpenCV()
 
     // Get the set of rays from 2D points
     m.def("computeRays", [](const std::vector<Camera>& cameras,

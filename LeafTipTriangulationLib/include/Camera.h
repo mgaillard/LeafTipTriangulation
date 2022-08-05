@@ -5,6 +5,7 @@
 
 #include <utils/warnoff.h>
 #include <glm/glm.hpp>
+#include <opencv2/core.hpp>
 #include <utils/warnon.h>
 
 #include "Types.h"
@@ -76,6 +77,36 @@ double computeMaximumCameraResolution(const std::vector<Camera>& cameras);
  * \return A vector of camera
  */
 std::vector<Camera> loadCamerasFromFiles(const std::vector<std::string>& files);
+
+/**
+ * \brief Undistort and flip Y axis on a SetsOfVec2
+ * \param cameraMatrix The camera matrix for the camera
+ * \param distCoeffs Distortion coefficients
+ * \param imageHeight Resolution of height of images
+ * \param points2d A set of 2D points visible from the camera
+ * \return The set of points undistorted with the Y axis flipped
+ */
+SetsOfVec2 undistortAndFlipYAxis(const cv::Mat1d& cameraMatrix,
+                                 const cv::Mat1d& distCoeffs,
+                                 int imageHeight,
+                                 const SetsOfVec2& points2d);
+
+/**
+ * \brief Generate a set of cameras from a camera matrix and a list of 6D poses
+ * \param imageWidth Resolution of width of images 
+ * \param imageHeight Resolution of height of images
+ * \param sensorSize Size of the camera sensor in mm
+ * \param cameraMatrix Camera matrix of the camera used to take images
+ * \param rvecs Per-view rotation in Rodrigues angles
+ * \param tvecs Per-view translation
+ * \return A set of cameras corresponding to the 6D poses
+ */
+std::vector<Camera> generateCamerasFromOpenCV(int imageWidth,
+                                              int imageHeight,
+                                              const cv::Size2d sensorSize,
+                                              const cv::Mat1d& cameraMatrix,
+                                              const std::vector<cv::Mat1d>& rvecs,
+                                              const std::vector<cv::Mat1d>& tvecs);
 
 /**
  * \brief Project 3D points on cameras. The viewport is 1000*1000 px.
