@@ -7,7 +7,6 @@
 #include <glm/glm.hpp>
 #include <utils/warnon.h>
 
-#include "Ray.h"
 #include "Types.h"
 
 class Camera
@@ -39,11 +38,11 @@ public:
 
     const glm::dvec4& viewport() const { return m_viewport; }
 
-    glm::dvec3 project(const glm::dvec3& point) const;
+    [[nodiscard]] glm::dvec3 project(const glm::dvec3& point) const;
 
-    glm::dvec3 unProject(const glm::dvec3& point) const;
+    [[nodiscard]] glm::dvec3 unProject(const glm::dvec3& point) const;
 
-    glm::dvec2 windowToViewport(const glm::dvec2& point) const;
+    [[nodiscard]] glm::dvec2 windowToViewport(const glm::dvec2& point) const;
 
 private:
     glm::dvec3 m_eye;
