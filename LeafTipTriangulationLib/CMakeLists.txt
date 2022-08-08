@@ -34,6 +34,8 @@ else()
     target_compile_options(LeafTipTriangulationLib PRIVATE -Wall -Wextra -pedantic -Werror)
 endif()
 
+set_target_properties(LeafTipTriangulationLib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 target_sources(LeafTipTriangulationLib
     PUBLIC
     ${HEADER_FILES}
