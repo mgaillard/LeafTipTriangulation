@@ -7,9 +7,10 @@ import cv2
 file_path = Path(__file__).resolve()
 project_path = file_path.parent.parent
 # Path to the workspace folder
-module_path = project_path / 'build' / 'LeafTipTriangulationPython' / 'Release'
+module_path = project_path / 'build' / 'LeafTipTriangulationPython'
 sys.path.append(str(module_path))
 from LeafTipTriangulationPython import undistortAndFlipYAxis, \
+                                       generateCamerasFromOpenCV, \
                                        computeRays, \
                                        matchRaysAndTriangulate
 
@@ -45,11 +46,13 @@ for image_file in image_files:
             allIds.append(charucoIds)
 
 imsize = gray.shape
+imWidth = imsize[1]
+imHeight = imsize[0]
 
 print("Calibration:")
 
-cameraMatrixInit = np.array([[ 1000.0,    0.0, imsize[0]/2.0],
-                             [    0.0, 1000.0, imsize[1]/2.0],
+cameraMatrixInit = np.array([[ 1000.0,    0.0, imWidth/2.0],
+                             [    0.0, 1000.0, imHeight/2.0],
                              [    0.0,    0.0,           1.0]])
 distCoeffsInit = np.zeros((5,1))
 flags = (cv2.CALIB_USE_INTRINSIC_GUESS + cv2.CALIB_RATIONAL_MODEL + cv2.CALIB_FIX_ASPECT_RATIO)
@@ -81,10 +84,19 @@ points2d = [
 ]
 
 # Undistort and Flip-Y axis points
-undistortedPoints2d = undistortAndFlipYAxis(camera_matrix, distortion_coefficients0, imsize[1], points2d)
+undistortedPoints2d = undistortAndFlipYAxis(camera_matrix, distortion_coefficients0, imHeight, points2d)
 
-# TODO: Generate cameras
+# Generate cameras from the calibrated views
+cameras = generateCamerasFromOpenCV(imWidth, imHeight, 5.76, 4.29, camera_matrix, rotation_vectors, translation_vectors)
 
-# TODO: Triangulate the two points
+# Triangulate the two points
+rays = computeRays(cameras, undistortedPoints2d)
+# Theta is high to enforce matchings
+theta = 4000.0
+points3d = matchRaysAndTriangulate(cameras, points2d, rays, theta)
 
-# TODO: Output the L2 distance between the two triangulated points
+# Output the L2 distance between the two triangulated points
+print("Triangulated {:d} points:".format(len(points3d)))
+
+dist = np.linalg.norm(points3d[0] - points3d[1])
+print("Distance between the two first points: {:.4f} m".format(dist))

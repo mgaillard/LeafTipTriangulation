@@ -160,6 +160,18 @@ cv::Mat1d convertNumpyToOpenCvMat(const py::array_t<double>& input)
     return matrix;
 }
 
+std::vector<cv::Mat1d> convertNumpyToVectorOfOpenCvMat(const std::vector<py::array_t<double>>& input)
+{
+    std::vector<cv::Mat1d> result;
+
+    for (const auto& i : input)
+    {
+        result.push_back(convertNumpyToOpenCvMat(i));
+    }
+
+    return result;
+}
+
 PYBIND11_MODULE(LeafTipTriangulationPython, m)
 {
     m.doc() = "pybind11 LeafTipTriangulation module plugin";
@@ -221,10 +233,10 @@ PYBIND11_MODULE(LeafTipTriangulationPython, m)
     m.def("loadCamerasFromFiles", &loadCamerasFromFiles);
 
     m.def("undistortAndFlipYAxis", [](const py::array_t<double>& cameraMatrixArray,
-                                             const py::array_t<double>& distCoeffsArray,
-                                             int imageHeight,
-                                             const std::vector<std::vector<py::array_t<double>>>& points2dArray)
-                                           -> std::vector<std::vector<py::array_t<double>>>
+                                      const py::array_t<double>& distCoeffsArray,
+                                      int imageHeight,
+                                      const std::vector<std::vector<py::array_t<double>>>& points2dArray)
+                                   -> std::vector<std::vector<py::array_t<double>>>
     {
         const auto cameraMatrix = convertNumpyToOpenCvMat(cameraMatrixArray);
         const auto distCoeffs = convertNumpyToOpenCvMat(distCoeffsArray);
@@ -235,11 +247,30 @@ PYBIND11_MODULE(LeafTipTriangulationPython, m)
         return convertGlmToNumpySetsOfVec2(outputPoints2d);
     });
 
-    // TODO: generateCamerasFromOpenCV()
+    m.def("generateCamerasFromOpenCV", [](int imageWidth,
+                                          int imageHeight,
+                                          double sensorWidthInMm,
+                                          double sensorHeightInMm,
+                                          const py::array_t<double>& cameraMatrixArray,
+                                          const std::vector<py::array_t<double>>& rvecsArray,
+                                          const std::vector<py::array_t<double>>& tvecsArray)
+                                       -> std::vector<Camera>
+    {
+        const auto cameraMatrix = convertNumpyToOpenCvMat(cameraMatrixArray);
+        const auto rvecs = convertNumpyToVectorOfOpenCvMat(rvecsArray);
+        const auto tvecs = convertNumpyToVectorOfOpenCvMat(tvecsArray);
+
+        return generateCamerasFromOpenCV(imageWidth,
+                                         imageHeight,
+                                         {sensorWidthInMm, sensorHeightInMm},
+                                         cameraMatrix,
+                                         rvecs,
+                                         tvecs);
+    });
 
     // Get the set of rays from 2D points
     m.def("computeRays", [](const std::vector<Camera>& cameras,
-                                   const std::vector<std::vector<py::array_t<double>>>& points2dArray) -> SetsOfRays
+                            const std::vector<std::vector<py::array_t<double>>>& points2dArray) -> SetsOfRays
     {
         const auto points2d = convertNumpyToGlmSetsOfVec2(points2dArray);
         return computeRays(cameras, points2d);
