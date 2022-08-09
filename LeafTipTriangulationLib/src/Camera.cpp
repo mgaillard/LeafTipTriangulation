@@ -321,12 +321,20 @@ std::vector<Camera> loadCamerasFromFiles(const std::vector<std::string>& files)
     return cameras;
 }
 
-SetsOfVec2 undistortAndFlipYAxis(
+SetsOfVec2 undistortCenterAndFlipYAxis(
+    int imageWidth,
+    int imageHeight,
     const cv::Mat1d& cameraMatrix,
     const cv::Mat1d& distCoeffs,
-    int imageHeight,
     const SetsOfVec2& points2d)
 {
+    const double opticalCenterX = cameraMatrix.at<double>(0, 2);
+    const double opticalCenterY = cameraMatrix.at<double>(1, 2);
+    const double imageCenterX = static_cast<double>(imageWidth) / 2.0;
+    const double imageCenterY = static_cast<double>(imageHeight) / 2.0;
+    const double translationX = imageCenterX - opticalCenterX;
+    const double translationY = imageCenterY - opticalCenterY;
+
     // Undistort 2D points and change the frame of reference
     // Copy points
     auto outputPoints2d = points2d;
@@ -341,8 +349,8 @@ SetsOfVec2 undistortAndFlipYAxis(
             cv::undistortPoints(inputDistortedPoints, outputUndistortedPoints, cameraMatrix, distCoeffs, cv::noArray(), cameraMatrix);
 
             // Save undistorted point
-            point2d.x = outputUndistortedPoints.front().x;
-            point2d.y = static_cast<double>(imageHeight) - outputUndistortedPoints.front().y;
+            point2d.x = outputUndistortedPoints.front().x + translationX;
+            point2d.y = static_cast<double>(imageHeight) - (outputUndistortedPoints.front().y + translationY);
         }
     }
 

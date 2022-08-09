@@ -23,7 +23,7 @@ double measureTwoPointsCharuco(
     assert(inputPoints2d.size() == rvecs.size());
     
     // Undistort 2D points and change the frame of reference
-    const auto points2d = undistortAndFlipYAxis(cameraMatrix, distCoeffs, imageHeight, inputPoints2d);
+    const auto points2d = undistortCenterAndFlipYAxis(imageWidth, imageHeight, cameraMatrix, distCoeffs, inputPoints2d);
 
     // For a Google Pixel 3, the sensor is 5.76 mm by 4.29 mm
     const cv::Size2d sensorSize(5.76, 4.29);

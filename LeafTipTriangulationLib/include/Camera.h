@@ -79,17 +79,19 @@ double computeMaximumCameraResolution(const std::vector<Camera>& cameras);
 std::vector<Camera> loadCamerasFromFiles(const std::vector<std::string>& files);
 
 /**
- * \brief Undistort and flip Y axis on a SetsOfVec2
+ * \brief Undistort, center, and flip Y axis on a SetsOfVec2
+ * \param imageWidth Resolution of width of images
+ * \param imageHeight Resolution of height of images
  * \param cameraMatrix The camera matrix for the camera
  * \param distCoeffs Distortion coefficients
- * \param imageHeight Resolution of height of images
  * \param points2d A set of 2D points visible from the camera
  * \return The set of points undistorted with the Y axis flipped
  */
-SetsOfVec2 undistortAndFlipYAxis(const cv::Mat1d& cameraMatrix,
-                                 const cv::Mat1d& distCoeffs,
-                                 int imageHeight,
-                                 const SetsOfVec2& points2d);
+SetsOfVec2 undistortCenterAndFlipYAxis(int imageWidth,
+                                       int imageHeight,
+                                       const cv::Mat1d& cameraMatrix,
+                                       const cv::Mat1d& distCoeffs,
+                                       const SetsOfVec2& points2d);
 
 /**
  * \brief Generate a set of cameras from a camera matrix and a list of 6D poses

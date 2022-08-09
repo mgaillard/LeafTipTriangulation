@@ -232,17 +232,18 @@ PYBIND11_MODULE(LeafTipTriangulationPython, m)
     // Load cameras from a file
     m.def("loadCamerasFromFiles", &loadCamerasFromFiles);
 
-    m.def("undistortAndFlipYAxis", [](const py::array_t<double>& cameraMatrixArray,
-                                      const py::array_t<double>& distCoeffsArray,
-                                      int imageHeight,
-                                      const std::vector<std::vector<py::array_t<double>>>& points2dArray)
-                                   -> std::vector<std::vector<py::array_t<double>>>
+    m.def("undistortCenterAndFlipYAxis", [](int imageWidth,
+                                            int imageHeight,
+                                            const py::array_t<double>& cameraMatrixArray,
+                                            const py::array_t<double>& distCoeffsArray,
+                                            const std::vector<std::vector<py::array_t<double>>>& points2dArray)
+                                         -> std::vector<std::vector<py::array_t<double>>>
     {
         const auto cameraMatrix = convertNumpyToOpenCvMat(cameraMatrixArray);
         const auto distCoeffs = convertNumpyToOpenCvMat(distCoeffsArray);
         const auto points2d = convertNumpyToGlmSetsOfVec2(points2dArray);
 
-        const auto outputPoints2d = undistortAndFlipYAxis(cameraMatrix, distCoeffs, imageHeight, points2d);
+        const auto outputPoints2d = undistortCenterAndFlipYAxis(imageWidth, imageHeight, cameraMatrix, distCoeffs, points2d);
 
         return convertGlmToNumpySetsOfVec2(outputPoints2d);
     });

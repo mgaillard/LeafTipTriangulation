@@ -7,9 +7,9 @@ import cv2
 file_path = Path(__file__).resolve()
 project_path = file_path.parent.parent
 # Path to the workspace folder
-module_path = project_path / 'build' / 'LeafTipTriangulationPython'
+module_path = project_path / 'build' / 'LeafTipTriangulationPython' / 'Release'
 sys.path.append(str(module_path))
-from LeafTipTriangulationPython import undistortAndFlipYAxis, \
+from LeafTipTriangulationPython import undistortCenterAndFlipYAxis, \
                                        generateCamerasFromOpenCV, \
                                        computeRays, \
                                        matchRaysAndTriangulate
@@ -46,28 +46,25 @@ for image_file in image_files:
             allIds.append(charucoIds)
 
 imsize = gray.shape
-imWidth = imsize[1]
-imHeight = imsize[0]
+im_width = imsize[1]
+im_height = imsize[0]
 
 print("Calibration:")
 
-cameraMatrixInit = np.array([[ 1000.0,    0.0, imWidth/2.0],
-                             [    0.0, 1000.0, imHeight/2.0],
-                             [    0.0,    0.0,           1.0]])
-distCoeffsInit = np.zeros((5,1))
-flags = (cv2.CALIB_USE_INTRINSIC_GUESS + cv2.CALIB_RATIONAL_MODEL + cv2.CALIB_FIX_ASPECT_RATIO)
-(ret, camera_matrix, distortion_coefficients0,
-rotation_vectors, translation_vectors,
+cameraMatrixInit = np.array([[ 1000.0,    0.0,  im_width/2.0],
+                             [    0.0, 1000.0, im_height/2.0],
+                             [    0.0,    0.0,          1.0]])
+distCoeffsInit = np.zeros((5, 1))
+
+(ret, camera_matrix, dist_coeffs, rvecs, tvecs,
 stdDeviationsIntrinsics, stdDeviationsExtrinsics,
 perViewErrors) = cv2.aruco.calibrateCameraCharucoExtended(
                 charucoCorners=allCorners,
                 charucoIds=allIds,
                 board=board,
-                imageSize=imsize,
+                imageSize=(im_width, im_height),
                 cameraMatrix=cameraMatrixInit,
-                distCoeffs=distCoeffsInit,
-                flags=flags,
-                criteria=(cv2.TERM_CRITERIA_EPS & cv2.TERM_CRITERIA_COUNT, 10000, 1e-9))
+                distCoeffs=distCoeffsInit)
 
 # Points on cameras
 points2d = [
@@ -84,19 +81,19 @@ points2d = [
 ]
 
 # Undistort and Flip-Y axis points
-undistortedPoints2d = undistortAndFlipYAxis(camera_matrix, distortion_coefficients0, imHeight, points2d)
+undistortedPoints2d = undistortCenterAndFlipYAxis(im_width, im_height, camera_matrix, dist_coeffs, points2d)
 
 # Generate cameras from the calibrated views
-cameras = generateCamerasFromOpenCV(imWidth, imHeight, 5.76, 4.29, camera_matrix, rotation_vectors, translation_vectors)
+cameras = generateCamerasFromOpenCV(im_width, im_height, 5.76, 4.29, camera_matrix, rvecs, tvecs)
 
 # Triangulate the two points
 rays = computeRays(cameras, undistortedPoints2d)
 # Theta is high to enforce matchings
 theta = 4000.0
-points3d = matchRaysAndTriangulate(cameras, points2d, rays, theta)
+points3d = matchRaysAndTriangulate(cameras, undistortedPoints2d, rays, theta)
 
 # Output the L2 distance between the two triangulated points
 print("Triangulated {:d} points:".format(len(points3d)))
 
 dist = np.linalg.norm(points3d[0] - points3d[1])
-print("Distance between the two first points: {:.4f} m".format(dist))
+print("Distance between the two first points: {:.6f} m".format(dist))
