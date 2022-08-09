@@ -4,6 +4,7 @@ LeafTipTriangulationCmd="./build/bin/Release/LeafTipTriangulation.exe"
 phenotype="tips"
 # Best value of theta per dataset
 theta2018="400"
+theta2018_synthetic="400"
 theta2022="1500"
 theta2022_synthetic="1000"
 probability="0.0"
@@ -38,6 +39,10 @@ process_sorghum_dataset sorghum_2018 $theta2018
 mkdir -p results/sorghum_2022
 python3 Phenotyping/scripts/convert_cvat_to_csv.py --input Phenotyping/sorghum_2022/annotations/annotations.xml > Phenotyping/sorghum_2022/leaf_tips.csv
 process_sorghum_dataset sorghum_2022 $theta2022
+
+# Processing the sorghum 2018 (synthetic) dataset
+mkdir -p results/sorghum_2018_synthetic
+process_sorghum_dataset sorghum_2018_synthetic $theta2018_synthetic
 
 # Processing the sorghum 2022 (synthetic) dataset
 mkdir -p results/sorghum_2022_synthetic

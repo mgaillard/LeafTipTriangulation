@@ -21,9 +21,14 @@ $ cmake -DCMAKE_BUILD_TYPE=Release ..
 $ cmake --build . --config Release --parallel 16
 # Run tests
 $ ctest
+# Create virtual environment
+$ python3 -m venv venv
+$ source venv/bin/activate
+$ pip install numpy matplotlib scipy
+$ pip install -r LeafTipTriangulationPython/requirements.txt
 # Run the leaf counting
-$ cd ../Phenotyping
-$ ../build/bin/LeafTipTriangulation leaf_counting
+$ cd ..
+$ bash run_phenotyping.sh
 ```
 
 ## Run the software on the Purdue RCAC cluster
