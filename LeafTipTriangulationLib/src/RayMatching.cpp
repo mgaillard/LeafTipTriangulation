@@ -217,25 +217,26 @@ double similarity(
 
     // Compute re-projection distance
     auto result = std::numeric_limits<double>::max();
+    const auto s0 = glm::distance(point0, glm::dvec2(q0));
+    const auto s1 = glm::distance(point1, glm::dvec2(q1));
 
     switch (strategy)
     {
     // Use only point 0 to compute the re-projection error
     case SimilarityStrategy::OnlyPoint0:
-        result = glm::distance(point0, glm::dvec2(q0));
+        result = s0;
         break;
 
     // Use only point 1 to compute the re-projection error
     case SimilarityStrategy::OnlyPoint1:
-        result = glm::distance(point1, glm::dvec2(q1));
+        result = s1;
         break;
 
     // Use both point 0 and point 1 to compute the re-projection error
     case SimilarityStrategy::BothPoints:
-    default:
-        result = glm::distance(point0, glm::dvec2(q0)) + glm::distance(point1, glm::dvec2(q1));
+        result = s0 + s1;
         break;
-    };
+    }
 
     return result;
 }
