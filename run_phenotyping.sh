@@ -3,10 +3,10 @@
 LeafTipTriangulationCmd="./build/bin/Release/LeafTipTriangulation.exe"
 phenotype="tips"
 # Best value of theta per dataset
-theta2018="400"
-theta2018_synthetic="400"
-theta2022="1500"
-theta2022_synthetic="1000"
+theta2018="200"
+theta2018_synthetic="200"
+theta2022="750"
+theta2022_synthetic="500"
 probability="0.0"
 
 copy_without_header_line() {

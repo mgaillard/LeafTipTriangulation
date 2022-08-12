@@ -25,27 +25,6 @@
 std::size_t convertVectorBoolToInt(const std::vector<bool>& v);
 
 /**
- * \brief Strategy for measuring errors in the similarity function 
- */
-enum class SimilarityStrategy
-{
-    /**
-     * \brief Output only the re-projection error of point 0
-     */
-    OnlyPoint0,
-
-    /**
-     * \brief Output only the re-projection error of point 1
-     */
-    OnlyPoint1,
-
-    /**
-     * \brief Output the re-projection error of both points (default strategy)
-     */
-    BothPoints
-};
-
-/**
  * \brief Compute a similarity coefficient between two points projected on two cameras
  * \param camera0 Camera A
  * \param ray0 Ray A
@@ -53,16 +32,14 @@ enum class SimilarityStrategy
  * \param camera1 Camera B
  * \param ray1 Ray B
  * \param point1 2D Point B
- * \param strategy Strategy to measure the error, see SimilarityStrategy
- * \return The similarity coefficient between two rays
+ * \return The similarity coefficient on ray 0, and the similarity coefficient on ray 1
  */
-double similarity(const Camera& camera0,
-                  const Ray& ray0,
-                  const glm::dvec2& point0,
-                  const Camera& camera1,
-                  const Ray& ray1,
-                  const glm::dvec2& point1,
-                  SimilarityStrategy strategy = SimilarityStrategy::BothPoints);
+std::tuple<double, double> similarity(const Camera& camera0,
+                                      const Ray& ray0,
+                                      const glm::dvec2& point0,
+                                      const Camera& camera1,
+                                      const Ray& ray1,
+                                      const glm::dvec2& point1);
 
 /**
  * \brief Structure to hold a cache entry for the function matchRaysAndTriangulate.
@@ -174,14 +151,13 @@ std::size_t convertVectorBoolToInt(const std::vector<bool>& v)
                            });
 }
 
-double similarity(
+std::tuple<double, double> similarity(
     const Camera& camera0,
     const Ray& ray0,
     const glm::dvec2& point0,
     const Camera& camera1,
     const Ray& ray1,
-    const glm::dvec2& point1,
-    SimilarityStrategy strategy)
+    const glm::dvec2& point1)
 {
     // See: Triangulation without correspondences from Cheng et al.
     const std::array<glm::dvec3, 2> u = {{ray0.direction, ray1.direction}};
@@ -193,7 +169,10 @@ double similarity(
     // Failure case 1: ray0 and ray1 are parallel
     if (!pseudoIntersectionExists)
     {
-        return std::numeric_limits<double>::max();
+        return {
+            std::numeric_limits<double>::max(),
+            std::numeric_limits<double>::max()
+        };
     }
 
     // Compute the re-projection of q on the two views
@@ -212,33 +191,19 @@ double similarity(
     if ((dotProduct0 <= 0.0) || (dotProduct1 <= 0.0)
         || (q0.z <= 0.0) || (q1.z <= 0.0))
     {
-        return std::numeric_limits<double>::max();
+        return {
+            std::numeric_limits<double>::max(),
+            std::numeric_limits<double>::max()
+        };
     }
 
-    // Compute re-projection distance
-    auto result = std::numeric_limits<double>::max();
-    const auto s0 = glm::distance(point0, glm::dvec2(q0));
-    const auto s1 = glm::distance(point1, glm::dvec2(q1));
-
-    switch (strategy)
-    {
+    // Compute re-projection distance in pixels
     // Use only point 0 to compute the re-projection error
-    case SimilarityStrategy::OnlyPoint0:
-        result = s0;
-        break;
-
+    const auto dist0 = glm::distance(point0, glm::dvec2(q0));
     // Use only point 1 to compute the re-projection error
-    case SimilarityStrategy::OnlyPoint1:
-        result = s1;
-        break;
+    const auto dist1 = glm::distance(point1, glm::dvec2(q1));
 
-    // Use both point 0 and point 1 to compute the re-projection error
-    case SimilarityStrategy::BothPoints:
-        result = s0 + s1;
-        break;
-    }
-
-    return result;
+    return {dist0, dist1};
 }
 
 SetsOfCorrespondences findSetsOfCorrespondences(
@@ -301,14 +266,17 @@ SetsOfCorrespondences findSetsOfCorrespondences(
         {
             for (int j = 0; j < costCols; j++)
             {
-                const auto dist = similarity(cameras[referenceCamera],
-                                             rays[referenceCamera][i],
-                                             points2d[referenceCamera][i],
-                                             cameras[c],
-                                             rays[c][j],
-                                             points2d[c][j]);
+                // Reprojection error on each view
+                const auto [dist0, dist1] = similarity(cameras[referenceCamera],
+                                                       rays[referenceCamera][i],
+                                                       points2d[referenceCamera][i],
+                                                       cameras[c],
+                                                       rays[c][j],
+                                                       points2d[c][j]);
+                // Total reprojection error
+                const auto dist = dist0 + dist1;
 
-                if (dist < thresholdNoPair)
+                if (dist0 < thresholdNoPair && dist1 < thresholdNoPair)
                 {
                     const auto integerDist = static_cast<long>(std::round(dist * realToLongMultiplier));
                     cost(i, j) = -integerDist;
@@ -436,6 +404,12 @@ SetsOfCorrespondences pointsRaysMatching(
     dlib::matrix<double> realCost(costSize, costSize);
     for (int i = 0; i < costSize; i++)
     {
+        // Set the default value and add dummy columns for non pairing points
+        for (int j = 0; j < costSize; j++)
+        {
+            realCost(i, j) = maximumDeltaError;
+        }
+
         // Compute the current reprojection error for the 3D point i
         // If the 3D point i is a single ray, the reprojection is 0.0 by default
         double currentError = 0.0;
@@ -448,13 +422,6 @@ SetsOfCorrespondences pointsRaysMatching(
         // Try to assign a ray from the other camera to the point i
         for (int j = 0; j < costCols; j++)
         {
-            // The change in error caused by assigning the 2D point j to the 3D point i
-            double deltaError = 0.0;
-
-            // Reprojection error of the 3D point i (or single ray) on 2D point j from the current camera
-            // By default the distance is maximum to prevent the matching
-            double dist = maximumDeltaError;
-
             // Check if point i is a 3D point or a single ray
             if (setsOfCorrespondences[i].size() > 1)
             {
@@ -462,16 +429,20 @@ SetsOfCorrespondences pointsRaysMatching(
                 auto newSetOfRays = setsOfCorrespondences[i];
                 newSetOfRays.emplace_back(cameraIndex, j);
                 // Triangulate with this new set of rays
-                const auto [newError, newTriangulatedPoint] = triangulatePointFromMultipleViews(
-                    cameras, points2d, newSetOfRays);
-
-                // Compare to the 2D point j
-                // Compute the re-projection error of the 3D point on the camera
-                deltaError = static_cast<double>(newError) - currentError;
-
+                const auto [newError, newTriangulatedPoint] = triangulatePointFromMultipleViews(cameras,
+                                                                                                points2d,
+                                                                                                newSetOfRays);
+                
                 // Project the triangulated 3D point i on the current camera
                 const auto projectedPoint = glm::dvec2(currentCamera.project(newTriangulatedPoint));
-                dist = glm::distance(projectedPoint, currentPoints2d[j]);
+                const auto dist = glm::distance(projectedPoint, currentPoints2d[j]);
+
+                // If the reprojection error is below the threshold, the match is possible
+                if (dist < thresholdNoPair)
+                {
+                    // The change in reprojection error caused by assigning the 2D point j to the 3D point i
+                    realCost(i, j) = newError - currentError;
+                }
             }
             else
             {
@@ -480,59 +451,41 @@ SetsOfCorrespondences pointsRaysMatching(
                 const auto singleRayCameraIndex = singleRay.first;
                 const auto singleRayIndex = singleRay.second;
 
-                // Compute the sum of the re-projection error for both views
-                // Since the threshold is divided by too later, we need to also divide the similarity by 2
-                // We do this to be consistent with the other case, when matching two views
-                dist = similarity(cameras[singleRayCameraIndex],
-                                  rays[singleRayCameraIndex][singleRayIndex],
-                                  points2d[singleRayCameraIndex][singleRayIndex],
-                                  currentCamera,
-                                  currentRays[j],
-                                  currentPoints2d[j],
-                                  SimilarityStrategy::BothPoints) / 2.0;
+                // Compute the re-projection error for both views
+                const auto [dist0, dist1] = similarity(cameras[singleRayCameraIndex],
+                                                       rays[singleRayCameraIndex][singleRayIndex],
+                                                       points2d[singleRayCameraIndex][singleRayIndex],
+                                                       currentCamera,
+                                                       currentRays[j],
+                                                       currentPoints2d[j]);
 
-
-                // Triangulate the point from two views using the pseudo intersection
-                glm::dvec3 newTriangulatedPoint;
-                const auto pseudoIntersectionExists = raysPseudoIntersection(rays[singleRayCameraIndex][singleRayIndex],
-                                                                             currentRays[j],
-                                                                             newTriangulatedPoint);
-                // If the triangulated point exists, compute the deltaError
-                // If the triangulated point does not exists, the deltaError will be set to the maximum value
-                // because the similarity is equal to infinity
-                if (pseudoIntersectionExists)
+                if (dist0 < thresholdNoPair && dist1 < thresholdNoPair)
                 {
-                    // Copy the current set of rays and add the candidate set of rays
-                    auto setOfCorrespondences = setsOfCorrespondences[i];
-                    setOfCorrespondences.emplace_back(cameraIndex, j);
+                    // Triangulate the point from two views using the pseudo intersection
+                    glm::dvec3 newTriangulatedPoint;
+                    const auto pseudoIntersectionExists = raysPseudoIntersection(rays[singleRayCameraIndex][singleRayIndex],
+                                                                                 currentRays[j],
+                                                                                 newTriangulatedPoint);
+                    // If the triangulated point exists, compute the deltaError
+                    // If the triangulated point does not exists, the deltaError will be set to the maximum value
+                    // because the similarity is equal to infinity
+                    if (pseudoIntersectionExists)
+                    {
+                        // Copy the current set of rays and add the candidate set of rays
+                        auto setOfCorrespondences = setsOfCorrespondences[i];
+                        setOfCorrespondences.emplace_back(cameraIndex, j);
 
-                    // Triangulate with this new set of rays
-                    const auto newError = reprojectionErrorFromMultipleViews(
-                        cameras, points2d, setOfCorrespondences, newTriangulatedPoint);
+                        // Triangulate with this new set of rays
+                        const auto newError = reprojectionErrorFromMultipleViews(cameras,
+                                                                                 points2d,
+                                                                                 setOfCorrespondences,
+                                                                                 newTriangulatedPoint);
 
-                    // Compare to the 2D point j
-                    // Compute the re-projection error of the 3D point on the camera
-                    deltaError = static_cast<double>(newError);
+                        // The change in reprojection error caused by assigning the 2D point j to the 2D point i
+                        realCost(i, j) = newError;
+                    }
                 }
             }
-
-            // Since we look at the reprojection error of the 3D point on only one 2D point, the threshold is divided by 2
-            if (dist < thresholdNoPair / 2.0)
-            {
-                realCost(i, j) = deltaError;
-            }
-            else
-            {
-                // if dist == std::numeric_limits<double>::max()
-                // or if above the threshold, we push the algorithm not to match the two points
-                realCost(i, j) = maximumDeltaError;
-            }
-        }
-
-        // Add dummy columns
-        for (int j = costCols; j < costSize; j++)
-        {
-            realCost(i, j) = maximumDeltaError;
         }
     }
 
@@ -796,13 +749,13 @@ bool computeDistributionOfSimilarities(
 
                     const auto& [cameraI, rayI] = setsOfCorrespondences[p][i];
                     const auto& [cameraJ, rayJ] = setsOfCorrespondences[q][j];
-                    const auto s = similarity(cameras[cameraI],
-                                              rays[cameraI][rayI],
-                                              points2d[cameraI][rayI],
-                                              cameras[cameraJ],
-                                              rays[cameraJ][rayJ],
-                                              points2d[cameraJ][rayJ]);
-
+                    const auto [s0, s1] = similarity(cameras[cameraI],
+                                                     rays[cameraI][rayI],
+                                                     points2d[cameraI][rayI],
+                                                     cameras[cameraJ],
+                                                     rays[cameraJ][rayJ],
+                                                     points2d[cameraJ][rayJ]);
+                    const auto s = s0 + s1;
                     if (p == q)
                     {
                         // The two rays belong to the same group
