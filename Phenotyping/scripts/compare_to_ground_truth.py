@@ -60,6 +60,16 @@ def merge_results_with_ground_truth(result_lines, truth_lines):
     return merged_result_lines
 
 
+def display_results_with_errors(results_with_truth):
+    """
+    Display the name of the plant if the result is different from the truth
+    """
+    for result in results_with_truth:
+        if result['result'] != result['truth']:
+            error = result['truth'] - result['result']
+            print("Plant with error {:d}: {}".format(error, result['name']))
+
+
 def vectors_results_truth(merged_result_lines):
     """
     Return a vector X of results, and a vector Y of true values
@@ -213,6 +223,8 @@ def compare_to_ground_truth_graphs(input_path: Path, truth_path: Path, output_pa
     generate_scatter_plot(results, truths, output_path.joinpath('scatter.png'))
     # Histogram of the absolute difference in leaf counted
     generate_histogram(results, truths, output_path.joinpath('histogram.png'))
+    # Display plants with problems
+    display_results_with_errors(results_with_truth)
 
 
 def compare_to_ground_truth_values(input_path: Path, truth_path: Path):
