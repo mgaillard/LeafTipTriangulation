@@ -40,7 +40,7 @@ double measureTwoPointsCharuco(
     const auto rays = computeRays(cameras, points2d);
 
     // Matching and triangulation of points
-    const auto [triangulatedPoints3D, setsOfCorrespondences] = matchRaysAndTriangulate(cameras, points2d, rays);
+    const auto [triangulatedPoints3D, setsOfCorrespondences, viewOrder] = matchRaysAndTriangulate(cameras, points2d, rays);
 
     return glm::distance(triangulatedPoints3D[0], triangulatedPoints3D[1]);
 }

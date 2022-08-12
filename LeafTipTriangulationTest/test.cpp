@@ -499,7 +499,7 @@ TEST_CASE("Synthetic correspondences and triangulation", "[matching]")
 	const auto rays = computeRays(cameras, points2d);
 
 	// Find the solution to the problem
-	auto [triangulatedPoints3d, setsOfCorrespondences] = matchRaysAndTriangulate(cameras, points2d, rays, thresholdNoPair);
+	auto [triangulatedPoints3d, setsOfCorrespondences, viewOrder] = matchRaysAndTriangulate(cameras, points2d, rays, thresholdNoPair);
 
 	// Check the output
 	REQUIRE(points3d.size() == triangulatedPoints3d.size());

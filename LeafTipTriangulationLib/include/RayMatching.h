@@ -53,9 +53,9 @@ bool computeDistributionOfSimilarities(
  * \param points2d A list of 2D points per camera
  * \param rays A list of 3D rays associated to 2D points per camera
  * \param thresholdNoPair Threshold in px above which two rays/points can't be paired together
- * \return Triangulated 3D points and the matching of rays that triangulates 2D points projected by cameras
+ * \return Triangulated 3D points, the matching of rays that triangulates 2D points projected by cameras, and the view order
  */
-std::tuple<SetOfVec3, SetsOfCorrespondences> matchRaysAndTriangulate(
+std::tuple<SetOfVec3, SetsOfCorrespondences, std::vector<int>> matchRaysAndTriangulate(
     const std::vector<Camera>& cameras,
     const SetsOfVec2& points2d,
     const SetsOfRays& rays,

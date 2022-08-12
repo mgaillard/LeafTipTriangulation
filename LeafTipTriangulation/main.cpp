@@ -71,7 +71,10 @@ GroundTruthMatchingResult testWithSyntheticData(const Parameters& parameters)
 	
 	// Matching and triangulation of points
 	const auto startTime = std::chrono::steady_clock::now();
-	auto [triangulatedPoints3D, setsOfCorrespondences] = matchRaysAndTriangulate(cameras, points2d, rays, parameters.thresholdNoPair);
+	auto [triangulatedPoints3D, setsOfCorrespondences, viewOrder] = matchRaysAndTriangulate(cameras,
+		                                                                                    points2d,
+		                                                                                    rays,
+		                                                                                    parameters.thresholdNoPair);
 	const auto endTime = std::chrono::steady_clock::now();
 
 	// Draw the scene in OBJ for Debugging
@@ -461,7 +464,7 @@ void runPlantPhenotypingExample2018(const std::string& folderCameras2018)
 	// Compute rays in 3D from camera matrices and 2D points
 	const auto rays = computeRays(setup.cameras(), points2d);
 
-	auto [triangulatedPoints3D, setsOfCorrespondences] = matchRaysAndTriangulate(setup.cameras(), points2d, rays);
+	auto [triangulatedPoints3D, setsOfCorrespondences, viewOrder] = matchRaysAndTriangulate(setup.cameras(), points2d, rays);
 
 	// Export the scene
 	exportSplitSceneAsOBJ(rays, setsOfCorrespondences, triangulatedPoints3D);
@@ -518,7 +521,7 @@ void runPlantPhenotypingExample2022(const std::string& folderCameras2022)
 	const auto points = plants.front().pointsFromViews(viewNames);
 	const auto cameras = setup.camerasFromViews(viewNames);
 	const auto rays = computeRays(cameras, points);
-	const auto [triangulatedPoints3D, setsOfCorrespondences] = matchRaysAndTriangulate(cameras, points, rays, 100.0);
+	const auto [triangulatedPoints3D, setsOfCorrespondences, viewOrder] = matchRaysAndTriangulate(cameras, points, rays, 100.0);
 
 	computeDistributionOfSimilarities("distribution_similarities.txt", cameras, points, rays, setsOfCorrespondences);
 

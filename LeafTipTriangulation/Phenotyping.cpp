@@ -17,6 +17,33 @@
 
 namespace fs = std::filesystem;
 
+/**
+ * \brief Convert a vector of integers to a string that can be display
+ *        For example: "{3, 5, 1, 6, 4, 7, 0, 2}"
+ * \param v A vector of integer values
+ * \return A string representing the vector
+ */
+std::string vectorIntToString(const std::vector<int>& v)
+{
+	std::stringstream out;
+
+	out << "{";
+
+	for (unsigned int i = 0; i < v.size(); i++)
+	{
+		if (i > 0)
+		{
+			out << ", ";
+		}
+
+		out << v[i];
+	}
+
+	out << "}";
+
+	return out.str();
+}
+
 PhenotypingSetup::PhenotypingSetup(
 	double imageWidth,
 	double imageHeight,
@@ -804,7 +831,7 @@ triangulatePhenotypePoints(
 	// Clamp all rays according to the phenotyping setup
 	clampRaysWithPhenotypingSetup(setup, viewNames, rays);
 	// Triangulate the 3D points
-	auto [triangulatedPoints3D, setsOfCorrespondences] = matchRaysAndTriangulate(cameras, points, rays, thresholdNoPair);
+	auto [triangulatedPoints3D, setsOfCorrespondences, viewOrder] = matchRaysAndTriangulate(cameras, points, rays, thresholdNoPair);
 	// If some of the points are triangulated with only one ray, we remove them because it's probably a failed match
 	removePointsFromSingleRays(triangulatedPoints3D, setsOfCorrespondences);
 	// Sort the set of rays to make it uniquely identifiable even if it has been permuted

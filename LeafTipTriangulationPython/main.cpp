@@ -283,10 +283,10 @@ PYBIND11_MODULE(LeafTipTriangulationPython, m)
                                                double thresholdNoPair) -> std::vector<py::array_t<double>>
     {
         const auto points2d = convertNumpyToGlmSetsOfVec2(points2dArray);
-        const auto [points3d, setsOfCorrespondences] = matchRaysAndTriangulate(cameras,
-                                                                               points2d,
-                                                                               rays,
-                                                                               thresholdNoPair);
+        const auto [points3d, setsOfCorrespondences, viewOrder] = matchRaysAndTriangulate(cameras,
+                                                                                          points2d,
+                                                                                          rays,
+                                                                                          thresholdNoPair);
         return convertNumpyToGlmSetOfVec3(points3d);
     });
 }

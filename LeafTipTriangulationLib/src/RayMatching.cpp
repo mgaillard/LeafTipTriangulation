@@ -49,6 +49,7 @@ struct MatchRaysAndTriangulateDPCacheEntry
     bool valid;
     SetOfVec3 triangulatedPoints;
     SetsOfCorrespondences setsOfCorrespondences;
+    std::vector<int> viewOrder;
 
     MatchRaysAndTriangulateDPCacheEntry() : valid(false)
     {
@@ -56,16 +57,18 @@ struct MatchRaysAndTriangulateDPCacheEntry
 
     void set(
         const SetOfVec3& newTriangulatedPoints,
-        const SetsOfCorrespondences& newSetsOfCorrespondences)
+        const SetsOfCorrespondences& newSetsOfCorrespondences,
+        const std::vector<int>& newViewOrder)
     {
         triangulatedPoints = newTriangulatedPoints;
         setsOfCorrespondences = newSetsOfCorrespondences;
+        viewOrder = newViewOrder;
         valid = true;
     }
 
-    std::tuple<SetOfVec3, SetsOfCorrespondences> asTuple() const
+    std::tuple<SetOfVec3, SetsOfCorrespondences, std::vector<int>> asTuple() const
     {
-        return {triangulatedPoints, setsOfCorrespondences};
+        return {triangulatedPoints, setsOfCorrespondences, viewOrder};
     }
 };
 
@@ -125,9 +128,9 @@ SetsOfCorrespondences pointsRaysMatching(
  * \param rays List of rays associated to 2D points per camera
  * \param activeCameraSet The active set of cameras as a vector of bool: true, camera activated false camera deactivated
  * \param thresholdNoPair Threshold in px above which two rays/points can't be paired together
- * \return The triangulated points and matching of rays for the current active camera set
+ * \return The triangulated points, matching of rays for the current active camera set, and the view order
  */
-std::tuple<SetOfVec3, SetsOfCorrespondences> matchRaysAndTriangulateDP(
+std::tuple<SetOfVec3, SetsOfCorrespondences, std::vector<int>> matchRaysAndTriangulateDP(
     std::vector<MatchRaysAndTriangulateDPCacheEntry>& cacheDP,
     const std::vector<Camera>& cameras,
     const SetsOfVec2& points2d,
@@ -544,7 +547,7 @@ SetsOfCorrespondences pointsRaysMatching(
     return newSetsOfCorrespondences;
 }
 
-std::tuple<SetOfVec3, SetsOfCorrespondences> matchRaysAndTriangulateDP(
+std::tuple<SetOfVec3, SetsOfCorrespondences, std::vector<int>> matchRaysAndTriangulateDP(
     std::vector<MatchRaysAndTriangulateDPCacheEntry>& cacheDP,
     const std::vector<Camera>& cameras,
     const SetsOfVec2& points2d,
@@ -607,9 +610,9 @@ std::tuple<SetOfVec3, SetsOfCorrespondences> matchRaysAndTriangulateDP(
         const auto triangulatedPoints3D = pseudoIntersectionManyPointsFromTwoViews(rays, setsOfCorrespondences);
 
         // Store in cache
-        cacheDP[cacheIndex].set(triangulatedPoints3D, setsOfCorrespondences);
+        cacheDP[cacheIndex].set(triangulatedPoints3D, setsOfCorrespondences, indexActiveCamera);
 
-        return {triangulatedPoints3D, setsOfCorrespondences};
+        return {triangulatedPoints3D, setsOfCorrespondences, indexActiveCamera};
     }
     // If there are more than 2 cameras, we split to smaller cases
     else if (numberActiveCameras > 2)
@@ -617,6 +620,7 @@ std::tuple<SetOfVec3, SetsOfCorrespondences> matchRaysAndTriangulateDP(
         double bestReprojError = std::numeric_limits<double>::max();
         SetsOfCorrespondences bestSetsOfRays;
         SetOfVec3 bestTriangulatedPoints;
+        std::vector<int> bestViewOrder;
 
         // We deactivate one camera, and get the answer with one camera less
         for (unsigned int c = 0; c < activeCameraSet.size(); c++)
@@ -628,12 +632,12 @@ std::tuple<SetOfVec3, SetsOfCorrespondences> matchRaysAndTriangulateDP(
                 subActiveCameraSet[c] = false;
 
                 // Get the setOfCorrespondences and triangulated points from the sub problems with one camera less
-                auto [subPoints, setsOfCorrespondences] = matchRaysAndTriangulateDP(cacheDP,
-                                                                                    cameras,
-                                                                                    points2d,
-                                                                                    rays,
-                                                                                    subActiveCameraSet,
-                                                                                    thresholdNoPair);
+                auto [subPoints, setsOfCorrespondences, subViewOrder] = matchRaysAndTriangulateDP(cacheDP,
+                                                                                                  cameras,
+                                                                                                  points2d,
+                                                                                                  rays,
+                                                                                                  subActiveCameraSet,
+                                                                                                  thresholdNoPair);
 
                 // If the number of points and rays identified in the sub problem
                 // are less that the number of points in this camera, cancel the reconstruction
@@ -655,15 +659,18 @@ std::tuple<SetOfVec3, SetsOfCorrespondences> matchRaysAndTriangulateDP(
                     bestReprojError = triangulationError;
                     bestSetsOfRays = setsOfCorrespondences;
                     bestTriangulatedPoints = triangulatedPoints;
+
+                    bestViewOrder = subViewOrder;
+                    bestViewOrder.push_back(static_cast<int>(c));
                 }
             }
         }
 
         // Store in cache
-        cacheDP[cacheIndex].set(bestTriangulatedPoints, bestSetsOfRays);
+        cacheDP[cacheIndex].set(bestTriangulatedPoints, bestSetsOfRays, bestViewOrder);
 
         // Return the best solution
-        return {bestTriangulatedPoints, bestSetsOfRays};
+        return {bestTriangulatedPoints, bestSetsOfRays, bestViewOrder};
     }
 
     // If there are less than 2 cameras, we can't triangulate anything
@@ -811,7 +818,7 @@ bool computeDistributionOfSimilarities(
     return true;
 }
 
-std::tuple<SetOfVec3, SetsOfCorrespondences> matchRaysAndTriangulate(
+std::tuple<SetOfVec3, SetsOfCorrespondences, std::vector<int>> matchRaysAndTriangulate(
     const std::vector<Camera>& cameras,
     const SetsOfVec2& points2d,
     const SetsOfRays& rays,
