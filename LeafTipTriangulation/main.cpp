@@ -326,7 +326,7 @@ void testCorrespondenceWithThreshold(double noiseStd)
 	parameters.noiseStd = noiseStd;
 	parameters.probabilityKeep = 0.5;
 
-	for (int thresholdNoPairInt = 1; thresholdNoPairInt <= 80; thresholdNoPairInt += 2)
+	for (int thresholdNoPairInt = 1; thresholdNoPairInt <= 40; thresholdNoPairInt++)
 	{
 		std::vector<GroundTruthMatchingResult> results;
 
