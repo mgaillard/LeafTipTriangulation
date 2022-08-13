@@ -931,7 +931,7 @@ void runCrocodileMeasurement()
 
 int main(int argc, char *argv[])
 {
-	spdlog::set_level(spdlog::level::trace);
+	spdlog::set_level(spdlog::level::debug);
 
 	if (argc < 2)
 	{

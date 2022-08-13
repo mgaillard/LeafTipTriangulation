@@ -859,6 +859,8 @@ triangulatePhenotypePoints(
 	// Sort the set of rays to make it uniquely identifiable even if it has been permuted
 	sortSetsOfCorrespondences(setsOfCorrespondences);
 
+	spdlog::trace("View order for plant {}: {}", plantPoints.plantName(), orderedViewNamesToString(viewNames, viewOrder, points));
+
 	return { triangulatedPoints3D, setsOfCorrespondences };
 }
 

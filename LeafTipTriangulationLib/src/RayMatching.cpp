@@ -631,6 +631,27 @@ std::tuple<SetOfVec3, SetsOfCorrespondences, std::vector<int>> matchRaysAndTrian
                 auto subActiveCameraSet = activeCameraSet;
                 subActiveCameraSet[c] = false;
 
+                // The number of points visible from this view must be less than
+                // the number of points visible in any view of the sub problem
+                bool subProblemHasMoreAnnotations = true;
+                for (unsigned int i = 0; i < subActiveCameraSet.size(); i++)
+                {
+                    if (subActiveCameraSet[i])
+                    {
+                        if (rays[i].size() < rays[c].size())
+                        {
+                            // One of the view in the sub problem has less points than the current view
+                            // We do not explore this branch
+                            subProblemHasMoreAnnotations = false;
+                        }
+                    }
+                }
+                // If the sub problem has less annotations than the current view, cancel the branch
+                if (!subProblemHasMoreAnnotations)
+                {
+                    continue;
+                }
+
                 // Get the setOfCorrespondences and triangulated points from the sub problems with one camera less
                 auto [subPoints, setsOfCorrespondences, subViewOrder] = matchRaysAndTriangulateDP(cacheDP,
                                                                                                   cameras,
@@ -643,7 +664,6 @@ std::tuple<SetOfVec3, SetsOfCorrespondences, std::vector<int>> matchRaysAndTrian
                 // are less that the number of points in this camera, cancel the reconstruction
                 if (rays[c].size() > setsOfCorrespondences.size())
                 {
-                    // TODO: Try to add the ray alone in the pointsRaysMatching function
                     continue;
                 }
 
