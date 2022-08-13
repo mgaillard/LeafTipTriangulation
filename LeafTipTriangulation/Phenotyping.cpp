@@ -18,25 +18,28 @@
 namespace fs = std::filesystem;
 
 /**
- * \brief Convert a vector of integers to a string that can be display
- *        For example: "{3, 5, 1, 6, 4, 7, 0, 2}"
- * \param v A vector of integer values
- * \return A string representing the vector
+ * \brief Convert a vector of view names and a vector of indices of views to a string that can be displayed
+ * \param viewNames A vector of view names
+ * \param viewOrder A vector of integer values that gives the order of views, for example: "{3, 5, 1, 6, 4, 7, 0, 2}"
+ * \return A string representing the ordered view names
  */
-std::string vectorIntToString(const std::vector<int>& v)
+std::string orderedViewNamesToString(
+	const std::vector<std::string>& viewNames,
+	const std::vector<int>& viewOrder,
+	const SetsOfVec2& points2d)
 {
 	std::stringstream out;
 
 	out << "{";
 
-	for (unsigned int i = 0; i < v.size(); i++)
+	for (unsigned int i = 0; i < viewOrder.size(); i++)
 	{
 		if (i > 0)
 		{
 			out << ", ";
 		}
 
-		out << v[i];
+		out << viewNames.at(viewOrder[i]) << "(" << points2d.at(viewOrder[i]).size() << ")";
 	}
 
 	out << "}";
