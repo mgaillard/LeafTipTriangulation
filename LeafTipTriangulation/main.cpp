@@ -957,9 +957,9 @@ int main(int argc, char *argv[])
 	else if (command == "accuracy_cameras")
 	{
 		// Accuracy vs number of cameras
-		testAccuracyWithMoreCameras(0.1f);
-	    testAccuracyWithMoreCameras(0.5f);
-		testAccuracyWithMoreCameras(2.0f);
+		testAccuracyWithMoreCameras(0.1);
+	    testAccuracyWithMoreCameras(0.5);
+		testAccuracyWithMoreCameras(2.0);
 	}
 	else if (command == "correspondence_noise")
 	{
@@ -969,9 +969,9 @@ int main(int argc, char *argv[])
 	else if (command == "correspondence_threshold")
 	{
 		// ROC curve of correspondence with vs threshold with 6 cameras
-		testCorrespondenceWithThreshold(0.1f);
-		testCorrespondenceWithThreshold(0.5f);
-		testCorrespondenceWithThreshold(2.0f);
+		testCorrespondenceWithThreshold(0.1);
+		testCorrespondenceWithThreshold(0.5);
+		testCorrespondenceWithThreshold(2.0);
 	}
 	else if (command == "plant_phenotyping_example_2018")
 	{
