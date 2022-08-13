@@ -676,6 +676,25 @@ void discardViewOnAllPlants(const std::string& viewName, std::vector<PlantPhenot
 	}
 }
 
+void keepOnlyPlantsWhoseNameContains(const std::string& plantName, std::vector<PlantPhenotypePoints>& plants)
+{
+	auto itPlants = plants.begin();
+
+	while (itPlants != plants.end())
+	{
+		// If the plant name does not contain the string "plantName"
+		if (itPlants->plantName().find(plantName) == std::string::npos)
+		{
+			// Erase from both vectors
+			itPlants = plants.erase(itPlants);
+		}
+		else
+		{
+			++itPlants;
+		}
+	}
+}
+
 void apply90DegreesRotationToViews(const std::string& viewName,
                                    const PhenotypingSetup& setup,
                                    std::vector<PlantPhenotypePoints>& plants)

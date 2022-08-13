@@ -392,6 +392,13 @@ void flipYAxisOnAllPlants(const PhenotypingSetup& setup, std::vector<PlantPhenot
 void discardViewOnAllPlants(const std::string& viewName, std::vector<PlantPhenotypePoints>& plants);
 
 /**
+ * \brief Keep only plants whose name contains a certain string
+ * \param plantName The string that the plant name should contain
+ * \param plants The list of plants to modify
+ */
+void keepOnlyPlantsWhoseNameContains(const std::string& plantName, std::vector<PlantPhenotypePoints>& plants);
+
+/**
  * \brief Apply a 90 degrees rotation to points in a view for a list of plants
  *        The rotation direction is defined in the Phenotyping setup
  * \param viewName The name of the view
