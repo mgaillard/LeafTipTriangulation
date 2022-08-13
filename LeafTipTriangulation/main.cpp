@@ -717,6 +717,7 @@ void runLeafCounting(
 void runExportAnnotations(
 	const std::string& annotationFolderStr,
 	const std::string& phenotype,
+	double thresholdNoPair,
 	const std::string& imageFolderStr,
 	const std::string& outputFolderStr)
 {
@@ -742,6 +743,11 @@ void runExportAnnotations(
 		return;
 	}
 
+	if (thresholdNoPair < std::numeric_limits<double>::max())
+	{
+		spdlog::debug("Association threshold is {:.2f}", thresholdNoPair);
+	}
+
 	const auto type = readPhenotypingPointTypeFromString(phenotype);
 	// Load list of plants for running the triangulation
 	const auto [setup, plants_calibrated] = loadPhenotypingSetupAndPhenotypePoints(annotationFolderStr, type);
@@ -761,7 +767,7 @@ void runExportAnnotations(
 	for (int i = 0; i < static_cast<int>(plants_calibrated.size()); i++)
 	{
 		// Triangulate points of the plant
-		const auto [triangulatedPoints3D, setsOfCorrespondences] = triangulatePhenotypePoints(setup, plants_calibrated[i]);
+		const auto [triangulatedPoints3D, setsOfCorrespondences] = triangulatePhenotypePoints(setup, plants_calibrated[i], thresholdNoPair);
 		// Re-project points of the plant on views, and retain correspondences with 2D to draw matches in views
 		auto [plantPoints, plantMatches] = projectPhenotypePointsAndRetainMatches(setup,
 			                                                                      plants_calibrated[i],
@@ -1056,18 +1062,26 @@ int main(int argc, char *argv[])
 	}
 	else if (command == "export_annotations")
 	{
-		if (args.size() < 4)
+		if (args.size() < 5)
 		{
 			spdlog::error("Missing arguments for leaf counting");
 			spdlog::error("Argument 1: Path to the folder for the phenotyping setup.");
 			spdlog::error("Argument 2: Phenotype to triangulate and count (tips, junctions).");
-			spdlog::error("Argument 3: Path to the folder with images.");
-			spdlog::error("Argument 4: Path to the output folder.");
+			spdlog::error("Argument 3: Theta parameter in px (threshold above which two points cannot be matched).");
+			spdlog::error("Argument 4: Path to the folder with images.");
+			spdlog::error("Argument 5: Path to the output folder.");
 
 			return 1;
 		}
 
-		runExportAnnotations(args[0], args[1], args[2], args[3]);
+		// If theta is zero, set to to infinity
+		double thresholdNoPair = std::stod(args[2]);
+		if (thresholdNoPair <= 0.0)
+		{
+			thresholdNoPair = std::numeric_limits<double>::max();
+		}
+
+		runExportAnnotations(args[0], args[1], thresholdNoPair, args[3], args[4]);
 	}
 	else if (command == "measure_crocodile")
 	{
