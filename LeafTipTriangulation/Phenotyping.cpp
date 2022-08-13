@@ -980,7 +980,10 @@ bool drawPointsInImageWithMatches(
 
 	// The radius of points is 0.5% of the largest dimension of the image
 	const auto radius = std::max(image.rows, image.cols) / 200;
-	const auto thickness = radius / 2;
+	const auto thicknessPrediction = radius / 2;
+	// The radius of the annotation is slightly larger than the prediction
+	// to make sure it is visible when both are at the same location
+	const auto thicknessAnnotation = thicknessPrediction + 1;
 
 	for (const auto& point : annotationPoints)
 	{
@@ -988,7 +991,7 @@ bool drawPointsInImageWithMatches(
 		           cv::Point2d(point.x, static_cast<double>(image.rows) - point.y),
 		           radius,
 		           cv::Scalar(0, 0, 255),
-		           thickness);
+		           thicknessAnnotation);
 	}
 
 	for (const auto& point : projectionPoints)
@@ -997,7 +1000,7 @@ bool drawPointsInImageWithMatches(
 		           cv::Point2d(point.x, static_cast<double>(image.rows) - point.y),
 		           radius,
 		           cv::Scalar(255, 0, 0),
-		           thickness);
+		           thicknessPrediction);
 	}
 
 	// Display matches with lines between points
@@ -1011,7 +1014,7 @@ bool drawPointsInImageWithMatches(
 			cv::Point2d pt1(projectionPoints[i].x, static_cast<double>(image.rows) - projectionPoints[i].y);
 			cv::Point2d pt2(annotationPoints[indexMatch].x, static_cast<double>(image.rows) - annotationPoints[indexMatch].y);
 
-			cv::line(image, pt1, pt2, cv::Scalar(255, 0, 0), thickness);
+			cv::line(image, pt1, pt2, cv::Scalar(255, 0, 0), thicknessPrediction);
 		}
 	}
 
