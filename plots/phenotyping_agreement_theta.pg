@@ -15,5 +15,5 @@ set key top right
 plot filename using 1:15 every ::0::15 with lines lt 1 title "Baseline", \
      ''       using 1:8 every ::16::31 with lines lt 2 title "Theta = 200 px", \
      ''       using 1:8 every ::32::47 with lines lt 3 title "Theta = 500 px", \
-     ''       using 1:8 every ::48::63 with lines lt 4 title "Theta = 750 px", \
-     ''       using 1:8 every ::64::79 with lines lt 5 title "Theta = 1000 px",
+     ''       using 1:8 every ::48::63 with lines lt 4 title "Theta = 600 px", \
+     ''       using 1:8 every ::64::79 with lines lt 5 title "Theta = 750 px",
