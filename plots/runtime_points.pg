@@ -11,9 +11,9 @@ set logscale xy
 
 set key bottom right
 
-f(x) = a*x**4 + b*x**3 + c*x**2 + d*x
+f(x) = a*x**3 + b*x**2 + c*x + d
 fit f(x) filename using 1:4 via a, b, c, d
-abcd_value = sprintf("y = %.3e*x^4 + %.3e*x^3 + %.3e*x^2 + %.3e*x", a, b, c, d)
+abcd_value = sprintf("y = %.3e*x^3 + %.3e*x^1 + %.3e*x + %.3e", a, b, c, d)
 set label 1 at graph 0.02, graph 0.93 abcd_value
 
 plot f(x) linestyle 2 title 'Polynomial regression', \
