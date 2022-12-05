@@ -13,9 +13,19 @@ set style fill empty
 
 set key top right
 
-plot filename using 2:8 every ::1::6 with lines lt 1 title "Prob = 0%", \
-     ''       using 2:8 every ::15::20 with lines lt 2 title "Prob = 10%", \
-     ''       using 2:8 every ::29::34 with lines lt 3 title "Prob = 20%", \
-     ''       using 2:8 every ::43::48 with lines lt 4 title "Prob = 30%", \
-     ''       using 2:8 every ::57::62 with lines lt 5 title "Prob = 40%", \
-     ''       using 2:8 every ::71::76 with lines lt 6 title "Prob = 50%"
+plot filename using 2:8 every ::0::4 with lines lt 1 title "Prob = -10%", \
+     ''       using 2:8 every ::5::9 with lines lt 2 title "Prob = -8%", \
+     ''       using 2:8 every ::10::14 with lines lt 3 title "Prob = -6%", \
+     ''       using 2:8 every ::15::19 with lines lt 4 title "Prob = -4%", \
+     ''       using 2:8 every ::20::24 with lines lt 5 title "Prob = -2%", \
+     ''       using 2:8 every ::25::29 with lines lt 6 title "Prob = 0%", \
+     ''       using 2:8 every ::30::34 with lines lt 7 title "Prob = 5%", \
+     ''       using 2:8 every ::35::39 with lines lt 8 title "Prob = 10%", \
+     ''       using 2:8 every ::40::44 with lines lt 9 title "Prob = 15%", \
+     ''       using 2:8 every ::45::49 with lines lt 10 title "Prob = 20%", \
+     ''       using 2:8 every ::50::54 with lines lt 11 title "Prob = 25%", \
+     ''       using 2:8 every ::55::59 with lines lt 12 title "Prob = 30%", \
+     ''       using 2:8 every ::60::64 with lines lt 13 title "Prob = 35%", \
+     ''       using 2:8 every ::65::69 with lines lt 14 title "Prob = 40%", \
+     ''       using 2:8 every ::70::74 with lines lt 15 title "Prob = 45%", \
+     ''       using 2:8 every ::75::79 with lines lt 16 title "Prob = 50%"
