@@ -16,8 +16,8 @@ set style fill empty
 
 set key top right
 
-plot filename using 1:15 with line lt 2 title "Baseline (max # of leaves visible from one view)", \
-     ''       using 1:15:16 with yerrorbars lt 2 pt 0 notitle, \
+plot filename using 1:22 with line lt 2 title "Baseline (max # of leaves visible from one view)", \
+     ''       using 1:22:23 with yerrorbars lt 2 pt 0 notitle, \
      filename using 1:4:3:7:6 with candlesticks lt -1 notitle whiskerbars 0.75, \
      ''       using 1:5:5:5:5 with candlesticks lt -1 notitle, \
      filename using 1:8 with line lt 1 title "Result of our approach"

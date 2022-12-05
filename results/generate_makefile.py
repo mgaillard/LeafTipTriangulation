@@ -251,7 +251,7 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
             for probability, aggregateSeedsResultFile in zip(probabilities, allAggregateSeedsResultFile):
                 probabilityStr = integerProbabilityStr(probability)
                 rule.addRecipe("printf '%s\t%s\t' {} {:d} >> {}".format(probabilityStr, theta, aggregateProbabilitiesAndSeedsResultFile))
-                rule.addRecipe('$(PROGRAM_DATAMASH) min 3 q1 3 median 3 q3 3 max 3 mean 3 sstdev 3 < {} >> {}'.format(aggregateSeedsResultFile, aggregateProbabilitiesAndSeedsResultFile))
+                rule.addRecipe('$(PROGRAM_DATAMASH) min 3 q1 3 median 3 q3 3 max 3 mean 3 sstdev 3 min 2 q1 2 median 2 q3 2 max 2 mean 2 sstdev 2 < {} >> {}'.format(aggregateSeedsResultFile, aggregateProbabilitiesAndSeedsResultFile))
             rule.print()
 
             # Rule to aggregate the baseline results from all probabilities
@@ -261,7 +261,7 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
             rule.addRecipe('> {}'.format(aggregateProbabilitiesAndSeedsResultBaseFile)) # Clear the result file
             for probability, aggregateSeedsResultBaseFile in zip(probabilities, allAggregateSeedsResultBaseFile):
                 probabilityStr = integerProbabilityStr(probability)
-                rule.addRecipe('$(PROGRAM_DATAMASH) min 3 q1 3 median 3 q3 3 max 3 mean 3 sstdev 3 < {} >> {}'.format(aggregateSeedsResultBaseFile, aggregateProbabilitiesAndSeedsResultBaseFile))
+                rule.addRecipe('$(PROGRAM_DATAMASH) min 3 q1 3 median 3 q3 3 max 3 mean 3 sstdev 3 min 2 q1 2 median 2 q3 2 max 2 mean 2 sstdev 2 < {} >> {}'.format(aggregateSeedsResultBaseFile, aggregateProbabilitiesAndSeedsResultBaseFile))
             rule.print()
 
             # Rule to merge the results and baseline into the same file
