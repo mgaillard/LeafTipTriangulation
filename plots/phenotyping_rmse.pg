@@ -1,0 +1,22 @@
+#!/usr/bin/gnuplot
+reset
+set terminal pdf
+
+set xlabel 'Percentage of annotation points discarded'
+set ylabel 'Root Mean Squared Error (RMSE)'
+
+set grid ytics
+
+set xrange [-10:51]
+
+set boxwidth 0.5
+set errorbars 1.0
+set style fill empty
+
+set key top right
+
+plot filename using 1:29 with line lt 2 title "Baseline (max # of leaves visible from one view)", \
+     ''       using 1:29:30 with yerrorbars lt 2 pt 0 notitle, \
+     filename using 1:11:10:14:13 with candlesticks lt -1 notitle whiskerbars 0.75, \
+     ''       using 1:12:12:12:12 with candlesticks lt -1 notitle, \
+     filename using 1:15 with line lt 1 title "Result of our approach"

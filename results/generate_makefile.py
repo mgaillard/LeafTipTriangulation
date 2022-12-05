@@ -90,6 +90,14 @@ def agreementProbabilityGraph(directory):
     return '{}_agreement_prob.pdf'.format(directory)
 
 
+def rmseGraph(directory, theta):
+    return '{}_rmse_{:d}.pdf'.format(directory, theta)
+
+
+def rmseThetaGraph(directory):
+    return '{}_rmse_theta.pdf'.format(directory)
+
+
 class MakeRule:
     def __init__(self):
         self.targets = []
@@ -281,6 +289,15 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
             rule.addRecipe('gnuplot -e "filename=\'{}\'" "../plots/phenotyping_agreement.pg" > {}'.format(aggregateProbabilitiesAndSeedsResultAllFile, agreementGraphFile))
             rule.print()
 
+            rmseGraphFile = rmseGraph(directory, theta)
+            graphFiles.append(rmseGraphFile)
+            # Rule to generate a graph for the specific value of theta
+            rule = MakeRule()
+            rule.addTarget(rmseGraphFile)
+            rule.addDependency(aggregateProbabilitiesAndSeedsResultAllFile)
+            rule.addRecipe('gnuplot -e "filename=\'{}\'" "../plots/phenotyping_rmse.pg" > {}'.format(aggregateProbabilitiesAndSeedsResultAllFile, rmseGraphFile))
+            rule.print()
+
         # Rule to merge all results for all theta values
         rule = MakeRule()
         rule.addTarget(currentResultAllFile)
@@ -292,6 +309,7 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
 
         agreementThetaGraphFile = agreementThetaGraph(directory)
         agreementProbabilityGraphFile = agreementProbabilityGraph(directory)
+        rmseThetaGraphFile = rmseThetaGraph(directory)
 
         graphFiles.append(agreementThetaGraphFile)
         graphFiles.append(agreementProbabilityGraphFile)
@@ -301,6 +319,12 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
         rule.addTarget(agreementThetaGraphFile)
         rule.addDependency(currentResultAllFile)
         rule.addRecipe('gnuplot -e "filename=\'{}\'" "../plots/phenotyping_agreement_theta.pg" > {}'.format(currentResultAllFile, agreementThetaGraphFile))
+        rule.print()
+
+        rule = MakeRule()
+        rule.addTarget(rmseThetaGraphFile)
+        rule.addDependency(currentResultAllFile)
+        rule.addRecipe('gnuplot -e "filename=\'{}\'" "../plots/phenotyping_rmse_theta.pg" > {}'.format(currentResultAllFile, rmseThetaGraphFile))
         rule.print()
 
         rule = MakeRule()
