@@ -313,6 +313,7 @@ def writeAllLeafCountingRuns(directories, thetas, probabilities, seeds):
 
         graphFiles.append(agreementThetaGraphFile)
         graphFiles.append(agreementProbabilityGraphFile)
+        graphFiles.append(rmseThetaGraphFile)
 
         # Rule to generate graphs
         rule = MakeRule()
