@@ -12,7 +12,7 @@ More generally, triangulation of 3D points:
 
 ## Please cite our work
 
-> Mathieu Gaillard and Bedrich Benes and Michael C. Tross and James C. Schnable. (2023). **Multi-view triangulation without correspondences**. Computers and Electronics in Agriculture (COMPAG).
+> Mathieu Gaillard, Bedrich Benes, Michael C. Tross, James C. Schnable. (2023). **Multi-view triangulation without correspondences**. Computers and Electronics in Agriculture (COMPAG).
 
 ```
 @article{Gaillard23COMPAG,
