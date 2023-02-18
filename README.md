@@ -10,6 +10,25 @@ More generally, triangulation of 3D points:
 - without correspondences
 - without assuming a rigid motion of points between views
 
+## Please cite our work
+
+> Mathieu Gaillard and Bedrich Benes and Michael C. Tross and James C. Schnable. (2023). **Multi-view triangulation without correspondences**. Computers and Electronics in Agriculture (COMPAG).
+
+```
+@article{Gaillard23COMPAG,
+  title = {Multi-view triangulation without correspondences},
+  author = {Mathieu Gaillard and Bedrich Benes and Michael C. Tross and James C. Schnable},
+  journal = {Computers and Electronics in Agriculture},
+  volume = {206},
+  pages = {107688},
+  year = {2023},
+  issn = {0168-1699},
+  doi = {10.1016/j.compag.2023.107688},
+  url = {https://www.sciencedirect.com/science/article/pii/S0168169923000765},
+  keywords = {High-throughput phenotyping, Multi-view 3D reconstruction, Sorghum leaf counting},
+}
+```
+
 ## Related work
 > Cheng, Y. Q., Collins, R., Hanson, A., & Riseman, E. (1994, November). Triangulation without correspondences. In *DARPA Image Understanding Workshop (IUW)*.
 
@@ -29,15 +48,6 @@ $ pip install -r LeafTipTriangulationPython/requirements.txt
 # Run the leaf counting
 $ cd ..
 $ bash run_phenotyping.sh
-```
-
-## Run the software on the Purdue RCAC cluster
-```bash
-# Run from the root of the repository
-# Compile
-$ bash jobs/compile.sh
-# Run the phenotyping example
-$ sbatch -A standby jobs/run_phenotyping.sub
 ```
 
 ## Run the software using Python
